@@ -1,0 +1,267 @@
+/* ===================================================================
+   TOP PEP — catalog data.
+   EUR prices from ENGLISH_TOP_Pep.pdf, RON (lei) prices from RO_TOP.pdf,
+   Janoshik COA test images from /Janotest, product photos from
+   /Produktbilder. Categories: Peptides / Capsules / Lab Supplies / Topicals.
+=================================================================== */
+(function () {
+  'use strict';
+
+  /* currency follows language: Romanian → lei, else → euro */
+  var CUR = (localStorage.getItem('toppep_lang') === 'ro') ? 'ron' : 'eur';
+
+  function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
+  var IMG = '/Produktbilder/', COA = '/Janotest/';
+
+  function P(o) {
+    o.category = o.category || 'Peptides';
+    o.purity = o.purity || '≥99%';
+    o.form = o.form || 'Lyophilized powder';
+    o.type = o.options ? 'variable' : 'simple';
+    o.full = o.full || o.name;
+    o.aliases = o.aliases || [];
+    return o;
+  }
+
+  var products = [
+    P({ slug: 'tirzepatide', name: 'GLP2-TZ', full: 'Tirzepatide (Mounjaro)', group: 'GLP-1', stock: 40,
+        img: IMG + 'GLP2-TZ 5mg.png', aliases: ['tirzepatide', 'mounjaro', 'glp2', 'glp-2', 'tz', 'tirzep'],
+        options: [ {label:'5 mg',price:60,ron:313.99}, {label:'10 mg',price:74.99,ron:392.99}, {label:'15 mg',price:119.99,ron:627.99}, {label:'20 mg',price:140,ron:732.99}, {label:'30 mg',price:155,ron:811.99}, {label:'60 mg',price:240,ron:1256.99} ],
+        blurb: 'Dual GIP / GLP-1 receptor agonist studied in metabolic-signalling research. Supplied lyophilized for reconstitution.' }),
+    P({ slug: 'semaglutide', name: 'GLP1-SM', full: 'Semaglutide (Ozempic/Wegovy)', group: 'GLP-1', stock: 34, onSale: true,
+        img: IMG + 'GLP1-SM 5mg.png', aliases: ['semaglutide', 'ozempic', 'wegovy', 'glp1', 'glp-1', 'sm', 'sema'],
+        options: [ {label:'5 mg',price:55,ron:287.99}, {label:'10 mg',price:75,ron:392.99}, {label:'15 mg',price:95,ron:496.99}, {label:'20 mg',price:115,ron:601.99} ],
+        blurb: 'GLP-1 receptor agonist analog for metabolic-pathway research use only.' }),
+    P({ slug: 'retatrutide', name: 'GLP-3 RT', full: 'Retatrutide', group: 'GLP-1', stock: 22, bestSeller: true,
+        img: IMG + 'GLP-3 RT 5mg.png', aliases: ['retatrutide', 'glp3', 'glp-3', 'rt', 'reta'],
+        options: [ {label:'5 mg',price:54.99,ron:287.99}, {label:'10 mg',price:79.99,ron:418.99}, {label:'15 mg',price:119.99,ron:627.99}, {label:'20 mg',price:129.99,ron:680.99} ],
+        blurb: 'Triple agonist studied across GIP, GLP-1 and glucagon receptor activity.' }),
+    P({ slug: 'cagrilintide', name: 'Cagrilintide', group: 'GLP-1', size: '10 mg', price: 119.99, ron: 627.99, stock: 18,
+        img: IMG + 'Cagrilintide 10mg.png',
+        blurb: 'Long-acting amylin analog investigated in appetite- and metabolic-regulation research.' }),
+
+    P({ slug: 'hgh-somatropin', name: 'HGH — Somatropin', full: 'HGH 191aa Somatropin', group: 'Growth Hormone', stock: 26,
+        img: IMG + 'HGH - Somatropin 15IU.png', coaImg: COA + 'HGH Somatropin .png', aliases: ['hgh', 'somatropin', '191aa', 'growth hormone'],
+        options: [ {label:'15 IU',price:99.99,ron:523.99}, {label:'24 IU',price:149.99,ron:784.99} ],
+        blurb: 'Recombinant somatropin supplied lyophilized for growth-hormone pathway research.' }),
+    P({ slug: 'hcg', name: 'HCG', group: 'Growth Hormone', size: '5000 IU', price: 69.99, ron: 365.99, stock: 30,
+        img: IMG + 'HCG 5000IU.png', coaImg: COA + 'HCG.png', aliases: ['hcg', 'gonadotropin'],
+        blurb: 'Human chorionic gonadotropin for endocrine-signalling research use.' }),
+    P({ slug: 'cjc-1295-no-dac', name: 'CJC-1295 (no DAC)', group: 'Growth Hormone', size: '10 mg', price: 64.99, ron: 339.99, stock: 44,
+        img: IMG + 'CJC-1295 (no DAC) 10mg.png', aliases: ['cjc', 'cjc1295', 'cjc-1295'],
+        blurb: 'GHRH analog without DAC, studied for short-acting secretagogue activity.' }),
+    P({ slug: 'cjc-1295-with-dac', name: 'CJC-1295 (with DAC)', group: 'Growth Hormone', size: '10 mg', price: 149.99, ron: 784.99, stock: 21,
+        img: IMG + 'CJC-1295 (with DAC) 10mg.png', aliases: ['cjc', 'cjc1295', 'cjc-1295', 'dac'],
+        blurb: 'GHRH analog with drug-affinity complex for extended half-life research.' }),
+    P({ slug: 'cjc-1295-ipamorelin', name: 'CJC-1295 (no DAC) + Ipamorelin', group: 'Growth Hormone', size: '5 / 5 mg', price: 74.99, ron: 392.99, stock: 33,
+        form: 'Lyophilized blend', onSale: true, img: IMG + 'CJC-1295 (no DAC) + Ipamorelin 5mg-5mg.png', coaImg: COA + 'CJC-1295 (no DAC) + Ipamorelin.png', aliases: ['cjc', 'ipamorelin', 'cp10', 'blend'],
+        blurb: 'Pre-combined secretagogue blend in a single vial for comparative studies.' }),
+    P({ slug: 'ipamorelin', name: 'Ipamorelin', group: 'Growth Hormone', size: '10 mg', price: 74.99, ron: 392.99, stock: 52, onSale: true,
+        img: IMG + 'Ipamorelin 10mg.png', aliases: ['ipamorelin', 'ipa'],
+        blurb: 'Selective growth-hormone secretagogue with a clean receptor profile.' }),
+    P({ slug: 'tesamorelin', name: 'Tesamorelin', group: 'Growth Hormone', size: '10 mg', price: 85, ron: 444.99, stock: 46, onSale: true,
+        img: IMG + 'Tesamorelin 10mg.png', aliases: ['tesamorelin', 'tesa'],
+        blurb: 'GHRH analog used to study growth-hormone releasing pathways.' }),
+    P({ slug: 'sermorelin', name: 'Sermorelin', group: 'Growth Hormone', size: '10 mg', price: 129.99, ron: 680.99, stock: 24,
+        img: IMG + 'Sermorelin 10mg.png', aliases: ['sermorelin'],
+        blurb: 'GHRH (1–29) fragment studied for endogenous secretagogue signalling.' }),
+    P({ slug: 'igf1-lr3', name: 'IGF1-LR3', group: 'Growth Hormone', size: '1 mg', price: 89.99, ron: 470.99, stock: 19,
+        img: IMG + 'IGF1-LR3 1mg.png', aliases: ['igf', 'igf1', 'igf-1', 'lr3'],
+        blurb: 'Long-arg-3 IGF-1 analog investigated in cellular growth research.' }),
+
+    P({ slug: 'bpc-157', name: 'BPC-157', group: 'Recovery', size: '10 mg', price: 44.99, ron: 235.99, stock: 70, onSale: true,
+        img: IMG + 'BPC-157 10mg.png', coaImg: COA + 'BPC-157.png', aliases: ['bpc', 'bpc157', 'bpc-157'],
+        blurb: 'Stable gastric pentadecapeptide studied for tissue-repair signalling.' }),
+    P({ slug: 'tb-500', name: 'TB-500', group: 'Recovery', size: '10 mg', price: 44.99, ron: 235.99, stock: 58,
+        img: IMG + 'TB-500 10mg.png', aliases: ['tb', 'tb500', 'tb-500', 'thymosin beta'],
+        blurb: 'Synthetic thymosin beta-4 fragment studied in actin regulation and motility.' }),
+    P({ slug: 'bpc-157-tb-500', name: 'Wolverine Blend (BPC-157/TB-500)', group: 'Recovery', size: '5 / 5 mg', price: 79.99, ron: 418.99, stock: 36,
+        form: 'Lyophilized blend', img: IMG + 'BPC-157 + TB-500 (Blend) 10mg.png', aliases: ['bpc', 'tb500', 'blend', 'wolverine'],
+        blurb: 'Combined repair blend in one vial for comparative recovery research.' }),
+    P({ slug: 'glow-blend', name: 'GLOW Blend (GHK-Cu + TB-500 + BPC-157)', group: 'Recovery', size: '50 mg', price: 99, ron: 517.99, stock: 27,
+        form: 'Lyophilized blend', onSale: true, img: IMG + 'GLOW Blend (GHK-Cu + TB-500 + BPC-157) 50mg.png', aliases: ['glow', 'ghk', 'tb500', 'bpc'],
+        blurb: 'Three-peptide blend combining GHK-Cu, TB-500 and BPC-157 for multi-target study.' }),
+    P({ slug: 'ss-31', name: 'SS-31', full: 'SS-31 (Elamipretide)', group: 'Recovery', size: '10 mg', price: 55.99, ron: 292.99, stock: 31,
+        img: IMG + 'SS-31 10mg.png', coaImg: COA + 'SS-31 (Elamipretide).png', aliases: ['ss-31', 'ss31', 'elamipretide', '2s10'],
+        blurb: 'Mitochondria-targeted peptide investigated in cellular-stress research.' }),
+
+    P({ slug: 'mots-c', name: 'MOTS-c', group: 'Longevity', size: '10 mg', price: 64.99, ron: 339.99, stock: 37,
+        img: IMG + 'MOTS-c 10mg.png', aliases: ['mots', 'motsc', 'mots-c'],
+        blurb: 'Mitochondrial-derived peptide studied in metabolic-homeostasis research.' }),
+    P({ slug: 'thymosin-alpha-1', name: 'Thymosin Alpha-1', group: 'Longevity', size: '10 mg', price: 159.99, ron: 837.99, stock: 16,
+        img: IMG + 'Thymosin Alpha-1 10mg.png', aliases: ['thymosin', 'alpha-1', 'ta1'],
+        blurb: 'Immune-modulating peptide investigated in cellular defense research.' }),
+    P({ slug: 'epitalon', name: 'Epitalon', full: 'Epithalon', group: 'Longevity', size: '10 mg', price: 64.99, ron: 339.99, stock: 33,
+        img: IMG + 'Epitalon 10mg.png', aliases: ['epitalon', 'epithalon'],
+        blurb: 'Tetrapeptide studied for telomerase and circadian-regulation research.' }),
+
+    P({ slug: 'semax', name: 'Semax', group: 'Neuro', size: '10 mg', price: 39.99, ron: 208.99, stock: 48,
+        img: IMG + 'Semax 10mg.png', coaImg: COA + 'Semax.png', aliases: ['semax', 'xa10'],
+        blurb: 'Neuropeptide fragment investigated in cognitive- and neuro-protection research.' }),
+    P({ slug: 'selank', name: 'Selank', group: 'Neuro', size: '10 mg', price: 39.99, ron: 208.99, stock: 45,
+        img: IMG + 'Selank 10mg.png', aliases: ['selank'],
+        blurb: 'Synthetic analog of tuftsin studied in anxiolytic and neuro-signalling research.' }),
+    P({ slug: 'dsip', name: 'DSIP', group: 'Neuro', size: '10 mg', price: 59.99, ron: 313.99, stock: 29,
+        img: IMG + 'DSIP 10mg.png', aliases: ['dsip', 'delta sleep'],
+        blurb: 'Delta sleep-inducing peptide investigated in neuro-regulation research.' }),
+    P({ slug: 'nad-plus', name: 'NAD+', group: 'Cellular', size: '500 mg', price: 74.99, ron: 392.99, stock: 41,
+        img: IMG + 'NAD+ 500mg.png', coaImg: COA + 'NAD+.png', aliases: ['nad', 'nad+', 'nj500'],
+        blurb: 'Nicotinamide adenine dinucleotide studied in cellular-energy research.' }),
+    P({ slug: 'pt-141', name: 'PT-141 (Bremelanotide)', group: 'Neuro', size: '10 mg', price: 69.99, ron: 365.99, stock: 34,
+        img: IMG + 'PT-141 (Bremelanotide) 10mg.png', aliases: ['pt-141', 'pt141', 'bremelanotide'],
+        blurb: 'Melanocortin-agonist peptide investigated in neuro-behavioural research.' }),
+    P({ slug: 'kpv', name: 'KPV', group: 'Recovery', size: '10 mg', price: 49.99, ron: 261.99, stock: 39,
+        img: IMG + 'KPV 10mg.png', coaImg: COA + 'KPV.png', aliases: ['kpv', 'kpv10'],
+        blurb: 'Alpha-MSH tripeptide fragment studied for anti-inflammatory signalling.' }),
+
+    P({ slug: 'ghk-cu', name: 'GHK-Cu', group: 'Cosmetic', stock: 55, onSale: true, img: IMG + 'GHK-Cu 50mg.png',
+        aliases: ['ghk', 'ghk-cu', 'ghkcu', 'copper peptide'],
+        options: [ {label:'50 mg',price:44.99,ron:235.99}, {label:'100 mg',price:74.99,ron:392.99} ],
+        blurb: 'Copper-binding tripeptide investigated in dermal and matrix-remodelling research.' }),
+    P({ slug: 'mt-2', name: 'MT-2 (Melanotan 2)', group: 'Cosmetic', size: '10 mg', price: 34.99, ron: 182.99, stock: 47, onSale: true,
+        img: IMG + 'MT-2 (Melanotan 2) 10mg.png', aliases: ['mt-2', 'mt2', 'melanotan'],
+        blurb: 'Melanocortin analog studied in pigmentation-pathway research.' }),
+
+    P({ slug: 'ghk-cu-serum', name: 'GHK-Cu Topical Serum', nameI18n: { de: 'GHK-CU Hautserum', ro: 'GHK-CU Ser Topical' },
+        category: 'Topicals', group: 'Cosmetic', img: IMG + 'GHK-Cu Topical Serum 30ml.png',
+        size: '30 ml', price: 70, ron: 366.99, stock: 44, form: 'Topical solution', purity: 'GHK-Cu formulation',
+        aliases: ['ghk', 'serum', 'topical', 'copper serum', 'hautserum', 'ser topical'],
+        blurb: 'Ready-to-use GHK-Cu topical serum for dermal research applications. 30 ml pump bottle.' }),
+
+    P({ slug: 'bacteriostatic-water', name: 'Bacteriostatic Water', category: 'Lab Supplies', group: 'Lab Supplies',
+        img: IMG + 'Bacteriostatic Water 10mg.png', purity: '0.9% benzyl alcohol', form: 'Multi-dose vial', stock: 120,
+        aliases: ['bacteriostatic', 'bac water', 'water', 'diluent', 'apa'],
+        options: [ {label:'3 ml',price:4.99,ron:25.99}, {label:'10 ml',price:14.99,ron:77.99} ],
+        blurb: 'Sterile diluent for reconstituting lyophilized research compounds.' })
+  ];
+
+  /* Janoshik verify links = the exact URL encoded in each report's QR code.
+     Products tested at more than one size carry multiple entries so the
+     COA page/lightbox can show every version. */
+  var coaTests = {
+    'bpc-157': [ { key: '134773_SXRU8P27IINC', img: 'BPC-157 10mg.png' } ],
+    'bpc-157-tb-500': [ { key: '171862_FTCNR7UJ9HR2', img: 'BPC-157+TB-500 Blend (BPC-157 10mg + TB-500 10mg).jpg' } ],
+    'cjc-1295-ipamorelin': [ { key: '134761_6LSBGXVE9K3I', img: 'CJC-1295 5mg + Ipamorelin 5mg.png' } ],
+    'hcg': [ { key: '134737_M5J3ZWUXXICC', img: 'HCG 5000iu.png' } ],
+    'hgh-somatropin': [
+      { size: '24 IU', key: '134743_T1QYZRF3SVMR', img: 'HGH Somatropin 24iu.jpg' },
+      { size: '36 IU', key: '196501_7P3BUC28NMDS', img: 'HGH Somatropin 36iu.jpg' }
+    ],
+    'kpv': [ { key: '134785_N5NVAXK9D3ZB', img: 'KPV 10mg.png' } ],
+    'nad-plus': [ { key: '134767_7ZKAA2Y98UKQ', img: 'NAD+ 500mg.png' } ],
+    'retatrutide': [
+      { size: '20 mg', key: '172889_47I323J3CHI7', img: 'Retatrutide 20mg.jpg' },
+      { size: '50 mg', key: '134797_NQ9N7A4WDXSR', img: 'Retatrutide 50mg.jpg' }
+    ],
+    'ss-31': [
+      { size: '10 mg', key: '134779_STQDEYPSY362', img: 'SS-31 10mg.jpg' },
+      { size: '50 mg', key: '170060_9UY94DQ5H5JT', img: 'SS-31 50mg.jpg' }
+    ],
+    'semaglutide': [ { key: '134803_3KE3LHFLV4RK', img: 'Semaglutide 20mg.png' } ],
+    'semax': [ { key: '134755_TUN8DULLLKGC', img: 'Semax 10mg.png' } ],
+    'tirzepatide': [
+      { size: '20 mg', key: '172892_I6ZGAYMMFEFZ', img: 'Tirzepatide 20mg.jpg' },
+      { size: '30 mg', key: '171860_M1ZLSLX8MHXD', img: 'Tirzepatide 30mg.jpg' },
+      { size: '60 mg', key: '134791_V58DY41VZICX', img: 'Tirzepatide 60mg.jpg' }
+    ]
+  };
+  function buildTests(tests) {
+    return tests.map(function (tst) {
+      return { size: tst.size || '', task: tst.key.split('_')[0], url: 'https://verify.janoshik.com/tests/' + tst.key, img: COA + tst.img };
+    });
+  }
+  products.forEach(function (p) {
+    var tests = coaTests[p.slug];
+    if (!tests) return;
+    var full = buildTests(tests);
+    p.coaAll = full;
+    p.coa = full[full.length - 1];
+  });
+
+  /* AHK-Cu is tested by Janoshik but not (yet) a catalog product — it still
+     gets its own entry in the COA library. */
+  var ahkTests = buildTests([{ size: '100 mg', key: '171867_RDW1G7KHKBQP', img: 'AHK-Cu 100mg.jpg' }]);
+  var extraCoas = [
+    { slug: 'ahk-cu', name: 'AHK-Cu', category: 'Peptides', order: 50, coaAll: ahkTests, coa: ahkTests[0] }
+  ];
+
+  /* per-size product photos so the product page can swap image on size change */
+  var optBase = { 'tirzepatide': 'GLP2-TZ', 'semaglutide': 'GLP1-SM', 'retatrutide': 'GLP-3 RT', 'ghk-cu': 'GHK-Cu', 'hgh-somatropin': 'HGH - Somatropin' };
+  products.forEach(function (p) {
+    if (p.type !== 'variable' || !optBase[p.slug]) return;
+    p.options.forEach(function (o) { o.img = IMG + optBase[p.slug] + ' ' + o.label.replace(/\s/g, '') + '.png'; });
+  });
+  (function () {
+    var bw = products.filter(function (p) { return p.slug === 'bacteriostatic-water'; })[0];
+    if (bw) { bw.options[0].img = IMG + 'Bacteriostatic Water 3ml.png'; bw.options[1].img = IMG + 'Bacteriostatic Water 10mg.png'; }
+  })();
+
+  /* lot numbers (used by the live bottom search + shown on cards) */
+  products.forEach(function (p, i) {
+    p.lot = 'TP' + p.slug.replace(/[^a-z0-9]/gi, '').slice(0, 6).toUpperCase() + (2001 + i * 3);
+  });
+
+  /* apply 10% sale to on-sale products (both currencies) */
+  function r2(n) { return Math.round(n * 100) / 100; }
+  products.forEach(function (p) {
+    if (!p.onSale) return;
+    if (p.type === 'variable') p.options.forEach(function (o) { o.oldPrice = o.price; o.oldRon = o.ron; o.price = r2(o.price * 0.9); o.ron = r2(o.ron * 0.9); });
+    else { p.oldPrice = p.price; p.oldRon = p.ron; p.price = r2(p.price * 0.9); p.ron = r2(p.ron * 0.9); }
+  });
+
+  var shopOrder = ['retatrutide', 'tirzepatide', 'bacteriostatic-water', 'ghk-cu', 'ghk-cu-serum',
+    'tesamorelin', 'glow-blend', 'cjc-1295-ipamorelin', 'mots-c', 'kpv', 'mt-2', 'semax', 'selank', 'semaglutide'];
+  products.forEach(function (p) { var i = shopOrder.indexOf(p.slug); p.order = i === -1 ? 100 - (p.stock / 10) : i; });
+
+  var faqs = [
+    { q: 'What does “for research use only” mean?', a: 'Every product listed is intended strictly for in-vitro laboratory research and analytical work. Nothing we sell is a drug, supplement, or medical product, and none of it is for human or veterinary use, consumption, or administration.' },
+    { q: 'Is a Certificate of Analysis included?', a: 'Yes. Tested lots ship with a lot-matched, third-party Janoshik COA that you can verify by task number in our COA library. Compounds still in testing are listed as “in testing”, with the report published as soon as it lands.' },
+    { q: 'How is my order packaged and shipped?', a: 'Orders are packed discreetly with no branding on the outside, cold-packed where the compound requires it, and dispatched quickly with tracked shipping.' },
+    { q: 'How should I store lyophilized peptides?', a: 'Sealed lyophilized vials are stable at –20 °C away from light. Once reconstituted with bacteriostatic water, keep refrigerated and use within the window appropriate to your protocol.' },
+    { q: 'Do you offer sizes or peptides that aren’t listed?', a: 'Often, yes. If you need a specific peptide or size that isn’t in the catalog, contact us on Telegram @TOP_Pep for availability and pricing.' },
+    { q: 'What payment methods do you accept?', a: 'Several payment methods are available at checkout. All payment data is handled by the processor; we never store card details.' }
+  ];
+
+  var strip = function (s) { return (s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); };
+  var num = function (s) { return s.replace(/[^0-9.]/g, ''); };
+  function val(x) { return CUR === 'ron' ? x.ron : x.price; }
+  function fmt(n) { return CUR === 'ron' ? n.toFixed(2) + ' Lei' : n.toFixed(2) + '€'; }
+
+  window.TOPPEP = {
+    products: products,
+    coas: products.filter(function (p) { return p.category !== 'Lab Supplies'; }).concat(extraCoas),
+    faqs: faqs,
+    categories: ['Peptides', 'Capsules', 'Lab Supplies', 'Topicals'],
+    featured: ['retatrutide', 'tirzepatide', 'ghk-cu', 'bpc-157', 'glow-blend', 'semaglutide'],
+    currency: CUR,
+    freeShip: CUR === 'ron' ? 1230 : 250,
+    shipCost: CUR === 'ron' ? 35 : 15.90,
+    telegram: '@TOP_Pep',
+    janoshikBlur: '/janoshikblur.png',
+    strip: strip,
+    imgUrl: function (path) { return enc(path); },
+    bySlug: function (slug) { return products.filter(function (p) { return p.slug === slug; })[0]; },
+    bacWater10: function () { var w = window.TOPPEP.bySlug('bacteriostatic-water'); return { product: w, option: w.options[1] }; },
+    valOf: val,
+    priceOf: function (p) {
+      if (p.type === 'variable') return Math.min.apply(null, p.options.map(val));
+      return val(p);
+    },
+    priceLabel: function (p) {
+      if (p.type === 'variable') {
+        var vs = p.options.map(val);
+        return fmt(Math.min.apply(null, vs)) + ' – ' + fmt(Math.max.apply(null, vs));
+      }
+      return fmt(val(p));
+    },
+    sizeLabel: function (p) {
+      if (p.type === 'variable') {
+        var labs = p.options.map(function (o) { return o.label; });
+        var unit = labs[0].replace(/[0-9.,\/\s]/g, '');
+        return num(labs[0]) + '–' + num(labs[labs.length - 1]) + ' ' + unit;
+      }
+      return p.size;
+    },
+    money: fmt
+  };
+})();

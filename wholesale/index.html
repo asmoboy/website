@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wholesale — TOP Pep</title>
+<meta name="description" content="Standing wholesale accounts with fixed volume pricing, batch-level COAs, and dispatch priority for clinics, resellers and research groups.">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=8">
+</head>
+<body data-page="wholesale">
+<a class="skip-link" href="#main">Skip to content</a>
+<main id="main">
+
+  <!-- WHOLESALE HERO -->
+  <section class="dark-split" aria-label="Wholesale">
+    <div class="ds-copy">
+      <span class="ds-eyebrow" data-i18n="wh_eb1">Wholesale &amp; volume</span>
+      <h2 data-i18n="wh_h1">Ordering<br>in volume?</h2>
+      <p data-i18n="wh_p1">Clinics, resellers, and research groups get standing accounts with fixed volume pricing, full COA documentation on every batch, and dispatch priority ahead of retail orders. Send us your monthly volume and we’ll put together a program.</p>
+      <div class="ds-stats">
+        <div><div class="v">10+</div><div class="l" data-i18n="wh_s1">Units per order</div></div>
+        <div><div class="v">Net 14</div><div class="l" data-i18n="wh_s2">Approved accounts</div></div>
+        <div><div class="v">24h</div><div class="l" data-i18n="wh_s3">Average dispatch</div></div>
+      </div>
+      <div class="ds-cta"><a class="btn btn-accent-ghost" href="#wholesale-request" data-i18n="wh_cta">Request wholesale pricing</a></div>
+    </div>
+    <div class="ds-media" role="img" aria-label="Product case" style="background-image:url('/ordering.png');"></div>
+  </section>
+
+  <!-- PROGRAM FEATURES -->
+  <section class="dark-split" aria-label="How wholesale works">
+    <div class="ds-copy">
+      <span class="ds-eyebrow" data-i18n="wh_eb2">How it works</span>
+      <h2 data-i18n="wh_h2">Scaled to what you order</h2>
+      <ul class="ds-checklist">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l5 5L20 6"/></svg><span data-i18n="wh_c1"><b>Tiered pricing</b> starting at 15 units</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l5 5L20 6"/></svg><span data-i18n="wh_c2"><b>Direct contact person</b> for order handling</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l5 5L20 6"/></svg><span data-i18n="wh_c3"><b>Batch-level COAs</b> included per shipment</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l5 5L20 6"/></svg><span data-i18n="wh_c4"><b>Flexible payment terms</b> for verified partners</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12l5 5L20 6"/></svg><span data-i18n="wh_c5"><b>Recurring supply slots</b> for regular buyers</span></li>
+      </ul>
+    </div>
+    <div class="ds-media" role="img" aria-label="Packaging" style="background-image:url('/Scaled.png');"></div>
+  </section>
+
+  <!-- REQUEST FORM -->
+  <section class="wholesale-form-section" id="wholesale-request">
+    <div class="wf-card">
+      <div class="ds-eyebrow" data-i18n="wh_feb">Get in touch</div>
+      <h2 data-i18n="wh_fh">Set up your account</h2>
+      <p data-i18n="wh_fp">Share your product interest, expected monthly volume, and order frequency — accounts are reviewed manually before pricing is released.</p>
+      <form class="wf-form" id="wholesaleForm" novalidate>
+        <div class="wf-row">
+          <input type="text" id="wfFirst" name="firstName" placeholder="First name" data-i18n-ph="ph_first" required aria-label="First name">
+          <input type="text" id="wfLast" name="lastName" placeholder="Last name" data-i18n-ph="ph_last" required aria-label="Last name">
+        </div>
+        <input type="email" id="wfEmail" name="email" placeholder="Email" data-i18n-ph="ph_email" required aria-label="Email">
+        <input type="text" id="wfCompany" name="company" placeholder="Company (optional)" data-i18n-ph="ph_company" aria-label="Company">
+        <input type="tel" id="wfPhone" name="phone" placeholder="Phone" data-i18n-ph="ph_phone" aria-label="Phone">
+        <textarea id="wfMessage" name="message" rows="6" placeholder="Products of interest, estimated volume, order frequency" data-i18n-ph="wh_ph_msg" required aria-label="Message"></textarea>
+        <button type="submit" class="wf-submit" data-i18n="wh_send">Send request</button>
+        <div class="wf-status" id="wfStatus" role="status"></div>
+      </form>
+    </div>
+  </section>
+
+</main>
+<script src="/data.js?v=8"></script>
+<script src="/app.js?v=8"></script>
+</body>
+</html>

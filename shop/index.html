@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — TOP Pep research catalog</title>
+<meta name="description" content="Browse the full TOP Pep catalog of third-party tested research peptides, blends, solutions and accessories.">
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=8">
+</head>
+<body data-page="shop">
+<a class="skip-link" href="#main">Skip to content</a>
+<main id="main">
+  <div class="wrap shop-head">
+    <span class="eyebrow text-muted" data-i18n="the_catalog">The catalog</span>
+    <h1 style="margin:10px 0 0;" data-i18n="all_research">All research compounds</h1>
+  </div>
+
+  <div class="wrap">
+    <div class="filter-bar">
+      <div class="pills">
+        <button class="pill" data-cat="All" aria-pressed="true">All</button>
+        <button class="pill" data-cat="Peptides" aria-pressed="false">Peptides</button>
+        <button class="pill" data-cat="Capsules" aria-pressed="false">Capsules</button>
+        <button class="pill" data-cat="Lab Supplies" aria-pressed="false">Lab Supplies</button>
+        <button class="pill" data-cat="Topicals" aria-pressed="false">Topicals</button>
+      </div>
+      <div class="filter-right">
+        <button class="pill sale-pill" id="saleToggle" aria-pressed="false"><span id="saleToggleLabel">On sale</span></button>
+        <select class="sort-select" id="sortSelect" aria-label="Sort products">
+          <option value="order">Recommended</option>
+          <option value="name">A → Z</option>
+          <option value="price-asc">Price ↑</option>
+          <option value="price-desc">Price ↓</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="shop-count" id="shopCount"></div>
+    <div class="product-grid" id="shopGrid"></div>
+    <div class="shop-empty" id="shopEmpty" style="display:none;"><span data-i18n="shop_empty">Nothing in this category yet — new stock is added regularly.</span> <a class="link-arrow" href="https://t.me/TOP_Pep">Telegram @TOP_Pep</a></div>
+  </div>
+
+  <div style="height:80px;"></div>
+</main>
+
+<div class="sticky-search" id="stickySearch">
+  <div class="sticky-search-inner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="stickySearchInput" type="search" placeholder="Search the catalog…" aria-label="Search catalog">
+  </div>
+</div>
+
+<script src="/data.js?v=8"></script>
+<script src="/app.js?v=8"></script>
+</body>
+</html>
