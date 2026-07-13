@@ -17,6 +17,9 @@
   function pimgLine(i) { var im = i.img || (T.bySlug(i.slug) || {}).img || ''; return '<img src="' + T.imgUrl(im) + '" alt="" loading="lazy">'; }
   function displayName(p) { return (p.nameI18n && p.nameI18n[lang]) || p.name; }
   function lineName(i) { var p = T.bySlug(i.slug); return p ? displayName(p) : i.name; }
+  function blurbText(p) { return (p.blurbI18n && p.blurbI18n[lang]) || p.blurb; }
+  function formLabel(p) { return (p.formI18n && p.formI18n[lang]) || p.form; }
+  function groupLabel(p) { return (p.groupI18n && p.groupI18n[lang]) || p.group; }
 
   /* ---- inline icons ---- */
   var I = {
@@ -81,10 +84,10 @@
       sec_glp_eyebrow: 'GLP-1 &amp; metabolic', sec_glp_h: 'Metabolic research', sec_gh_eyebrow: 'Secretagogues', sec_gh_h: 'Growth-hormone peptides', sec_rec_eyebrow: 'Repair', sec_rec_h: 'Recovery &amp; healing',
       promise1_h: 'Tested before it lists', promise1_p: 'Every lot is third-party verified for identity and purity <em>before</em> it goes on sale — never after a complaint.',
       promise2_h: 'COA in every box', promise2_p: 'The certificate matched to your exact lot number ships with the order and stays public in our library.',
-      promise3_h: 'Discreet &amp; cold-shipped', promise3_p: 'Plain packaging, cold-packed where required, tracked EU-wide and to the US within 24–48 hours.',
+      promise3_h: 'Discreet &amp; tracked', promise3_p: 'Plain, unbranded packaging with tracking, dispatched within 24–48 hours and delivered across the EU and UK.',
       faqt_eyebrow: 'Questions', faqt_h: 'Before you order', faqt_p: 'Purity, packaging, storage, and what “research use only” actually means — the short version.', faqt_all: 'All FAQs',
       faqt_q1: 'Is a Certificate of Analysis included?', faqt_a1: 'Yes. Every lot is third-party tested and the lot-matched COA ships in the box and is posted publicly so you can verify it against your vial.',
-      faqt_q2: 'How is my order packaged?', faqt_a2: 'Discreetly, with no product references on the outside, cold-packed where required, and dispatched within 24–48 hours.',
+      faqt_q2: 'How is my order packaged?', faqt_a2: 'Discreetly, with no product references on the outside, and dispatched within 24–48 hours with tracking.',
       faqt_q3: 'How should lyophilized peptides be stored?', faqt_a3: 'Sealed vials are stable at –20 °C away from light. Once reconstituted, keep refrigerated and use within your protocol’s window.',
       ship_protect: 'Shipping protection', ship_protect_sub: 'Covers loss, damage or a stuck parcel — we reship free of charge',
       form_invalid: 'Please complete the required fields with a valid email.', form_sending: 'Sending…',
@@ -181,20 +184,57 @@
       co_inst: 'Institution / lab (optional)', co_addr: 'Address', co_city: 'City', co_zip: 'Postal code', co_country: 'Country',
       co_ship1: 'Tracked standard', co_ship1s: 'All EU countries, 24–48h dispatch', co_ship1p: 'Free over €250',
       co_ship2: 'Express', co_ship2s: 'Priority, insulated, 1–2 days', co_ship3: 'United Kingdom', co_ship3s: 'Tracked, 3–5 days',
-      co_addons: 'Add to your order', co_add: 'Add', co_card: 'Card'
+      co_addons: 'Add to your order', co_add: 'Add', co_card: 'Card',
+      coa_subtitle: 'Janoshik Test Results',
+      sort_recommended: 'Recommended', sort_az: 'A → Z', sort_price_asc: 'Price ↑', sort_price_desc: 'Price ↓',
+      acc_welcome: 'Welcome back', acc_create_title: 'Create your account', acc_signin: 'Sign in', acc_create: 'Create account',
+      acc_google: 'Continue with Google', acc_or_email: 'or with email', acc_name: 'Full name', acc_pass: 'Password',
+      acc_remember: 'Remember me', acc_forgot: 'Forgot password?', acc_demo: 'Demo only — no account was created.',
+      pay_bank: 'Bank transfer', pay_bank_body: 'Transfer details are emailed after you place the order; we dispatch on receipt of cleared funds.',
+      pay_crypto: 'Crypto', pay_crypto_body: 'Pay in BTC, ETH or USDT. A wallet address and the exact amount are shown after you place the order.',
+      cc_num: 'Card number', cc_exp: 'Expiry', cc_cvc: 'CVC', co_added: 'Added',
+      tab_coa_tested: 'This lot is third-party tested by Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">View the verified report</a>.',
+      tab_coa_testing: 'This compound is currently in testing at Janoshik — the verified report will be published in our COA library as soon as it lands.',
+      tab_details_body: 'Supplied as a sealed {form} in a tamper-evident vial. Reconstitute with bacteriostatic water according to your own protocol; we provide no dosing guidance, as all products are sold strictly for laboratory research use.',
+      spec_storage: 'Storage', spec_storage_val: '–20 °C, protect from light', spec_use: 'Use', spec_use_val: 'Research only', spec_coa_testing: 'In testing',
+      legal_updated: 'Last updated · 2026-07-01', legal_operated: 'TOP Pep is operated by ORCA MARKETING AGENCY S.R.L.',
+      tc_h1: 'Terms &amp; conditions',
+      tc_s1h: 'Research use only', tc_s1p: 'All products are sold strictly for in-vitro laboratory and analytical research. Nothing offered is a drug, food, cosmetic, or medical device, and none of it is intended for human or veterinary use, consumption, or administration. By ordering you confirm you are a qualified researcher and will handle material accordingly.',
+      tc_s2h: 'Eligibility', tc_s2p: 'You must be of legal age in your jurisdiction and permitted to purchase research chemicals where you are located. You are responsible for ensuring that receipt and use of any compound is lawful in your country.',
+      tc_s3h: 'Orders &amp; pricing', tc_s3p: 'Prices are shown in euro and may change without notice. We may decline or cancel any order at our discretion, including where a lot fails verification or where we cannot ship lawfully to your address.',
+      tc_s4h: 'Liability', tc_s4p: 'To the fullest extent permitted by law, TOP Pep — a brand operated by ORCA MARKETING AGENCY S.R.L. — is not liable for any use of products beyond their stated research purpose. You assume all responsibility for safe handling, storage, and disposal.',
+      tc_s5h: 'Changes', tc_s5p: 'We may update these terms from time to time. Continued use of the site after changes take effect constitutes acceptance of the revised terms.',
+      pp_h1: 'Privacy policy',
+      pp_s1h: 'What we collect', pp_s1p: 'Contact and shipping details you provide at checkout, order history, and basic analytics about how the site is used. We do not store payment card numbers — those are handled by our payment processor.',
+      pp_s2h: 'How we use it', pp_s2p: 'To process and ship orders, provide support, send batch and COA updates you opt into, and improve the site. We never sell your personal data.',
+      pp_s3h: 'Sharing', pp_s3p: 'We share the minimum necessary with shipping carriers and our payment processor to fulfil your order. They are bound to use it only for that purpose.',
+      pp_s4h: 'Your rights', pp_s4p: 'You may request access to, correction of, or deletion of your personal data, and you can unsubscribe from marketing at any time via the link in any email.',
+      pp_s5h: 'Contact', pp_s5p: 'For any privacy request, reach us through the details on the Contact page.',
+      ra_h1: 'Research-use agreement', ra_intro: 'By placing an order you accept the following agreement.',
+      ra_s1h: 'Acknowledgement of purpose', ra_s1p: 'You acknowledge that all products are intended solely for laboratory research and in-vitro experimentation, and are not for human or veterinary use, consumption, diagnosis, or treatment of any condition.',
+      ra_s2h: 'Researcher status', ra_s2p: 'You represent that you are a qualified researcher or acting on behalf of a research institution, and that you have the training and facilities to handle research chemicals safely.',
+      ra_s3h: 'Compliance', ra_s3p: 'You agree to comply with all applicable laws and institutional policies governing the import, possession, handling, and disposal of the materials you order.',
+      ra_s4h: 'No resale for misuse', ra_s4p: 'You will not resell, relabel, or distribute any product for use outside its stated research purpose, nor to any party you believe intends such use.',
+      ra_s5h: 'Assumption of risk', ra_s5p: 'You assume all risk and responsibility associated with the receipt, storage, handling, and use of the materials, and release TOP Pep from liability arising from misuse.',
+      shp_h1: 'Shipping policy', shp_intro: 'This policy summarises how orders are dispatched and delivered.',
+      shp_s1h: 'Dispatch times', shp_s1p: 'In-stock orders are dispatched within 24–48 hours of payment clearing. Orders placed before the daily cut-off enter same-day picking.',
+      shp_s2h: 'Rates &amp; free shipping', shp_s2p: 'Standard tracked shipping is a flat rate and free on orders over €250. Express and United Kingdom options are available at checkout.',
+      shp_s3h: 'Packaging', shp_s3p: 'All orders ship discreetly with no product references outside. Compounds arrive freeze-dried and shelf-stable, sealed against light and moisture — no cold chain required.',
+      shp_s4h: 'Tracking', shp_s4p: 'A tracking link is emailed when your parcel is handed to the carrier. Transit times vary by destination and carrier.',
+      shp_s5h: 'Returns', shp_s5p: 'Because these are sensitive research materials, we cannot accept returns of opened vials. Contact us within 7 days if an order arrives damaged or incorrect and we’ll make it right.'
     },
     de: {
       nav_shop: 'Katalog', nav_coa: 'COA', nav_quality: 'Qualität', nav_shipping: 'Versand', nav_wholesale: 'Großhandel', nav_partner: 'Partnerprogramm',
       sign_in: 'Anmelden', about: 'Über uns', faq: 'FAQ',
       add_to_cart: 'In den Warenkorb', select_options: 'Optionen wählen', tap_a_size: 'Tippe auf eine Größe, um sie hinzuzufügen',
-      sale: 'Sale', best_seller: 'Bestseller', on_sale: 'Im Sale', clear: 'Zurücksetzen', checkout: 'Zur Kasse',
+      sale: 'Sale', best_seller: 'Bestseller', on_sale: 'Im Sale', clear: 'Auswahl aufheben', checkout: 'Zur Kasse',
       cat_peptides: 'Peptide', cat_capsules: 'Kapseln', cat_labsupplies: 'Laborbedarf', cat_topicals: 'Topische Produkte',
       your_cart: 'Dein Warenkorb', cart_empty: 'Dein Warenkorb ist leer', subtotal: 'Zwischensumme', browse: 'Katalog ansehen',
       free_ship_unlocked: 'Du hast <b>Gratisversand</b> freigeschaltet', away_free: 'bis zum <b>Gratisversand</b>',
       added_recon: 'Zur Rekonstitution hinzugefügt', ships_taxes: 'Versand &amp; Steuern werden an der Kasse berechnet.',
       in_stock_today: 'Auf Lager · Versand heute', ships_next: 'Auf Lager · Versand am nächsten Werktag',
       two_day: 'Lieferung in 2 Tagen — bei dir bis', select_size: 'Größe wählen', purity: 'Reinheit', form: 'Form', dispatch: 'Versand',
-      same_day: 'Am selben Tag', same_day_dispatch: 'Versand am selben Tag', third_party: 'Unabhängig getestet', coa_per_lot: 'COA pro Charge', free_over: 'Gratisversand ab 250 €',
+      same_day: 'Am selben Tag', same_day_dispatch: 'Versand am selben Tag', third_party: 'Drittanbieter-getestet', coa_per_lot: 'COA pro Charge', free_over: 'Gratisversand ab 250 €',
       categories: 'Kategorien', continue_shopping: 'Weiter einkaufen', search_ph: 'Wirkstoffe suchen…',
       popular: 'Beliebte Produkte', no_results: 'Keine Treffer für', results: 'Treffer',
       coa_verified: 'Verifiziert', coa_in_testing: 'In Prüfung', coa_report_soon: 'wird von Janoshik geprüft — Bericht folgt in Kürze',
@@ -220,10 +260,10 @@
       sec_glp_eyebrow: 'GLP-1 &amp; Stoffwechsel', sec_glp_h: 'Metabolische Forschung', sec_gh_eyebrow: 'Sekretagoga', sec_gh_h: 'Wachstumshormon-Peptide', sec_rec_eyebrow: 'Regeneration', sec_rec_h: 'Regeneration &amp; Heilung',
       promise1_h: 'Getestet, bevor es gelistet wird', promise1_p: 'Jede Charge wird unabhängig auf Identität und Reinheit geprüft, <em>bevor</em> sie in den Verkauf geht — nie erst nach einer Reklamation.',
       promise2_h: 'COA in jeder Box', promise2_p: 'Das Zertifikat zu deiner exakten Chargennummer liegt der Bestellung bei und bleibt öffentlich in unserer Bibliothek einsehbar.',
-      promise3_h: 'Diskret &amp; gekühlt versendet', promise3_p: 'Neutrale Verpackung, gekühlt wo nötig, mit Sendungsverfolgung EU-weit und in die USA innerhalb von 24–48 Stunden.',
+      promise3_h: 'Diskret &amp; mit Sendungsverfolgung', promise3_p: 'Neutrale, unbedruckte Verpackung mit Sendungsverfolgung — Versand innerhalb von 24–48 Stunden, Lieferung in die gesamte EU und nach Großbritannien.',
       faqt_eyebrow: 'Fragen', faqt_h: 'Bevor du bestellst', faqt_p: 'Reinheit, Verpackung, Lagerung — und was „nur für Forschungszwecke“ wirklich bedeutet. Die Kurzfassung.', faqt_all: 'Alle FAQs',
-      faqt_q1: 'Liegt ein Analysenzertifikat (COA) bei?', faqt_a1: 'Ja. Jede Charge wird unabhängig getestet; das chargengenaue COA liegt der Box bei und wird öffentlich veröffentlicht, damit du es mit deinem Vial abgleichen kannst.',
-      faqt_q2: 'Wie wird meine Bestellung verpackt?', faqt_a2: 'Diskret, ohne Produkthinweise auf der Außenseite, gekühlt wo nötig — Versand innerhalb von 24–48 Stunden.',
+      faqt_q1: 'Liegt ein Analysenzertifikat (COA) bei?', faqt_a1: 'Ja. Jede Charge wird von einem Drittanbieter getestet; das chargengenaue COA liegt der Box bei und wird veröffentlicht, damit du es mit deinem Vial abgleichen kannst.',
+      faqt_q2: 'Wie wird meine Bestellung verpackt?', faqt_a2: 'Diskret, ohne Produkthinweise auf der Außenseite — Versand innerhalb von 24–48 Stunden mit Sendungsverfolgung.',
       faqt_q3: 'Wie lagere ich lyophilisierte Peptide richtig?', faqt_a3: 'Versiegelte Vials sind bei –20 °C, lichtgeschützt, stabil. Nach der Rekonstitution gekühlt lagern und innerhalb des Zeitfensters deines Protokolls verwenden.',
       ship_protect: 'Versandschutz', ship_protect_sub: 'Deckt Verlust, Beschädigung oder ein hängendes Paket ab — wir versenden kostenlos neu',
       form_invalid: 'Bitte fülle die Pflichtfelder aus und gib eine gültige E-Mail-Adresse an.', form_sending: 'Wird gesendet…',
@@ -236,7 +276,7 @@
       ph_first: 'Vorname', ph_last: 'Nachname', ph_email: 'E-Mail', ph_company: 'Firma (optional)', ph_phone: 'Telefon',
       wh_eb1: 'Großhandel &amp; Volumen', wh_h1: 'Bestellst du<br>in großen Mengen?',
       wh_p1: 'Kliniken, Wiederverkäufer und Forschungsgruppen erhalten feste Konten mit fixen Volumenpreisen, vollständiger COA-Dokumentation zu jeder Charge und Versandpriorität vor Einzelbestellungen. Nenn uns dein monatliches Volumen und wir stellen dir ein Programm zusammen.',
-      wh_s1: 'Einheiten pro Bestellung', wh_s2: 'Geprüfte Konten', wh_s3: 'Durchschnittlicher Versand', wh_cta: 'Großhandelspreise anfragen',
+      wh_s1: 'Einheiten pro Bestellung', wh_s2: 'Geprüfte Konten', wh_s3: 'Ø Versandzeit', wh_cta: 'Großhandelspreise anfragen',
       wh_eb2: 'So funktioniert’s', wh_h2: 'Skaliert nach deiner Bestellmenge',
       wh_c1: '<b>Staffelpreise</b> ab 15 Einheiten', wh_c2: '<b>Direkter Ansprechpartner</b> für die Abwicklung', wh_c3: '<b>Chargen-COAs</b> bei jeder Lieferung inklusive', wh_c4: '<b>Flexible Zahlungsziele</b> für verifizierte Partner', wh_c5: '<b>Feste Lieferslots</b> für Stammkunden',
       wh_feb: 'Kontakt aufnehmen', wh_fh: 'Richte dein Konto ein', wh_fp: 'Teile uns mit, welche Produkte dich interessieren, dein erwartetes Monatsvolumen und die Bestellfrequenz — Konten werden manuell geprüft, bevor Preise freigegeben werden.',
@@ -316,11 +356,48 @@
       ab_l1: 'So testen wir', ab_e2: 'Für wen wir das machen', ab_h2b: 'Gemacht für Leute, die das COA wirklich lesen',
       ab_p3: 'Unsere Kunden sind Labore, Studierende und unabhängige Forschende, denen wichtig ist, was wirklich im Vial steckt. Wir bauen für die Person, die die Chargennummer nachschlägt — denn sie hat recht damit.',
       ab_l2: 'Zur COA-Bibliothek',
-      co_h1: 'Kasse', co_email: 'E-Mail-Adresse', co_news: 'Informiert mich über neue Chargen &amp; COAs', ship_addr: 'Lieferadresse',
+      co_h1: 'Kasse', co_email: 'E-Mail-Adresse', co_news: 'Per E-Mail über neue Chargen &amp; COAs informieren', ship_addr: 'Lieferadresse',
       co_inst: 'Institution / Labor (optional)', co_addr: 'Adresse', co_city: 'Stadt', co_zip: 'Postleitzahl', co_country: 'Land',
       co_ship1: 'Standard mit Tracking', co_ship1s: 'Alle EU-Länder, Versand in 24–48 h', co_ship1p: 'Gratis ab 250 €',
       co_ship2: 'Express', co_ship2s: 'Priorität, isoliert, 1–2 Tage', co_ship3: 'Vereinigtes Königreich', co_ship3s: 'Mit Tracking, 3–5 Tage',
-      co_addons: 'Zur Bestellung hinzufügen', co_add: 'Hinzufügen', co_card: 'Karte'
+      co_addons: 'Zur Bestellung hinzufügen', co_add: 'Hinzufügen', co_card: 'Karte',
+      coa_subtitle: 'Janoshik-Testergebnisse',
+      sort_recommended: 'Empfohlen', sort_az: 'A → Z', sort_price_asc: 'Preis ↑', sort_price_desc: 'Preis ↓',
+      acc_welcome: 'Willkommen zurück', acc_create_title: 'Konto erstellen', acc_signin: 'Anmelden', acc_create: 'Konto erstellen',
+      acc_google: 'Mit Google fortfahren', acc_or_email: 'oder mit E-Mail', acc_name: 'Vollständiger Name', acc_pass: 'Passwort',
+      acc_remember: 'Angemeldet bleiben', acc_forgot: 'Passwort vergessen?', acc_demo: 'Nur zur Demo — es wurde kein Konto erstellt.',
+      pay_bank: 'Banküberweisung', pay_bank_body: 'Die Überweisungsdaten erhältst du nach der Bestellung per E-Mail; wir versenden nach Zahlungseingang.',
+      pay_crypto: 'Krypto', pay_crypto_body: 'Zahle in BTC, ETH oder USDT. Wallet-Adresse und der genaue Betrag werden nach der Bestellung angezeigt.',
+      cc_num: 'Kartennummer', cc_exp: 'Gültig bis', cc_cvc: 'Prüfziffer', co_added: 'Hinzugefügt',
+      tab_coa_tested: 'Diese Charge wurde von Janoshik durch einen Drittanbieter getestet (Task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Verifizierten Bericht ansehen</a>.',
+      tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer COA-Bibliothek.',
+      tab_details_body: 'Wird als versiegeltes {form} in einem manipulationssicheren Vial geliefert. Rekonstituiere nach deinem eigenen Protokoll mit bakteriostatischem Wasser; wir geben keine Dosierungshinweise, da alle Produkte ausschließlich für die Laborforschung verkauft werden.',
+      spec_storage: 'Lagerung', spec_storage_val: '–20 °C, vor Licht schützen', spec_use: 'Verwendung', spec_use_val: 'Nur Forschung', spec_coa_testing: 'In Prüfung',
+      legal_updated: 'Zuletzt aktualisiert · 01.07.2026', legal_operated: 'TOP Pep ist eine Marke der ORCA MARKETING AGENCY S.R.L.',
+      tc_h1: 'AGB',
+      tc_s1h: 'Nur für Forschungszwecke', tc_s1p: 'Alle Produkte werden ausschließlich für die In-vitro-Labor- und Analyseforschung verkauft. Nichts davon ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit deiner Bestellung bestätigst du, dass du ein qualifizierter Forscher bist und das Material entsprechend handhabst.',
+      tc_s2h: 'Voraussetzungen', tc_s2p: 'Du musst in deinem Rechtsraum volljährig und berechtigt sein, Forschungschemikalien an deinem Standort zu erwerben. Du bist dafür verantwortlich, dass der Erhalt und die Verwendung jedes Wirkstoffs in deinem Land rechtmäßig sind.',
+      tc_s3h: 'Bestellungen &amp; Preise', tc_s3p: 'Die Preise sind in Euro angegeben und können sich ohne Ankündigung ändern. Wir können jede Bestellung nach eigenem Ermessen ablehnen oder stornieren, insbesondere wenn eine Charge die Prüfung nicht besteht oder wir nicht rechtmäßig an deine Adresse versenden können.',
+      tc_s4h: 'Haftung', tc_s4p: 'Soweit gesetzlich zulässig, haftet TOP Pep — eine Marke der ORCA MARKETING AGENCY S.R.L. — nicht für eine Verwendung der Produkte über den angegebenen Forschungszweck hinaus. Du übernimmst die volle Verantwortung für sichere Handhabung, Lagerung und Entsorgung.',
+      tc_s5h: 'Änderungen', tc_s5p: 'Wir können diese Bedingungen von Zeit zu Zeit aktualisieren. Die weitere Nutzung der Website nach Inkrafttreten von Änderungen gilt als Annahme der überarbeiteten Bedingungen.',
+      pp_h1: 'Datenschutzerklärung',
+      pp_s1h: 'Was wir erheben', pp_s1p: 'Kontakt- und Versanddaten, die du an der Kasse angibst, den Bestellverlauf sowie grundlegende Statistiken zur Nutzung der Website. Wir speichern keine Kartennummern — diese werden von unserem Zahlungsdienstleister verarbeitet.',
+      pp_s2h: 'Wie wir sie verwenden', pp_s2p: 'Zur Abwicklung und zum Versand von Bestellungen, für den Support, zum Versand von Chargen- und COA-Updates, die du abonnierst, und zur Verbesserung der Website. Wir verkaufen deine personenbezogenen Daten niemals.',
+      pp_s3h: 'Weitergabe', pp_s3p: 'Wir geben nur das Nötigste an Versanddienstleister und unseren Zahlungsdienstleister weiter, um deine Bestellung auszuführen. Diese dürfen die Daten ausschließlich zu diesem Zweck verwenden.',
+      pp_s4h: 'Deine Rechte', pp_s4p: 'Du kannst Auskunft über deine personenbezogenen Daten sowie deren Berichtigung oder Löschung verlangen und dich jederzeit über den Link in jeder E-Mail vom Marketing abmelden.',
+      pp_s5h: 'Kontakt', pp_s5p: 'Für Datenschutzanfragen erreichst du uns über die Angaben auf der Kontaktseite.',
+      ra_h1: 'Forschungsnutzungs-Vereinbarung', ra_intro: 'Mit deiner Bestellung akzeptierst du die folgende Vereinbarung.',
+      ra_s1h: 'Zweckbestätigung', ra_s1p: 'Du bestätigst, dass alle Produkte ausschließlich für die Laborforschung und In-vitro-Experimente bestimmt sind und nicht für den menschlichen oder tierischen Gebrauch, Verzehr, die Diagnose oder die Behandlung von Erkrankungen.',
+      ra_s2h: 'Forscherstatus', ra_s2p: 'Du versicherst, dass du ein qualifizierter Forscher bist oder im Auftrag einer Forschungseinrichtung handelst und über die Ausbildung und Einrichtungen verfügst, um Forschungschemikalien sicher zu handhaben.',
+      ra_s3h: 'Einhaltung', ra_s3p: 'Du verpflichtest dich, alle geltenden Gesetze und institutionellen Richtlinien für Import, Besitz, Handhabung und Entsorgung der bestellten Materialien einzuhalten.',
+      ra_s4h: 'Kein Weiterverkauf zum Missbrauch', ra_s4p: 'Du wirst kein Produkt für eine Verwendung außerhalb seines angegebenen Forschungszwecks weiterverkaufen, umetikettieren oder weitergeben, auch nicht an Parteien, von denen du eine solche Verwendung annimmst.',
+      ra_s5h: 'Risikoübernahme', ra_s5p: 'Du übernimmst alle Risiken und die Verantwortung im Zusammenhang mit Erhalt, Lagerung, Handhabung und Verwendung der Materialien und stellst TOP Pep von jeder Haftung frei, die aus Missbrauch entsteht.',
+      shp_h1: 'Versandrichtlinie', shp_intro: 'Diese Richtlinie fasst zusammen, wie Bestellungen versendet und zugestellt werden.',
+      shp_s1h: 'Versandzeiten', shp_s1p: 'Lagerware wird innerhalb von 24–48 Stunden nach Zahlungseingang versendet. Bestellungen vor dem täglichen Annahmeschluss gehen in die Kommissionierung am selben Tag.',
+      shp_s2h: 'Kosten &amp; Gratisversand', shp_s2p: 'Der Standardversand mit Sendungsverfolgung erfolgt zum Pauschalpreis und ist ab 250 € gratis. Express- und Großbritannien-Optionen stehen an der Kasse zur Verfügung.',
+      shp_s3h: 'Verpackung', shp_s3p: 'Alle Bestellungen werden diskret und ohne Produkthinweise auf der Außenseite versendet. Die Wirkstoffe kommen gefriergetrocknet und lagerstabil an, versiegelt gegen Licht und Feuchtigkeit — keine Kühlkette erforderlich.',
+      shp_s4h: 'Sendungsverfolgung', shp_s4p: 'Ein Tracking-Link wird per E-Mail versendet, sobald dein Paket an den Versanddienst übergeben wird. Die Laufzeiten variieren je nach Ziel und Dienstleister.',
+      shp_s5h: 'Rücksendungen', shp_s5p: 'Da es sich um empfindliche Forschungsmaterialien handelt, können wir geöffnete Vials nicht zurücknehmen. Melde dich innerhalb von 7 Tagen bei uns, wenn eine Bestellung beschädigt oder falsch ankommt, und wir bringen es in Ordnung.'
     },
     ro: {
       nav_shop: 'Catalog', nav_coa: 'COA', nav_quality: 'Calitate', nav_shipping: 'Livrare', nav_wholesale: 'En-gros', nav_partner: 'Program parteneri',
@@ -333,7 +410,7 @@
       added_recon: 'Adăugat pentru reconstituire', ships_taxes: 'Transportul &amp; taxele se calculează la finalizare.',
       in_stock_today: 'În stoc · se expediază azi', ships_next: 'În stoc · se expediază în următoarea zi lucrătoare',
       two_day: 'Livrare în 2 zile — primești până pe', select_size: 'Alege mărimea', purity: 'Puritate', form: 'Formă', dispatch: 'Expediere',
-      same_day: 'În aceeași zi', same_day_dispatch: 'Expediere în aceeași zi', third_party: 'Testat independent', coa_per_lot: 'COA pe lot', free_over: 'Livrare gratuită peste 1.230 Lei',
+      same_day: 'În aceeași zi', same_day_dispatch: 'Expediere în aceeași zi', third_party: 'Testat de terți', coa_per_lot: 'COA pe lot', free_over: 'Livrare gratuită peste 1.230 Lei',
       categories: 'Categorii', continue_shopping: 'Continuă cumpărăturile', search_ph: 'Caută compuși…',
       popular: 'Produse populare', no_results: 'Niciun rezultat pentru', results: 'rezultate',
       coa_verified: 'Verificat', coa_in_testing: 'În testare', coa_report_soon: 'în așteptare la Janoshik — raportul urmează în curând',
@@ -356,13 +433,13 @@
       bac_water: 'Apă bacteriostatică 10 ml',
       hero_cta1: 'Vezi catalogul', hero_cta2: 'Vezi biblioteca COA', stat_purity: 'Puritate documentată', stat_compounds: 'Compuși în stoc', stat_free: 'Livrare gratuită peste',
       sec_best: 'Catalogul', sec_featured: 'Peptide', shop_all: 'Vezi toate', browse_word: 'Explorează',
-      sec_glp_eyebrow: 'GLP-1 &amp; metabolic', sec_glp_h: 'Cercetare metabolică', sec_gh_eyebrow: 'Secretagogi', sec_gh_h: 'Peptide pentru hormonul de creștere', sec_rec_eyebrow: 'Reparare', sec_rec_h: 'Recuperare &amp; vindecare',
-      promise1_h: 'Testat înainte de listare', promise1_p: 'Fiecare lot este verificat independent pentru identitate și puritate <em>înainte</em> de a fi pus în vânzare — niciodată după o reclamație.',
+      sec_glp_eyebrow: 'GLP-1 &amp; metabolism', sec_glp_h: 'Cercetare metabolică', sec_gh_eyebrow: 'Secretagogi', sec_gh_h: 'Peptide pentru hormonul de creștere', sec_rec_eyebrow: 'Reparare', sec_rec_h: 'Recuperare &amp; vindecare',
+      promise1_h: 'Testat înainte de listare', promise1_p: 'Fiecare lot este verificat de terți pentru identitate și puritate <em>înainte</em> de a fi pus în vânzare — niciodată după o reclamație.',
       promise2_h: 'COA în fiecare cutie', promise2_p: 'Certificatul aferent lotului tău exact vine odată cu comanda și rămâne public în biblioteca noastră.',
-      promise3_h: 'Discret &amp; livrat la rece', promise3_p: 'Ambalaj neutru, împachetat la rece unde e necesar, cu urmărire în toată UE și în SUA în 24–48 de ore.',
+      promise3_h: 'Discret &amp; cu urmărire', promise3_p: 'Ambalaj neutru, fără branding, cu urmărire — expediat în 24–48 de ore și livrat în toată UE și în Regatul Unit.',
       faqt_eyebrow: 'Întrebări', faqt_h: 'Înainte să comanzi', faqt_p: 'Puritate, ambalare, depozitare — și ce înseamnă de fapt „doar pentru cercetare”. Pe scurt.', faqt_all: 'Toate întrebările',
-      faqt_q1: 'Este inclus un Certificat de Analiză (COA)?', faqt_a1: 'Da. Fiecare lot este testat independent, iar COA-ul aferent lotului vine în cutie și este publicat public, ca să îl poți verifica cu flaconul tău.',
-      faqt_q2: 'Cum este ambalată comanda mea?', faqt_a2: 'Discret, fără nicio referire la produs pe exterior, împachetat la rece unde e necesar și expediat în 24–48 de ore.',
+      faqt_q1: 'Este inclus un Certificat de Analiză (COA)?', faqt_a1: 'Da. Fiecare lot este testat de terți, iar COA-ul aferent lotului vine în cutie și este publicat, ca să îl poți verifica cu flaconul tău.',
+      faqt_q2: 'Cum este ambalată comanda mea?', faqt_a2: 'Discret, fără nicio referire la produs pe exterior, și expediat în 24–48 de ore cu urmărire.',
       faqt_q3: 'Cum se păstrează corect peptidele liofilizate?', faqt_a3: 'Flacoanele sigilate sunt stabile la –20 °C, ferite de lumină. După reconstituire, păstrează-le la frigider și folosește-le în intervalul protocolului tău.',
       ship_protect: 'Protecția transportului', ship_protect_sub: 'Acoperă pierderea, deteriorarea sau un colet blocat — retrimitem gratuit',
       form_invalid: 'Te rugăm să completezi câmpurile obligatorii cu un e-mail valid.', form_sending: 'Se trimite…',
@@ -375,7 +452,7 @@
       ph_first: 'Prenume', ph_last: 'Nume', ph_email: 'E-mail', ph_company: 'Companie (opțional)', ph_phone: 'Telefon',
       wh_eb1: 'En-gros &amp; volum', wh_h1: 'Comanzi<br>în volum?',
       wh_p1: 'Clinicile, revânzătorii și grupurile de cercetare primesc conturi permanente cu prețuri fixe de volum, documentație COA completă pentru fiecare lot și prioritate la expediere înaintea comenzilor individuale. Spune-ne volumul tău lunar și îți pregătim un program.',
-      wh_s1: 'Unități per comandă', wh_s2: 'Conturi aprobate', wh_s3: 'Expediere medie', wh_cta: 'Cere prețuri en-gros',
+      wh_s1: 'Unități per comandă', wh_s2: 'Conturi aprobate', wh_s3: 'Timp mediu de expediere', wh_cta: 'Cere prețuri en-gros',
       wh_eb2: 'Cum funcționează', wh_h2: 'Scalat după cât comanzi',
       wh_c1: '<b>Prețuri pe niveluri</b> începând de la 15 unități', wh_c2: '<b>Persoană de contact directă</b> pentru comenzi', wh_c3: '<b>COA-uri per lot</b> incluse la fiecare livrare', wh_c4: '<b>Termene de plată flexibile</b> pentru parteneri verificați', wh_c5: '<b>Sloturi de livrare recurente</b> pentru clienți fideli',
       wh_feb: 'Ia legătura cu noi', wh_fh: 'Configurează-ți contul', wh_fp: 'Spune-ne ce produse te interesează, volumul lunar estimat și frecvența comenzilor — conturile sunt verificate manual înainte de a debloca prețurile.',
@@ -455,14 +532,84 @@
       ab_l1: 'Cum testăm', ab_e2: 'Pentru cine e', ab_h2b: 'Făcut pentru cei care chiar citesc COA-ul',
       ab_p3: 'Clienții noștri sunt laboratoare, studenți și cercetători independenți cărora le pasă ce e de fapt în flacon. Construim pentru omul care verifică numărul de lot — pentru că are dreptate să o facă.',
       ab_l2: 'Vezi biblioteca COA',
-      co_h1: 'Finalizare comandă', co_email: 'Adresă de e-mail', co_news: 'Trimite-mi pe e-mail loturile și COA-urile noi', ship_addr: 'Adresă de livrare',
+      co_h1: 'Finalizare comandă', co_email: 'Adresă de e-mail', co_news: 'Vreau să primesc pe e-mail noutăți despre loturi și COA-uri', ship_addr: 'Adresă de livrare',
       co_inst: 'Instituție / laborator (opțional)', co_addr: 'Adresă', co_city: 'Oraș', co_zip: 'Cod poștal', co_country: 'Țară',
       co_ship1: 'Standard cu tracking', co_ship1s: 'Toate țările UE, expediere în 24–48h', co_ship1p: 'Gratuit peste 250 €',
       co_ship2: 'Express', co_ship2s: 'Prioritar, izolat, 1–2 zile', co_ship3: 'Regatul Unit', co_ship3s: 'Cu tracking, 3–5 zile',
-      co_addons: 'Adaugă la comandă', co_add: 'Adaugă', co_card: 'Card'
+      co_addons: 'Adaugă la comandă', co_add: 'Adaugă', co_card: 'Card',
+      coa_subtitle: 'Rezultatele testelor Janoshik',
+      sort_recommended: 'Recomandate', sort_az: 'A → Z', sort_price_asc: 'Preț ↑', sort_price_desc: 'Preț ↓',
+      acc_welcome: 'Bine ai revenit', acc_create_title: 'Creează-ți contul', acc_signin: 'Autentificare', acc_create: 'Creează cont',
+      acc_google: 'Continuă cu Google', acc_or_email: 'sau cu e-mail', acc_name: 'Nume complet', acc_pass: 'Parolă',
+      acc_remember: 'Ține-mă minte', acc_forgot: 'Ai uitat parola?', acc_demo: 'Doar demo — nu a fost creat niciun cont.',
+      pay_bank: 'Transfer bancar', pay_bank_body: 'Detaliile de transfer îți sunt trimise pe e-mail după plasarea comenzii; expediem la confirmarea plății.',
+      pay_crypto: 'Cripto', pay_crypto_body: 'Plătește în BTC, ETH sau USDT. Adresa portofelului și suma exactă apar după plasarea comenzii.',
+      cc_num: 'Număr card', cc_exp: 'Expiră', cc_cvc: 'CVC', co_added: 'Adăugat',
+      tab_coa_tested: 'Acest lot este testat de terți la Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Vezi raportul verificat</a>.',
+      tab_coa_testing: 'Acest compus este în curs de testare la Janoshik — raportul verificat va fi publicat în biblioteca noastră COA imediat ce este gata.',
+      tab_details_body: 'Livrat ca {form} sigilat într-un flacon cu sigiliu de siguranță. Reconstituie cu apă bacteriostatică conform propriului protocol; nu oferim indicații de dozare, deoarece toate produsele se vând strict pentru cercetare de laborator.',
+      spec_storage: 'Depozitare', spec_storage_val: '–20 °C, ferit de lumină', spec_use: 'Utilizare', spec_use_val: 'Doar cercetare', spec_coa_testing: 'În testare',
+      legal_updated: 'Ultima actualizare · 01.07.2026', legal_operated: 'TOP Pep este operat de ORCA MARKETING AGENCY S.R.L.',
+      tc_h1: 'Termeni &amp; condiții',
+      tc_s1h: 'Doar pentru uz de cercetare', tc_s1p: 'Toate produsele sunt vândute strict pentru cercetare de laborator și analitică in-vitro. Nimic din ceea ce oferim nu este medicament, aliment, cosmetic sau dispozitiv medical și nimic nu este destinat utilizării, consumului sau administrării umane ori veterinare. Prin plasarea comenzii confirmi că ești cercetător calificat și că vei manipula materialul în consecință.',
+      tc_s2h: 'Eligibilitate', tc_s2p: 'Trebuie să ai vârsta legală în jurisdicția ta și să ai dreptul de a cumpăra substanțe chimice de cercetare acolo unde te afli. Ești responsabil să te asiguri că primirea și utilizarea oricărui compus sunt legale în țara ta.',
+      tc_s3h: 'Comenzi &amp; prețuri', tc_s3p: 'Prețurile sunt afișate în euro și se pot modifica fără notificare. Putem refuza sau anula orice comandă la discreția noastră, inclusiv atunci când un lot nu trece de verificare sau când nu putem livra legal la adresa ta.',
+      tc_s4h: 'Răspundere', tc_s4p: 'În măsura maximă permisă de lege, TOP Pep — o marcă operată de ORCA MARKETING AGENCY S.R.L. — nu răspunde pentru nicio utilizare a produselor dincolo de scopul lor de cercetare declarat. Îți asumi întreaga responsabilitate pentru manipularea, depozitarea și eliminarea în siguranță.',
+      tc_s5h: 'Modificări', tc_s5p: 'Putem actualiza acești termeni din când în când. Utilizarea în continuare a site-ului după intrarea în vigoare a modificărilor constituie acceptarea termenilor revizuiți.',
+      pp_h1: 'Politică de confidențialitate',
+      pp_s1h: 'Ce colectăm', pp_s1p: 'Datele de contact și de livrare pe care le furnizezi la finalizarea comenzii, istoricul comenzilor și statistici de bază despre modul în care este utilizat site-ul. Nu stocăm numere de card — acestea sunt gestionate de procesatorul nostru de plăți.',
+      pp_s2h: 'Cum le folosim', pp_s2p: 'Pentru a procesa și expedia comenzile, a oferi asistență, a trimite noutăți despre loturi și COA-uri la care te abonezi și a îmbunătăți site-ul. Nu vindem niciodată datele tale personale.',
+      pp_s3h: 'Partajare', pp_s3p: 'Partajăm strictul necesar cu firmele de curierat și cu procesatorul nostru de plăți pentru a-ți onora comanda. Aceștia sunt obligați să le folosească doar în acest scop.',
+      pp_s4h: 'Drepturile tale', pp_s4p: 'Poți solicita accesul, corectarea sau ștergerea datelor tale personale și te poți dezabona oricând de la comunicările de marketing prin linkul din orice e-mail.',
+      pp_s5h: 'Contact', pp_s5p: 'Pentru orice solicitare privind confidențialitatea, ne poți contacta prin datele de pe pagina de contact.',
+      ra_h1: 'Acord de utilizare în cercetare', ra_intro: 'Prin plasarea unei comenzi accepți următorul acord.',
+      ra_s1h: 'Recunoașterea scopului', ra_s1p: 'Recunoști că toate produsele sunt destinate exclusiv cercetării de laborator și experimentelor in-vitro și nu utilizării, consumului, diagnosticării sau tratării vreunei afecțiuni la om ori animale.',
+      ra_s2h: 'Statut de cercetător', ra_s2p: 'Declari că ești cercetător calificat sau acționezi în numele unei instituții de cercetare și că ai pregătirea și dotările necesare pentru a manipula în siguranță substanțe chimice de cercetare.',
+      ra_s3h: 'Conformitate', ra_s3p: 'Ești de acord să respecți toate legile aplicabile și politicile instituționale care reglementează importul, deținerea, manipularea și eliminarea materialelor pe care le comanzi.',
+      ra_s4h: 'Fără revânzare pentru utilizare abuzivă', ra_s4p: 'Nu vei revinde, reeticheta sau distribui niciun produs pentru utilizare în afara scopului său de cercetare declarat și nici către vreo parte despre care crezi că intenționează o astfel de utilizare.',
+      ra_s5h: 'Asumarea riscului', ra_s5p: 'Îți asumi toate riscurile și responsabilitatea legate de primirea, depozitarea, manipularea și utilizarea materialelor și exonerezi TOP Pep de orice răspundere care decurge din utilizarea abuzivă.',
+      shp_h1: 'Politică de livrare', shp_intro: 'Această politică rezumă modul în care comenzile sunt expediate și livrate.',
+      shp_s1h: 'Timpi de expediere', shp_s1p: 'Comenzile din stoc sunt expediate în 24–48 de ore de la confirmarea plății. Comenzile plasate înainte de ora-limită zilnică intră în pregătire în aceeași zi.',
+      shp_s2h: 'Tarife &amp; livrare gratuită', shp_s2p: 'Livrarea standard cu urmărire este la tarif fix și gratuită pentru comenzile de peste 250 €. Opțiunile Express și Regatul Unit sunt disponibile la finalizarea comenzii.',
+      shp_s3h: 'Ambalare', shp_s3p: 'Toate comenzile sunt expediate discret, fără nicio referire la produs pe exterior. Compușii ajung liofilizați și stabili la raft, sigilați împotriva luminii și umidității — nu este nevoie de lanț de frig.',
+      shp_s4h: 'Urmărire', shp_s4p: 'Un link de urmărire îți este trimis pe e-mail când coletul este predat curierului. Timpii de tranzit variază în funcție de destinație și curier.',
+      shp_s5h: 'Retururi', shp_s5p: 'Deoarece acestea sunt materiale de cercetare sensibile, nu putem accepta returul flacoanelor deschise. Contactează-ne în 7 zile dacă o comandă ajunge deteriorată sau greșită și o vom rezolva.'
     }
   };
   var LOCALES = { en: 'en-GB', de: 'de-AT', ro: 'ro-RO' };
+  var COUNTRIES = {
+    de: { Austria:'Österreich', Belgium:'Belgien', Bulgaria:'Bulgarien', Croatia:'Kroatien', Cyprus:'Zypern', Czechia:'Tschechien', Denmark:'Dänemark', Estonia:'Estland', Finland:'Finnland', France:'Frankreich', Germany:'Deutschland', Greece:'Griechenland', Hungary:'Ungarn', Ireland:'Irland', Italy:'Italien', Latvia:'Lettland', Lithuania:'Litauen', Luxembourg:'Luxemburg', Malta:'Malta', Netherlands:'Niederlande', Poland:'Polen', Portugal:'Portugal', Romania:'Rumänien', Slovakia:'Slowakei', Slovenia:'Slowenien', Spain:'Spanien', Sweden:'Schweden', 'United Kingdom':'Vereinigtes Königreich' },
+    ro: { Austria:'Austria', Belgium:'Belgia', Bulgaria:'Bulgaria', Croatia:'Croația', Cyprus:'Cipru', Czechia:'Cehia', Denmark:'Danemarca', Estonia:'Estonia', Finland:'Finlanda', France:'Franța', Germany:'Germania', Greece:'Grecia', Hungary:'Ungaria', Ireland:'Irlanda', Italy:'Italia', Latvia:'Letonia', Lithuania:'Lituania', Luxembourg:'Luxemburg', Malta:'Malta', Netherlands:'Țările de Jos', Poland:'Polonia', Portugal:'Portugalia', Romania:'România', Slovakia:'Slovacia', Slovenia:'Slovenia', Spain:'Spania', Sweden:'Suedia', 'United Kingdom':'Regatul Unit' }
+  };
+  var SKIP = { en: 'Skip to content', de: 'Zum Inhalt springen', ro: 'Sari la conținut' };
+  /* per-page <title> (— TOP Pep is appended) + meta description */
+  var PAGE_META = {
+    home:     { t: { en: 'Research peptides, verified before they ship', de: 'Forschungspeptide, geprüft bevor sie versendet werden', ro: 'Peptide de cercetare, verificate înainte de expediere' }, d: { en: 'Third-party tested research peptides with a Certificate of Analysis on the product page. Discreet, tracked EU & UK shipping.', de: 'Drittanbieter-getestete Forschungspeptide mit Analysenzertifikat auf der Produktseite. Diskreter Versand mit Sendungsverfolgung in EU & UK.', ro: 'Peptide de cercetare testate de terți, cu certificat de analiză pe pagina produsului. Livrare discretă și urmărită în UE & Regatul Unit.' } },
+    shop:     { t: { en: 'Catalog', de: 'Katalog', ro: 'Catalog' }, d: { en: 'Browse the full TOP Pep catalog of third-party tested research peptides, blends and lab supplies.', de: 'Durchstöbere den gesamten TOP-Pep-Katalog an drittanbieter-getesteten Forschungspeptiden, Mischungen und Laborbedarf.', ro: 'Răsfoiește întregul catalog TOP Pep de peptide de cercetare testate de terți, amestecuri și consumabile de laborator.' } },
+    coa:      { t: { en: 'COA library', de: 'COA-Bibliothek', ro: 'Bibliotecă COA' }, d: { en: 'Public library of Janoshik Certificates of Analysis. Verify your vial against its lot number.', de: 'Öffentliche Bibliothek der Janoshik-Analysenzertifikate. Prüfe dein Vial anhand der Chargennummer.', ro: 'Bibliotecă publică de certificate de analiză Janoshik. Verifică-ți flaconul după numărul de lot.' } },
+    quality:  { t: { en: 'Quality & testing', de: 'Qualität & Tests', ro: 'Calitate & testare' }, d: { en: 'Every TOP Pep batch is independently tested by Janoshik — HPLC purity, mass-spec identity, and a certificate you can verify.', de: 'Jede TOP-Pep-Charge wird von Janoshik unabhängig getestet — HPLC-Reinheit, MS-Identität und ein verifizierbares Zertifikat.', ro: 'Fiecare lot TOP Pep este testat independent de Janoshik — puritate HPLC, identitate prin spectrometrie de masă și un certificat verificabil.' } },
+    shipping: { t: { en: 'Shipping', de: 'Versand', ro: 'Livrare' }, d: { en: 'Freeze-dried, sealed and shipped discreetly with tracking. Free over €250, delivery across the EU and UK.', de: 'Gefriergetrocknet, versiegelt und diskret mit Sendungsverfolgung versendet. Gratis ab 250 €, Lieferung in EU und UK.', ro: 'Liofilizat, sigilat și expediat discret cu urmărire. Gratuit peste 250 €, livrare în UE și Regatul Unit.' } },
+    wholesale:{ t: { en: 'Wholesale', de: 'Großhandel', ro: 'En-gros' }, d: { en: 'Standing wholesale accounts with fixed volume pricing, batch-level COAs and dispatch priority.', de: 'Feste Großhandelskonten mit fixen Volumenpreisen, Chargen-COAs und Versandpriorität.', ro: 'Conturi en-gros permanente cu prețuri fixe de volum, COA-uri per lot și prioritate la expediere.' } },
+    partner:  { t: { en: 'Partner Program', de: 'Partnerprogramm', ro: 'Program parteneri' }, d: { en: 'Earn 20–40% tiered commission promoting third-party tested research peptides. Monthly PayPal payouts.', de: 'Verdiene 20–40 % gestaffelte Provision mit drittanbieter-getesteten Forschungspeptiden. Monatliche PayPal-Auszahlungen.', ro: 'Câștigă un comision de 20–40% promovând peptide de cercetare testate de terți. Plăți lunare prin PayPal.' } },
+    contact:  { t: { en: 'Contact', de: 'Kontakt', ro: 'Contact' }, d: { en: 'Question about an order, a COA, or reconstitution? Contact the TOP Pep support team.', de: 'Frage zu einer Bestellung, einem COA oder zur Rekonstitution? Kontaktiere das TOP-Pep-Support-Team.', ro: 'Ai o întrebare despre o comandă, un COA sau reconstituire? Contactează echipa de asistență TOP Pep.' } },
+    faq:      { t: { en: 'FAQ', de: 'FAQ', ro: 'Întrebări frecvente' }, d: { en: 'Answers on testing, COAs, storage, shipping, wholesale and support.', de: 'Antworten zu Tests, COAs, Lagerung, Versand, Großhandel und Support.', ro: 'Răspunsuri despre testare, COA-uri, depozitare, livrare, en-gros și asistență.' } },
+    about:    { t: { en: 'About', de: 'Über uns', ro: 'Despre' }, d: { en: 'Why TOP Pep exists: documented, traceable research material in a market full of guesswork.', de: 'Warum es TOP Pep gibt: dokumentiertes, rückverfolgbares Forschungsmaterial in einem Markt voller Rätselraten.', ro: 'De ce există TOP Pep: material de cercetare documentat și trasabil, într-o piață plină de presupuneri.' } },
+    cart:     { t: { en: 'Your cart', de: 'Dein Warenkorb', ro: 'Coșul tău' }, d: {} },
+    checkout: { t: { en: 'Checkout', de: 'Kasse', ro: 'Finalizare comandă' }, d: {} },
+    account:  { t: { en: 'Account', de: 'Konto', ro: 'Cont' }, d: {} },
+    terms:    { t: { en: 'Terms & conditions', de: 'AGB', ro: 'Termeni & condiții' }, d: {} },
+    privacy:  { t: { en: 'Privacy policy', de: 'Datenschutzerklärung', ro: 'Politică de confidențialitate' }, d: {} },
+    'legal-agreement':  { t: { en: 'Research-use agreement', de: 'Forschungsnutzungs-Vereinbarung', ro: 'Acord de utilizare în cercetare' }, d: {} },
+    'shipping-policy':  { t: { en: 'Shipping policy', de: 'Versandrichtlinie', ro: 'Politică de livrare' }, d: {} }
+  };
+  function applyPageMeta() {
+    try { document.documentElement.lang = lang; } catch (e) {}
+    var sk = $('.skip-link'); if (sk && SKIP[lang]) sk.textContent = SKIP[lang];
+    var m = PAGE_META[page]; if (!m) return;
+    if (m.t && m.t[lang]) document.title = m.t[lang] + ' — TOP Pep';
+    var md = $('meta[name="description"]');
+    if (md && m.d && m.d[lang]) md.setAttribute('content', m.d[lang]);
+  }
   var lang = localStorage.getItem('toppep_lang') || 'en';
   if (!DICT[lang]) lang = 'en';
   function t(key) { return (DICT[lang] && DICT[lang][key]) || DICT.en[key] || key; }
@@ -648,7 +795,7 @@
         '<div class="footer-cols">' +
           '<div class="f-brand-col"><div class="f-brand"><img src="/logo.png" alt="TOP Pep"></div>' +
             '<p class="footer-desc">' + t('footer_desc') + '</p>' +
-            '<div class="footer-pills"><span class="footer-pill">' + t('third_party') + '</span><span class="footer-pill">EU &amp; US</span></div></div>' +
+            '<div class="footer-pills"><span class="footer-pill">' + t('third_party') + '</span><span class="footer-pill">EU &amp; UK</span></div></div>' +
           '<div><h3>' + t('f_catalog') + '</h3><ul><li><a href="/shop/">' + t('fl_all') + '</a></li><li><a href="/shop/">' + t('cat_peptides') + '</a></li><li><a href="/shop/">' + t('cat_topicals') + '</a></li><li><a href="/shop/">' + t('cat_labsupplies') + '</a></li><li><a href="/coa/">' + t('fl_coa') + '</a></li></ul></div>' +
           '<div><h3>' + t('f_company') + '</h3><ul><li><a href="/about/">' + t('about') + '</a></li><li><a href="/quality/">' + t('nav_quality') + '</a></li><li><a href="/wholesale/">' + t('nav_wholesale') + '</a></li><li><a href="/faq/">' + t('faq') + '</a></li></ul></div>' +
           '<div><h3>' + t('f_support') + '</h3><ul><li><a href="/contact/">' + t('nav_contact') + '</a></li><li><a href="/shipping/">' + t('nav_shipping') + '</a></li><li><a href="/shipping-policy/">' + lg[2] + '</a></li><li><a href="/faq/">' + t('faq') + '</a></li><li><a href="/account/">' + t('sign_in') + '</a></li></ul></div>' +
@@ -782,6 +929,8 @@
     // translate any static markup tagged with data-i18n / data-i18n-ph
     $$('[data-i18n]').forEach(function (el) { var v = t(el.getAttribute('data-i18n')); if (v) el.innerHTML = v; });
     $$('[data-i18n-ph]').forEach(function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph'))); });
+    if (lang !== 'en' && COUNTRIES[lang]) $$('[data-country]').forEach(function (el) { var c = COUNTRIES[lang][el.getAttribute('data-country')]; if (c) el.textContent = c; });
+    applyPageMeta();
 
     // size sheet
     $('#sheetClose').addEventListener('click', closeSizeSheet);
@@ -1044,7 +1193,7 @@
       var params = new URLSearchParams(location.search);
       if (params.get('mode') === 'register') switchAuth('register');
       $$('.auth-tab').forEach(function (t) { t.addEventListener('click', function () { switchAuth(t.dataset.mode); }); });
-      $('#authForm').addEventListener('submit', function (e) { e.preventDefault(); $('#authStatus').textContent = 'Demo only — no account was created.'; });
+      $('#authForm').addEventListener('submit', function (e) { e.preventDefault(); $('#authStatus').textContent = t('acc_demo'); });
     },
 
     coa: function () {
@@ -1199,7 +1348,7 @@
           '<span class="eyebrow">' + t('cat_' + T.strip(p.category)) + ' · ' + t('research_only') + '</span>' +
           '<h1>' + displayName(p) + '</h1>' +
           '<div class="pd-price">' + topPrice + '</div>' +
-          '<p class="pd-desc">' + p.blurb + '</p>' +
+          '<p class="pd-desc">' + blurbText(p) + '</p>' +
           (isVar ?
             '<div class="pd-options">' +
               '<div class="pd-select-head"><span class="opt-label">' + t('select_size') + '</span><button class="pd-clear" id="pdClear">' + t('clear') + '</button></div>' +
@@ -1210,14 +1359,14 @@
             '<div class="stepper pd-stepper-lg"><button data-pstep="-1" aria-label="-">–</button><span class="qty pd-qty">1</span><button data-pstep="1" aria-label="+">+</button></div>' +
             '<button class="btn btn-block" id="pdAdd">' + t('add_to_cart') + '</button>' +
           '</div>' +
-          '<div class="pd-cats">' + t('categories') + ': <a href="/shop/">' + t('cat_' + T.strip(p.category)) + '</a>, <a href="/shop/">' + p.group + '</a></div>' +
+          '<div class="pd-cats">' + t('categories') + ': <a href="/shop/">' + t('cat_' + T.strip(p.category)) + '</a>, <a href="/shop/">' + groupLabel(p) + '</a></div>' +
           '<div class="pd-ship">' +
             '<div class="ship-line">' + I.clock + '<span>' + shipStatus + '</span></div>' +
             '<div class="ship-line">' + I.truck + '<span>' + t('two_day') + ' <b>' + fmtDate(ship.deliver) + '</b></span></div>' +
           '</div>' +
           '<div class="spec-grid">' +
             '<div class="cell"><div class="k">' + t('purity') + '</div><div class="v">' + p.purity + '</div></div>' +
-            '<div class="cell"><div class="k">' + t('form') + '</div><div class="v">' + p.form.replace(' powder', '').replace(' blend', '') + '</div></div>' +
+            '<div class="cell"><div class="k">' + t('form') + '</div><div class="v">' + (lang === 'en' ? p.form.replace(' powder', '').replace(' blend', '') : formLabel(p)) + '</div></div>' +
             '<div class="cell"><div class="k">' + t('dispatch') + '</div><div class="v">' + (ship.shipsToday ? t('same_day') : t('next_business_day')) + '</div></div>' +
           '</div>' +
           '<ul class="trust-checks">' +
@@ -1296,16 +1445,20 @@
 
     function tabsHTML(p) {
       var coaLine = p.coa
-        ? 'This lot is third-party tested by Janoshik (task #' + p.coa.task + '). <a href="' + p.coa.url + '" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">View the verified report</a>.'
-        : 'This compound is currently in testing at Janoshik — the verified report will be published in our COA library as soon as it lands.';
+        ? t('tab_coa_tested').replace('{task}', p.coa.task).replace('{url}', p.coa.url)
+        : t('tab_coa_testing');
+      var fl = formLabel(p);
+      if (lang === 'en') fl = fl.toLowerCase();
+      else if (lang === 'ro') fl = fl.charAt(0).toLowerCase() + fl.slice(1);
+      var detailsBody = t('tab_details_body').replace('{form}', fl);
       return '<div class="pd-tabs"><div class="tab-nav" role="tablist">' +
         '<button role="tab" data-tab="desc" aria-selected="true">' + t('description') + '</button>' +
         '<button role="tab" data-tab="details" aria-selected="false">' + t('details') + '</button>' +
         '<button role="tab" data-tab="specs" aria-selected="false">' + t('specifications') + '</button>' +
         '</div>' +
-        '<div class="tab-panel active" data-panel="desc"><p>' + p.blurb + ' ' + coaLine + '</p></div>' +
-        '<div class="tab-panel" data-panel="details"><p>Supplied as a sealed ' + p.form.toLowerCase() + ' in a tamper-evident vial. Reconstitute with bacteriostatic water according to your own protocol; we provide no dosing guidance, as all products are sold strictly for laboratory research use.</p></div>' +
-        '<div class="tab-panel" data-panel="specs"><dl><dt>Purity</dt><dd>' + p.purity + '</dd><dt>Form</dt><dd>' + p.form + '</dd><dt>Storage</dt><dd>–20°C, protect from light</dd><dt>COA</dt><dd>' + (p.coa ? 'Janoshik #' + p.coa.task : 'In testing') + '</dd><dt>Use</dt><dd>Research only</dd></dl></div>' +
+        '<div class="tab-panel active" data-panel="desc"><p>' + blurbText(p) + ' ' + coaLine + '</p></div>' +
+        '<div class="tab-panel" data-panel="details"><p>' + detailsBody + '</p></div>' +
+        '<div class="tab-panel" data-panel="specs"><dl><dt>' + t('purity') + '</dt><dd>' + p.purity + '</dd><dt>' + t('form') + '</dt><dd>' + formLabel(p) + '</dd><dt>' + t('spec_storage') + '</dt><dd>' + t('spec_storage_val') + '</dd><dt>COA</dt><dd>' + (p.coa ? 'Janoshik #' + p.coa.task : t('spec_coa_testing')) + '</dd><dt>' + t('spec_use') + '</dt><dd>' + t('spec_use_val') + '</dd></dl></div>' +
       '</div>';
     }
   }
@@ -1393,7 +1546,7 @@
       b.addEventListener('click', function () {
         var p = T.bySlug(b.dataset.upsell);
         Cart.add(p, p.type === 'variable' ? p.options[0] : null, 1);
-        b.textContent = 'Added';
+        b.textContent = t('co_added');
         renderCheckout();
       });
     });
@@ -1411,12 +1564,12 @@
 
   /* ---- account tabs ---- */
   function switchAuth(mode) {
-    $$('.auth-tab').forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.mode === mode)); });
+    $$('.auth-tab').forEach(function (tab) { tab.setAttribute('aria-selected', String(tab.dataset.mode === mode)); });
     var reg = mode === 'register';
     $('#nameField').style.display = reg ? '' : 'none';
-    $('#authSubmit').textContent = reg ? 'Create account' : 'Sign in';
+    $('#authSubmit').textContent = reg ? t('acc_create') : t('acc_signin');
     $('#authRow').style.display = reg ? 'none' : 'flex';
-    $('#authTitle').textContent = reg ? 'Create your account' : 'Welcome back';
+    $('#authTitle').textContent = reg ? t('acc_create_title') : t('acc_welcome');
   }
 
   /* ---- faq / accordion (shared) ---- */

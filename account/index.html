@@ -9,40 +9,40 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=10">
+<link rel="stylesheet" href="/styles.css?v=11">
 </head>
 <body data-page="account">
 <a class="skip-link" href="#main">Skip to content</a>
 <main id="main">
   <div class="auth-wrap">
     <div class="auth-card">
-      <h1 id="authTitle" style="font-size:1.5rem;margin-bottom:22px;">Welcome back</h1>
+      <h1 id="authTitle" style="font-size:1.5rem;margin-bottom:22px;" data-i18n="acc_welcome">Welcome back</h1>
       <div class="auth-tabs" role="tablist">
-        <button class="auth-tab" data-mode="login" role="tab" aria-selected="true">Sign in</button>
-        <button class="auth-tab" data-mode="register" role="tab" aria-selected="false">Create account</button>
+        <button class="auth-tab" data-mode="login" role="tab" aria-selected="true" data-i18n="acc_signin">Sign in</button>
+        <button class="auth-tab" data-mode="register" role="tab" aria-selected="false" data-i18n="acc_create">Create account</button>
       </div>
 
       <button class="oauth-btn" type="button">
         <svg viewBox="0 0 24 24"><path fill="#0B0B0D" d="M12 11v3.3h4.6c-.2 1.2-1.5 3.5-4.6 3.5-2.8 0-5-2.3-5-5.1s2.2-5.1 5-5.1c1.6 0 2.6.7 3.2 1.2l2.2-2.1C16 4.5 14.2 3.7 12 3.7 7.5 3.7 3.9 7.3 3.9 12s3.6 8.3 8.1 8.3c4.7 0 7.8-3.3 7.8-7.9 0-.5 0-.9-.1-1.4z"/></svg>
-        Continue with Google
+        <span data-i18n="acc_google">Continue with Google</span>
       </button>
-      <div class="auth-divider">or with email</div>
+      <div class="auth-divider" data-i18n="acc_or_email">or with email</div>
 
       <form id="authForm">
-        <div class="field" id="nameField" style="display:none;"><label for="acName">Full name</label><input id="acName" type="text" placeholder="Dr. A. Researcher"></div>
-        <div class="field"><label for="acEmail">Email address</label><input id="acEmail" type="email" placeholder="you@lab.com" required></div>
-        <div class="field"><label for="acPass">Password</label><input id="acPass" type="password" placeholder="••••••••" required></div>
+        <div class="field" id="nameField" style="display:none;"><label for="acName" data-i18n="acc_name">Full name</label><input id="acName" type="text" placeholder="Dr. A. Researcher"></div>
+        <div class="field"><label for="acEmail" data-i18n="co_email">Email address</label><input id="acEmail" type="email" placeholder="you@lab.com" required></div>
+        <div class="field"><label for="acPass" data-i18n="acc_pass">Password</label><input id="acPass" type="password" placeholder="••••••••" required></div>
         <div class="auth-row" id="authRow">
-          <label class="remember"><input type="checkbox"> Remember me</label>
-          <a class="auth-forgot" href="#">Forgot password?</a>
+          <label class="remember"><input type="checkbox"> <span data-i18n="acc_remember">Remember me</span></label>
+          <a class="auth-forgot" href="#" data-i18n="acc_forgot">Forgot password?</a>
         </div>
-        <button class="btn btn-block" type="submit" id="authSubmit">Sign in</button>
+        <button class="btn btn-block" type="submit" id="authSubmit" data-i18n="acc_signin">Sign in</button>
         <p class="drawer-note" id="authStatus" style="margin-top:14px;min-height:16px;"></p>
       </form>
     </div>
   </div>
 </main>
-<script src="/data.js?v=10"></script>
-<script src="/app.js?v=10"></script>
+<script src="/data.js?v=11"></script>
+<script src="/app.js?v=11"></script>
 </body>
 </html>

@@ -222,14 +222,61 @@
     'tesamorelin', 'glow-blend', 'cjc-1295-ipamorelin', 'mots-c', 'kpv', 'mt-2', 'semax', 'selank', 'semaglutide'];
   products.forEach(function (p) { var i = shopOrder.indexOf(p.slug); p.order = i === -1 ? 100 - (p.stock / 10) : i; });
 
-  var faqs = [
-    { q: 'What does “for research use only” mean?', a: 'Every product listed is intended strictly for in-vitro laboratory research and analytical work. Nothing we sell is a drug, supplement, or medical product, and none of it is for human or veterinary use, consumption, or administration.' },
-    { q: 'Is a Certificate of Analysis included?', a: 'Yes. Tested lots ship with a lot-matched, third-party Janoshik COA that you can verify by task number in our COA library. Compounds still in testing are listed as “in testing”, with the report published as soon as it lands.' },
-    { q: 'How is my order packaged and shipped?', a: 'Orders are packed discreetly with no branding on the outside, cold-packed where the compound requires it, and dispatched quickly with tracked shipping.' },
-    { q: 'How should I store lyophilized peptides?', a: 'Sealed lyophilized vials are stable at –20 °C away from light. Once reconstituted with bacteriostatic water, keep refrigerated and use within the window appropriate to your protocol.' },
-    { q: 'Do you offer sizes or peptides that aren’t listed?', a: 'Often, yes. If you need a specific peptide or size that isn’t in the catalog, contact us on Telegram @TOP_Pep for availability and pricing.' },
-    { q: 'What payment methods do you accept?', a: 'Several payment methods are available at checkout. All payment data is handled by the processor; we never store card details.' }
-  ];
+  /* ---------- DE / RO translations for product data ---------- */
+  var GROUP_I18N = {
+    'GLP-1':          { de: 'GLP-1',                ro: 'GLP-1' },
+    'Growth Hormone': { de: 'Wachstumshormon',      ro: 'Hormon de creștere' },
+    'Recovery':       { de: 'Regeneration',         ro: 'Recuperare' },
+    'Longevity':      { de: 'Langlebigkeit',        ro: 'Longevitate' },
+    'Neuro':          { de: 'Neuro',                ro: 'Neuro' },
+    'Cellular':       { de: 'Zellulär',             ro: 'Celular' },
+    'Cosmetic':       { de: 'Kosmetik',             ro: 'Cosmetic' },
+    'Lab Supplies':   { de: 'Laborbedarf',          ro: 'Consumabile de laborator' }
+  };
+  var FORM_I18N = {
+    'Lyophilized powder': { de: 'Lyophilisiertes Pulver', ro: 'Pulbere liofilizată' },
+    'Lyophilized blend':  { de: 'Lyophilisierte Mischung', ro: 'Amestec liofilizat' },
+    'Topical solution':   { de: 'Topische Lösung',        ro: 'Soluție topică' },
+    'Multi-dose vial':    { de: 'Mehrdosen-Vial',         ro: 'Flacon multidoză' }
+  };
+  var BLURB_I18N = {
+    'tirzepatide': { de: 'Dualer GIP-/GLP-1-Rezeptoragonist, untersucht in der Erforschung metabolischer Signalwege. Lyophilisiert zur Rekonstitution geliefert.', ro: 'Agonist dublu al receptorilor GIP/GLP-1, studiat în cercetarea semnalizării metabolice. Livrat liofilizat pentru reconstituire.' },
+    'semaglutide': { de: 'GLP-1-Rezeptoragonist-Analogon zur Erforschung metabolischer Signalwege. Nur für Forschungszwecke.', ro: 'Analog agonist al receptorului GLP-1 pentru cercetarea căilor metabolice. Doar pentru uz de cercetare.' },
+    'retatrutide': { de: 'Dreifachagonist, untersucht hinsichtlich der Aktivität an GIP-, GLP-1- und Glukagon-Rezeptoren.', ro: 'Agonist triplu, studiat pentru activitatea la receptorii GIP, GLP-1 și glucagon.' },
+    'cagrilintide': { de: 'Langwirksames Amylin-Analogon, untersucht in der Appetit- und Stoffwechselregulationsforschung.', ro: 'Analog de amilină cu acțiune prelungită, studiat în cercetarea reglării apetitului și a metabolismului.' },
+    'hgh-somatropin': { de: 'Rekombinantes Somatropin, lyophilisiert geliefert für die Erforschung von Wachstumshormon-Signalwegen.', ro: 'Somatropină recombinantă, livrată liofilizat pentru cercetarea căilor hormonului de creștere.' },
+    'hcg': { de: 'Humanes Choriongonadotropin für die Erforschung endokriner Signalwege.', ro: 'Gonadotropină corionică umană pentru cercetarea semnalizării endocrine.' },
+    'cjc-1295-no-dac': { de: 'GHRH-Analogon ohne DAC, untersucht auf kurzwirksame Sekretagoga-Aktivität.', ro: 'Analog GHRH fără DAC, studiat pentru activitatea secretagogă de scurtă durată.' },
+    'cjc-1295-with-dac': { de: 'GHRH-Analogon mit Drug-Affinity-Complex zur Erforschung einer verlängerten Halbwertszeit.', ro: 'Analog GHRH cu complex de afinitate (DAC) pentru cercetarea unei durate de înjumătățire prelungite.' },
+    'cjc-1295-ipamorelin': { de: 'Vorgemischte Sekretagoga-Kombination in einem einzigen Vial für vergleichende Studien.', ro: 'Amestec secretagog precombinat într-un singur flacon, pentru studii comparative.' },
+    'ipamorelin': { de: 'Selektives Wachstumshormon-Sekretagogum mit sauberem Rezeptorprofil.', ro: 'Secretagog selectiv al hormonului de creștere, cu un profil receptor curat.' },
+    'tesamorelin': { de: 'GHRH-Analogon zur Untersuchung wachstumshormonfreisetzender Signalwege.', ro: 'Analog GHRH folosit pentru studierea căilor de eliberare a hormonului de creștere.' },
+    'sermorelin': { de: 'GHRH-(1–29)-Fragment, untersucht auf endogene Sekretagoga-Signalgebung.', ro: 'Fragment GHRH (1–29), studiat pentru semnalizarea secretagogă endogenă.' },
+    'igf1-lr3': { de: 'Long-Arg-3-IGF-1-Analogon, untersucht in der Zellwachstumsforschung.', ro: 'Analog IGF-1 Long-Arg-3, studiat în cercetarea creșterii celulare.' },
+    'bpc-157': { de: 'Stabiles gastrisches Pentadecapeptid, untersucht auf Signalwege der Geweberegeneration.', ro: 'Pentadecapeptidă gastrică stabilă, studiată pentru semnalizarea de reparare a țesuturilor.' },
+    'tb-500': { de: 'Synthetisches Thymosin-beta-4-Fragment, untersucht in der Aktin-Regulation und Zellmotilität.', ro: 'Fragment sintetic de timozină beta-4, studiat în reglarea actinei și motilitatea celulară.' },
+    'bpc-157-tb-500': { de: 'Kombinierte Regenerations-Mischung in einem Vial für vergleichende Recovery-Forschung.', ro: 'Amestec combinat de recuperare într-un flacon, pentru cercetare comparativă a recuperării.' },
+    'glow-blend': { de: 'Drei-Peptid-Mischung aus GHK-Cu, TB-500 und BPC-157 für Multi-Target-Studien.', ro: 'Amestec de trei peptide — GHK-Cu, TB-500 și BPC-157 — pentru studii multi-țintă.' },
+    'ss-31': { de: 'Mitochondrien-gerichtetes Peptid, untersucht in der Erforschung zellulären Stresses.', ro: 'Peptidă direcționată spre mitocondrii, studiată în cercetarea stresului celular.' },
+    'mots-c': { de: 'Mitochondrial abgeleitetes Peptid, untersucht in der Erforschung der metabolischen Homöostase.', ro: 'Peptidă derivată mitocondrial, studiată în cercetarea homeostaziei metabolice.' },
+    'thymosin-alpha-1': { de: 'Immunmodulierendes Peptid, untersucht in der Erforschung der zellulären Abwehr.', ro: 'Peptidă imunomodulatoare, studiată în cercetarea apărării celulare.' },
+    'epitalon': { de: 'Tetrapeptid, untersucht auf Telomerase- und Zirkadianregulationsforschung.', ro: 'Tetrapeptidă studiată pentru cercetarea telomerazei și a reglării circadiene.' },
+    'semax': { de: 'Neuropeptid-Fragment, untersucht in der kognitiven und neuroprotektiven Forschung.', ro: 'Fragment neuropeptidic, studiat în cercetarea cognitivă și neuroprotectoare.' },
+    'selank': { de: 'Synthetisches Tuftsin-Analogon, untersucht in der anxiolytischen und neuronalen Signalforschung.', ro: 'Analog sintetic al tuftsinei, studiat în cercetarea anxiolitică și a semnalizării neuronale.' },
+    'dsip': { de: 'Delta-Schlaf-induzierendes Peptid, untersucht in der Neuroregulationsforschung.', ro: 'Peptidă care induce somnul delta, studiată în cercetarea neuroreglării.' },
+    'nad-plus': { de: 'Nicotinamid-Adenin-Dinukleotid, untersucht in der Erforschung der zellulären Energie.', ro: 'Nicotinamidă adenin dinucleotidă, studiată în cercetarea energiei celulare.' },
+    'pt-141': { de: 'Melanocortin-Agonist-Peptid, untersucht in der neuroverhaltensbezogenen Forschung.', ro: 'Peptidă agonistă melanocortinică, studiată în cercetarea neurocomportamentală.' },
+    'kpv': { de: 'Alpha-MSH-Tripeptid-Fragment, untersucht auf entzündungshemmende Signalgebung.', ro: 'Fragment tripeptidic alfa-MSH, studiat pentru semnalizarea antiinflamatoare.' },
+    'ghk-cu': { de: 'Kupferbindendes Tripeptid, untersucht in der dermalen und Matrix-Remodelling-Forschung.', ro: 'Tripeptidă care leagă cuprul, studiată în cercetarea dermică și a remodelării matricei.' },
+    'mt-2': { de: 'Melanocortin-Analogon, untersucht in der Erforschung von Pigmentierungs-Signalwegen.', ro: 'Analog melanocortinic, studiat în cercetarea căilor de pigmentare.' },
+    'ghk-cu-serum': { de: 'Gebrauchsfertiges GHK-Cu-Hautserum für dermale Forschungsanwendungen. 30-ml-Pumpflasche.', ro: 'Ser topic GHK-Cu gata de utilizare pentru aplicații de cercetare dermică. Flacon cu pompă de 30 ml.' },
+    'bacteriostatic-water': { de: 'Steriles Lösungsmittel zur Rekonstitution lyophilisierter Forschungswirkstoffe.', ro: 'Diluant steril pentru reconstituirea compușilor de cercetare liofilizați.' }
+  };
+  products.forEach(function (p) {
+    if (GROUP_I18N[p.group]) p.groupI18n = GROUP_I18N[p.group];
+    if (FORM_I18N[p.form]) p.formI18n = FORM_I18N[p.form];
+    if (BLURB_I18N[p.slug]) p.blurbI18n = BLURB_I18N[p.slug];
+  });
 
   var strip = function (s) { return (s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); };
   var num = function (s) { return s.replace(/[^0-9.]/g, ''); };
@@ -239,7 +286,6 @@
   window.TOPPEP = {
     products: products,
     coas: products.filter(function (p) { return p.category !== 'Lab Supplies'; }).concat(extraCoas),
-    faqs: faqs,
     categories: ['Peptides', 'Lab Supplies', 'Topicals'],
     featured: ['retatrutide', 'tirzepatide', 'ghk-cu', 'bpc-157', 'glow-blend', 'semaglutide'],
     currency: CUR,

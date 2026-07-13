@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=10">
+<link rel="stylesheet" href="/styles.css?v=11">
 </head>
 <body data-page="shop">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -30,10 +30,10 @@
       <div class="filter-right">
         <button class="pill sale-pill" id="saleToggle" aria-pressed="false"><span id="saleToggleLabel">On sale</span></button>
         <select class="sort-select" id="sortSelect" aria-label="Sort products">
-          <option value="order">Recommended</option>
-          <option value="name">A → Z</option>
-          <option value="price-asc">Price ↑</option>
-          <option value="price-desc">Price ↓</option>
+          <option value="order" data-i18n="sort_recommended">Recommended</option>
+          <option value="name" data-i18n="sort_az">A → Z</option>
+          <option value="price-asc" data-i18n="sort_price_asc">Price ↑</option>
+          <option value="price-desc" data-i18n="sort_price_desc">Price ↓</option>
         </select>
       </div>
     </div>
@@ -53,7 +53,7 @@
   </div>
 </div>
 
-<script src="/data.js?v=10"></script>
-<script src="/app.js?v=10"></script>
+<script src="/data.js?v=11"></script>
+<script src="/app.js?v=11"></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=10">
+<link rel="stylesheet" href="/styles.css?v=11">
 </head>
 <body data-page="checkout">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -39,7 +39,7 @@
           </div>
           <div class="field"><label for="coCountry" data-i18n="co_country">Country</label>
             <select id="coCountry">
-              <option>Austria</option><option>Belgium</option><option>Bulgaria</option><option>Croatia</option><option>Cyprus</option><option>Czechia</option><option>Denmark</option><option>Estonia</option><option>Finland</option><option>France</option><option selected>Germany</option><option>Greece</option><option>Hungary</option><option>Ireland</option><option>Italy</option><option>Latvia</option><option>Lithuania</option><option>Luxembourg</option><option>Malta</option><option>Netherlands</option><option>Poland</option><option>Portugal</option><option>Romania</option><option>Slovakia</option><option>Slovenia</option><option>Spain</option><option>Sweden</option><option>United Kingdom</option>
+              <option data-country="Austria">Austria</option><option data-country="Belgium">Belgium</option><option data-country="Bulgaria">Bulgaria</option><option data-country="Croatia">Croatia</option><option data-country="Cyprus">Cyprus</option><option data-country="Czechia">Czechia</option><option data-country="Denmark">Denmark</option><option data-country="Estonia">Estonia</option><option data-country="Finland">Finland</option><option data-country="France">France</option><option data-country="Germany" selected>Germany</option><option data-country="Greece">Greece</option><option data-country="Hungary">Hungary</option><option data-country="Ireland">Ireland</option><option data-country="Italy">Italy</option><option data-country="Latvia">Latvia</option><option data-country="Lithuania">Lithuania</option><option data-country="Luxembourg">Luxembourg</option><option data-country="Malta">Malta</option><option data-country="Netherlands">Netherlands</option><option data-country="Poland">Poland</option><option data-country="Portugal">Portugal</option><option data-country="Romania">Romania</option><option data-country="Slovakia">Slovakia</option><option data-country="Slovenia">Slovenia</option><option data-country="Spain">Spain</option><option data-country="Sweden">Sweden</option><option data-country="United Kingdom">United Kingdom</option>
             </select>
           </div>
         </div>
@@ -80,24 +80,24 @@
               <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
             <div class="accordion-body">
-              <div class="field"><label for="ccNum">Card number</label><input id="ccNum" inputmode="numeric" placeholder="4242 4242 4242 4242"></div>
+              <div class="field"><label for="ccNum" data-i18n="cc_num">Card number</label><input id="ccNum" inputmode="numeric" placeholder="4242 4242 4242 4242"></div>
               <div class="field-row">
-                <div class="field"><label for="ccExp">Expiry</label><input id="ccExp" placeholder="MM / YY"></div>
-                <div class="field"><label for="ccCvc">CVC</label><input id="ccCvc" placeholder="123"></div>
+                <div class="field"><label for="ccExp" data-i18n="cc_exp">Expiry</label><input id="ccExp" placeholder="MM / YY"></div>
+                <div class="field"><label for="ccCvc" data-i18n="cc_cvc">CVC</label><input id="ccCvc" placeholder="123"></div>
               </div>
             </div>
           </div>
           <div class="accordion-item">
-            <button type="button" class="accordion-head">Bank transfer
+            <button type="button" class="accordion-head"><span data-i18n="pay_bank">Bank transfer</span>
               <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
-            <div class="accordion-body">Transfer details are emailed after you place the order; we dispatch on receipt of cleared funds.</div>
+            <div class="accordion-body" data-i18n="pay_bank_body">Transfer details are emailed after you place the order; we dispatch on receipt of cleared funds.</div>
           </div>
           <div class="accordion-item">
-            <button type="button" class="accordion-head">Crypto
+            <button type="button" class="accordion-head"><span data-i18n="pay_crypto">Crypto</span>
               <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
-            <div class="accordion-body">Pay with major assets at a locked rate valid for 15 minutes at checkout.</div>
+            <div class="accordion-body" data-i18n="pay_crypto_body">Pay in BTC, ETH or USDT. A wallet address and the exact amount are shown after you place the order.</div>
           </div>
         </div>
 
@@ -107,7 +107,7 @@
     </div>
   </div>
 </main>
-<script src="/data.js?v=10"></script>
-<script src="/app.js?v=10"></script>
+<script src="/data.js?v=11"></script>
+<script src="/app.js?v=11"></script>
 </body>
 </html>
