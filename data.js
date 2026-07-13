@@ -7,6 +7,12 @@
 (function () {
   'use strict';
 
+  /* first visit: pick the language from the visitor's browser locale */
+  if (!localStorage.getItem('toppep_lang')) {
+    var navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
+    localStorage.setItem('toppep_lang', navLang.indexOf('de') === 0 ? 'de' : navLang.indexOf('ro') === 0 ? 'ro' : 'en');
+  }
+
   /* currency follows language: Romanian → lei, else → euro */
   var CUR = (localStorage.getItem('toppep_lang') === 'ro') ? 'ron' : 'eur';
 
@@ -124,7 +130,8 @@
 
     P({ slug: 'ghk-cu-serum', name: 'GHK-Cu Topical Serum', nameI18n: { de: 'GHK-CU Hautserum', ro: 'GHK-CU Ser Topical' },
         category: 'Topicals', group: 'Cosmetic', img: IMG + 'GHK-Cu Topical Serum 30ml.png',
-        size: '30 ml', price: 70, ron: 366.99, stock: 44, form: 'Topical solution', purity: 'GHK-Cu formulation',
+        size: '30 ml', price: 49.99, ron: 261.99, oldPrice: 70, oldRon: 366.99, onSale: true,
+        stock: 44, form: 'Topical solution', purity: 'GHK-Cu formulation',
         aliases: ['ghk', 'serum', 'topical', 'copper serum', 'hautserum', 'ser topical'],
         blurb: 'Ready-to-use GHK-Cu topical serum for dermal research applications. 30 ml pump bottle.' }),
 
@@ -201,12 +208,13 @@
     p.lot = 'TP' + p.slug.replace(/[^a-z0-9]/gi, '').slice(0, 6).toUpperCase() + (2001 + i * 3);
   });
 
-  /* apply 10% sale to on-sale products (both currencies) */
+  /* apply 10% sale to on-sale products (both currencies);
+     items with a hand-set oldPrice keep their explicit discount */
   function r2(n) { return Math.round(n * 100) / 100; }
   products.forEach(function (p) {
     if (!p.onSale) return;
-    if (p.type === 'variable') p.options.forEach(function (o) { o.oldPrice = o.price; o.oldRon = o.ron; o.price = r2(o.price * 0.9); o.ron = r2(o.ron * 0.9); });
-    else { p.oldPrice = p.price; p.oldRon = p.ron; p.price = r2(p.price * 0.9); p.ron = r2(p.ron * 0.9); }
+    if (p.type === 'variable') p.options.forEach(function (o) { if (o.oldPrice) return; o.oldPrice = o.price; o.oldRon = o.ron; o.price = r2(o.price * 0.9); o.ron = r2(o.ron * 0.9); });
+    else if (!p.oldPrice) { p.oldPrice = p.price; p.oldRon = p.ron; p.price = r2(p.price * 0.9); p.ron = r2(p.ron * 0.9); }
   });
 
   var shopOrder = ['retatrutide', 'tirzepatide', 'bacteriostatic-water', 'ghk-cu', 'ghk-cu-serum',
@@ -231,7 +239,7 @@
     products: products,
     coas: products.filter(function (p) { return p.category !== 'Lab Supplies'; }).concat(extraCoas),
     faqs: faqs,
-    categories: ['Peptides', 'Capsules', 'Lab Supplies', 'Topicals'],
+    categories: ['Peptides', 'Lab Supplies', 'Topicals'],
     featured: ['retatrutide', 'tirzepatide', 'ghk-cu', 'bpc-157', 'glow-blend', 'semaglutide'],
     currency: CUR,
     freeShip: CUR === 'ron' ? 1230 : 250,

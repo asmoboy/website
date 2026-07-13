@@ -70,7 +70,11 @@
       rights: 'For research use only.', reset: 'Reset', back_catalog: '← Back to catalog', description: 'Description', details: 'Details', specifications: 'Specifications', coa_in_box: 'Free lot-matched COA in every box', results_for: 'results for', product: 'Product', price: 'Price', proceed_checkout: 'Proceed to checkout', contact_label: 'Contact', shipping_method: 'Shipping method', payment: 'Payment', cart_empty_sub: 'Browse the catalog to add third-party tested research compounds — a lot-matched COA ships with every order.',
       all: 'All', the_catalog: 'The catalog', all_research: 'All research compounds', shop_empty: 'Nothing in this category yet — new stock is added regularly.',
       hero_eyebrow: 'Third-party tested · Research use only', hero_h1: 'Every vial ships with <span class="outline">proof</span>, not promises.',
-      hero_lede: 'TOP Pep sources, tests, and documents every research peptide before it leaves the lab. A lot-matched Certificate of Analysis is in every box — no exceptions, no guesswork.',
+      hero_lede: 'TOP Pep sources and tests our research peptides through independent lab analysis. A Certificate of Analysis for tested batches is published on the product page — real results, not just claims.',
+      next_business_day: 'Next business day', next_day_dispatch: 'Dispatch on the next business day',
+      ag_eyebrow: 'Research use only', ag_h: 'You must be 18 or older to enter',
+      ag_p: 'TOP Pep supplies research compounds strictly for in-vitro laboratory use — not intended for human or veterinary consumption. By continuing, you confirm you are at least 18 years old and agree to our <a href="/terms/">Terms &amp; Conditions</a> and <a href="/legal-agreement/">Research Use Agreement</a>.',
+      ag_enter: 'I\'m 18 or older — Enter', ag_exit: 'Exit', ag_foot: 'HPLC + MS tested · COA available · Discreet shipping',
       hero_cta1: 'Browse the catalog', hero_cta2: 'View the COA library', stat_purity: 'Documented purity', stat_compounds: 'Compounds in stock', stat_free: 'Free-shipping threshold',
       sec_best: 'The catalog', sec_featured: 'Peptides', shop_all: 'Shop all', browse_word: 'Browse',
       sec_glp_eyebrow: 'GLP-1 &amp; metabolic', sec_glp_h: 'Metabolic research', sec_gh_eyebrow: 'Secretagogues', sec_gh_h: 'Growth-hormone peptides', sec_rec_eyebrow: 'Repair', sec_rec_h: 'Recovery &amp; healing',
@@ -183,7 +187,7 @@
       sign_in: 'Anmelden', about: 'Über uns', faq: 'FAQ',
       add_to_cart: 'In den Warenkorb', select_options: 'Optionen wählen', tap_a_size: 'Tippe auf eine Größe, um sie hinzuzufügen',
       sale: 'Sale', best_seller: 'Bestseller', on_sale: 'Im Sale', clear: 'Zurücksetzen', checkout: 'Zur Kasse',
-      cat_peptides: 'Peptide', cat_capsules: 'Kapseln', cat_labsupplies: 'Laborbedarf', cat_topicals: 'Topika',
+      cat_peptides: 'Peptide', cat_capsules: 'Kapseln', cat_labsupplies: 'Laborbedarf', cat_topicals: 'Topische Produkte',
       your_cart: 'Dein Warenkorb', cart_empty: 'Dein Warenkorb ist leer', subtotal: 'Zwischensumme', browse: 'Katalog ansehen',
       free_ship_unlocked: 'Du hast <b>Gratisversand</b> freigeschaltet', away_free: 'bis zum <b>Gratisversand</b>',
       added_recon: 'Zur Rekonstitution hinzugefügt', ships_taxes: 'Versand &amp; Steuern werden an der Kasse berechnet.',
@@ -203,8 +207,12 @@
       disclaimer: 'Alle Produkte werden ausschließlich für Labor- und In-vitro-Forschungszwecke verkauft. Nichts auf dieser Seite ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts davon ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit der Bestellung bestätigst du, dass du ein qualifizierter Forscher bist.',
       rights: 'Nur für Forschungszwecke.', reset: 'Zurücksetzen', back_catalog: '← Zurück zum Katalog', description: 'Beschreibung', details: 'Details', specifications: 'Spezifikationen', coa_in_box: 'Gratis chargengenaues COA in jeder Box', results_for: 'Treffer für', product: 'Produkt', price: 'Preis', proceed_checkout: 'Zur Kasse gehen', contact_label: 'Kontakt', shipping_method: 'Versandart', payment: 'Zahlung', cart_empty_sub: 'Durchsuche den Katalog und füge extern getestete Forschungswirkstoffe hinzu — ein chargengenaues COA liegt jeder Bestellung bei.',
       all: 'Alle', the_catalog: 'Der Katalog', all_research: 'Alle Forschungswirkstoffe', shop_empty: 'In dieser Kategorie ist noch nichts — neue Ware kommt regelmäßig hinzu.',
-      hero_eyebrow: 'Unabhängig getestet · Nur für Forschungszwecke', hero_h1: 'Jedes Vial kommt mit <span class="outline">Nachweis</span> — nicht mit Versprechen.',
-      hero_lede: 'TOP Pep beschafft, testet und dokumentiert jedes Forschungspeptid, bevor es das Labor verlässt. Jeder Bestellung liegt ein chargengenaues Analysenzertifikat bei — ohne Ausnahme, ohne Rätselraten.',
+      hero_eyebrow: 'Drittanbieter-getestet · Nur für Forschungszwecke', hero_h1: 'Jedes Vial kommt mit <span class="outline">Beweis</span>, nicht mit Versprechen.',
+      hero_lede: 'TOP Pep bezieht und testet seine Forschungspeptide durch unabhängige Laboranalysen. Ein Analysezertifikat für getestete Chargen ist direkt auf der Produktseite einsehbar — echte Ergebnisse, keine bloßen Behauptungen.',
+      next_business_day: 'Nächster Werktag', next_day_dispatch: 'Versand am nächsten Werktag',
+      ag_eyebrow: 'Nur für Forschungszwecke', ag_h: 'Du musst mindestens 18 Jahre alt sein',
+      ag_p: 'TOP Pep liefert Forschungssubstanzen ausschließlich für die In-vitro-Laboranwendung — nicht für den menschlichen oder tierischen Verzehr bestimmt. Indem du fortfährst, bestätigst du, dass du mindestens 18 Jahre alt bist und unseren <a href="/terms/">AGB</a> sowie der <a href="/legal-agreement/">Forschungsnutzungs-Vereinbarung</a> zustimmst.',
+      ag_enter: 'Ich bin 18 oder älter — Eintreten', ag_exit: 'Verlassen', ag_foot: 'HPLC + MS getestet · COA verfügbar · Diskreter Versand',
       hero_cta1: 'Katalog ansehen', hero_cta2: 'COA-Bibliothek ansehen', stat_purity: 'Dokumentierte Reinheit', stat_compounds: 'Wirkstoffe auf Lager', stat_free: 'Gratisversand ab',
       sec_best: 'Der Katalog', sec_featured: 'Peptide', shop_all: 'Alle ansehen', browse_word: 'Ansehen',
       sec_glp_eyebrow: 'GLP-1 &amp; Stoffwechsel', sec_glp_h: 'Metabolische Forschung', sec_gh_eyebrow: 'Sekretagoga', sec_gh_h: 'Wachstumshormon-Peptide', sec_rec_eyebrow: 'Regeneration', sec_rec_h: 'Regeneration &amp; Heilung',
@@ -317,7 +325,7 @@
       sign_in: 'Autentificare', about: 'Despre', faq: 'Întrebări',
       add_to_cart: 'Adaugă în coș', select_options: 'Alege opțiunile', tap_a_size: 'Atinge o mărime pentru a o adăuga în coș',
       sale: 'Reducere', best_seller: 'Cel mai vândut', on_sale: 'La reducere', clear: 'Resetează', checkout: 'Finalizează comanda',
-      cat_peptides: 'Peptide', cat_capsules: 'Capsule', cat_labsupplies: 'Consumabile de laborator', cat_topicals: 'Topice',
+      cat_peptides: 'Peptide', cat_capsules: 'Capsule', cat_labsupplies: 'Consumabile de laborator', cat_topicals: 'Produse topice',
       your_cart: 'Coșul tău', cart_empty: 'Coșul tău este gol', subtotal: 'Subtotal', browse: 'Vezi catalogul',
       free_ship_unlocked: 'Ai deblocat <b>livrarea gratuită</b>', away_free: 'până la <b>livrare gratuită</b>',
       added_recon: 'Adăugat pentru reconstituire', ships_taxes: 'Transportul &amp; taxele se calculează la finalizare.',
@@ -337,8 +345,12 @@
       disclaimer: 'Toate produsele sunt vândute strict pentru utilizare în cercetare de laborator și in-vitro. Nimic de pe acest site nu este un medicament, aliment, cosmetic sau dispozitiv medical și nimic nu este destinat utilizării, consumului sau administrării umane ori veterinare. Prin plasarea comenzii confirmi că ești cercetător calificat.',
       rights: 'Doar pentru cercetare.', reset: 'Resetează', back_catalog: '← Înapoi la catalog', description: 'Descriere', details: 'Detalii', specifications: 'Specificații', coa_in_box: 'COA gratuit, per lot, în fiecare cutie', results_for: 'rezultate pentru', product: 'Produs', price: 'Preț', proceed_checkout: 'Continuă spre finalizare', contact_label: 'Contact', shipping_method: 'Metodă de livrare', payment: 'Plată', cart_empty_sub: 'Răsfoiește catalogul pentru a adăuga compuși de cercetare testați independent — fiecare comandă include un COA per lot.',
       all: 'Toate', the_catalog: 'Catalogul', all_research: 'Toți compușii de cercetare', shop_empty: 'Încă nimic în această categorie — adăugăm stoc nou regulat.',
-      hero_eyebrow: 'Testat independent · Doar pentru cercetare', hero_h1: 'Fiecare flacon vine cu <span class="outline">dovezi</span>, nu cu promisiuni.',
-      hero_lede: 'TOP Pep procură, testează și documentează fiecare peptid de cercetare înainte să părăsească laboratorul. Un Certificat de Analiză per lot este în fiecare cutie — fără excepții, fără presupuneri.',
+      hero_eyebrow: 'Testat de terți · Doar pentru uz de cercetare', hero_h1: 'Fiecare flacon vine cu <span class="outline">dovezi</span>, nu cu promisiuni.',
+      hero_lede: 'TOP Pep se aprovizionează și testează peptidele de cercetare prin analize efectuate în laboratoare independente. Un certificat de analiză pentru loturile testate este publicat direct pe pagina produsului — rezultate reale, nu simple afirmații.',
+      next_business_day: 'Următoarea zi lucrătoare', next_day_dispatch: 'Expediere în următoarea zi lucrătoare',
+      ag_eyebrow: 'Doar pentru uz de cercetare', ag_h: 'Trebuie să ai cel puțin 18 ani pentru a intra',
+      ag_p: 'TOP Pep furnizează compuși de cercetare strict pentru uz de laborator in-vitro — nu sunt destinați consumului uman sau veterinar. Continuând, confirmi că ai cel puțin 18 ani și ești de acord cu <a href="/terms/">Termenii &amp; Condițiile</a> și <a href="/legal-agreement/">Acordul de utilizare în cercetare</a>.',
+      ag_enter: 'Am 18 ani sau mai mult — Intră', ag_exit: 'Ieși', ag_foot: 'Testat HPLC + MS · COA disponibil · Livrare discretă',
       hero_cta1: 'Vezi catalogul', hero_cta2: 'Vezi biblioteca COA', stat_purity: 'Puritate documentată', stat_compounds: 'Compuși în stoc', stat_free: 'Livrare gratuită peste',
       sec_best: 'Catalogul', sec_featured: 'Peptide', shop_all: 'Vezi toate', browse_word: 'Explorează',
       sec_glp_eyebrow: 'GLP-1 &amp; metabolic', sec_glp_h: 'Cercetare metabolică', sec_gh_eyebrow: 'Secretagogi', sec_gh_h: 'Peptide pentru hormonul de creștere', sec_rec_eyebrow: 'Reparare', sec_rec_h: 'Recuperare &amp; vindecare',
@@ -720,9 +732,39 @@
   /* =================================================================
      BUILD + WIRE CHROME
   ================================================================= */
+  /* ---- 18+ age gate (first visit only) ---- */
+  function ageGateHTML() {
+    return '' +
+      '<div class="age-gate" id="ageGate" role="dialog" aria-modal="true" aria-label="Age verification">' +
+        '<div class="age-panel">' +
+          '<img class="age-logo" src="/logo.png" alt="TOP Pep">' +
+          '<span class="age-eyebrow">' + t('ag_eyebrow') + '</span>' +
+          '<h2>' + t('ag_h') + '</h2>' +
+          '<p>' + t('ag_p') + '</p>' +
+          '<div class="age-actions">' +
+            '<button class="btn" id="ageEnter">' + t('ag_enter') + '</button>' +
+            '<button class="btn btn-outline" id="ageExit">' + t('ag_exit') + '</button>' +
+          '</div>' +
+          '<div class="age-foot">' + t('ag_foot') + '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
   function buildChrome() {
     document.body.insertAdjacentHTML('afterbegin', tickerHTML() + headerHTML() + searchModalHTML() + drawerHTML() + sizeSheetHTML() + coaLightboxHTML());
     document.body.insertAdjacentHTML('beforeend', footerHTML());
+
+    // age gate on first visit
+    if (!localStorage.getItem('toppep_age_ok')) {
+      document.body.insertAdjacentHTML('beforeend', ageGateHTML());
+      document.body.classList.add('no-scroll');
+      $('#ageEnter').addEventListener('click', function () {
+        localStorage.setItem('toppep_age_ok', '1');
+        var g = $('#ageGate'); if (g) g.remove();
+        document.body.classList.remove('no-scroll');
+      });
+      $('#ageExit').addEventListener('click', function () { location.href = 'https://www.google.com'; });
+    }
 
     // language switcher
     var langBtn = $('#langBtn'), langMenu = $('#langMenu');
@@ -1173,14 +1215,13 @@
           '<div class="spec-grid">' +
             '<div class="cell"><div class="k">' + t('purity') + '</div><div class="v">' + p.purity + '</div></div>' +
             '<div class="cell"><div class="k">' + t('form') + '</div><div class="v">' + p.form.replace(' powder', '').replace(' blend', '') + '</div></div>' +
-            '<div class="cell"><div class="k">' + t('dispatch') + '</div><div class="v">' + t('same_day') + '</div></div>' +
+            '<div class="cell"><div class="k">' + t('dispatch') + '</div><div class="v">' + (ship.shipsToday ? t('same_day') : t('next_business_day')) + '</div></div>' +
           '</div>' +
           '<ul class="trust-checks">' +
             '<li>' + I.check + t('third_party') + '</li>' +
             '<li>' + I.check + t('coa_per_lot') + '</li>' +
-            '<li>' + I.check + t('same_day_dispatch') + '</li>' +
+            '<li>' + I.check + (ship.shipsToday ? t('same_day_dispatch') : t('next_day_dispatch')) + '</li>' +
             '<li>' + I.check + t('free_shipping_over') + ' ' + money(T.freeShip) + '</li>' +
-            '<li><span class="dot"></span>' + shipStatus + '</li>' +
           '</ul>' +
         '</div>' +
       '</div>' +
