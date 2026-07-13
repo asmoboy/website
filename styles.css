@@ -148,7 +148,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   display: flex; align-items: center;
 }
 .ticker-track { display: inline-flex; animation: ticker 34s linear infinite; }
-.ticker-track > span { display: inline-flex; align-items: center; }
+/* each half never shrinks and always spans at least the full viewport, so the
+   loop stays gapless even on ultra-wide (2560px+) screens */
+.ticker-track > span { display: inline-flex; align-items: center; flex-shrink: 0; min-width: 100vw; }
 .ticker-item { display: inline-flex; align-items: center; gap: 20px; padding: 0 20px; }
 .ticker-item::after { content: '\25C6'; font-size: 7px; opacity: 0.55; }
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -583,7 +585,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .coa-frame > svg { width: 40%; margin: 30% auto; color: var(--muted); display: block; }
 .coa-soon { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-weight: 600; font-size: 1.05rem; }
 .coa-soon svg { width: 40px; height: 40px; }
-.coa-card .coa-name { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin-top: 16px; color: var(--text-on-light); }
+.coa-sizes { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 12px; }
+.coa-size { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; padding: 5px 11px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--white); color: var(--muted); min-height: 30px; transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease; }
+.coa-size:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+.coa-size.active { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
+.coa-card .coa-name { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin-top: 10px; color: var(--text-on-light); }
+.coa-card .coa-sizes + .coa-name { margin-top: 10px; }
 
 /* COA lightbox */
 .coa-lightbox { position: fixed; inset: 0; z-index: 430; background: rgba(10,10,10,0.72); display: none; padding: 32px 18px; overflow-y: auto; }
@@ -610,6 +617,11 @@ ul { margin: 0; padding: 0; list-style: none; }
 .legal h2 { font-size: 1.2rem; margin: 36px 0 12px; }
 .legal h2 .n { font-family: var(--font-mono); font-size: 0.8em; color: var(--muted); margin-right: 10px; }
 .legal p { color: var(--muted); margin-bottom: 14px; }
+.impressum-list { display: grid; grid-template-columns: minmax(160px, auto) 1fr; gap: 12px 28px; margin-top: 8px; }
+.impressum-list dt { font-weight: 600; color: var(--ink); }
+.impressum-list dd { margin: 0; color: var(--muted); }
+.impressum-list dd a { color: var(--accent-primary); font-weight: 600; }
+@media (max-width: 560px) { .impressum-list { grid-template-columns: 1fr; gap: 4px 0; } .impressum-list dd { margin-bottom: 12px; } }
 
 /* ---------- FOOTER ---------- */
 .site-footer { background: var(--bg-primary); color: var(--text-secondary); padding: 64px 0 26px; border-top: 1px solid var(--border-dark); }
@@ -838,6 +850,15 @@ ul { margin: 0; padding: 0; list-style: none; }
   .header-inner { grid-template-columns: 1fr auto; gap: 12px; }
   .header-actions { gap: 2px; }
   .header-actions .hide-mobile { display: none; }
+  /* mobile action order: search · language · cart · menu */
+  .header-actions #openSearch { order: 1; }
+  .header-actions .lang-switch { order: 2; }
+  .header-actions .cart-pill { order: 3; }
+  .header-actions .menu-toggle { order: 4; }
+  /* only the cart, no running total */
+  .cart-pill .cart-sum { display: none; }
+  /* pin the language dropdown to the right edge so it never overflows left */
+  .lang-menu { position: fixed; top: calc(var(--ticker-h) + var(--header-h) - 6px); right: 12px; left: auto; }
   .hero-inner, .page-hero-inner, .faq-teaser, .pd, .cart-layout, .checkout-layout, .alt-section { grid-template-columns: 1fr; }
   .hero-art { order: -1; }
   .hero-art svg { max-width: 320px; }

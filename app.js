@@ -221,7 +221,11 @@
       shp_s2h: 'Rates &amp; free shipping', shp_s2p: 'Standard tracked shipping is a flat rate and free on orders over €250. Express and United Kingdom options are available at checkout.',
       shp_s3h: 'Packaging', shp_s3p: 'All orders ship discreetly with no product references outside. Compounds arrive freeze-dried and shelf-stable, sealed against light and moisture — no cold chain required.',
       shp_s4h: 'Tracking', shp_s4p: 'A tracking link is emailed when your parcel is handed to the carrier. Transit times vary by destination and carrier.',
-      shp_s5h: 'Returns', shp_s5p: 'Because these are sensitive research materials, we cannot accept returns of opened vials. Contact us within 7 days if an order arrives damaged or incorrect and we’ll make it right.'
+      shp_s5h: 'Returns', shp_s5p: 'Because these are sensitive research materials, we cannot accept returns of opened vials. Contact us within 7 days if an order arrives damaged or incorrect and we’ll make it right.',
+      nav_impressum: 'Legal notice', im_h1: 'Legal notice',
+      im_operator: 'Site operator', im_address: 'Registered address', im_email: 'Email',
+      im_reg: 'Trade register no.', im_vat: 'VAT ID', im_responsible: 'Responsible for content',
+      im_onrequest: 'Available on request', im_note: 'This legal notice will be completed with the trade-register and VAT numbers before commercial launch.'
     },
     de: {
       nav_shop: 'Katalog', nav_coa: 'COA', nav_quality: 'Qualität', nav_shipping: 'Versand', nav_wholesale: 'Großhandel', nav_partner: 'Partnerprogramm',
@@ -248,7 +252,7 @@
       disclaimer: 'Alle Produkte werden ausschließlich für Labor- und In-vitro-Forschungszwecke verkauft. Nichts auf dieser Seite ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts davon ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit der Bestellung bestätigst du, dass du ein qualifizierter Forscher bist.',
       rights: 'Nur für Forschungszwecke.', reset: 'Zurücksetzen', back_catalog: '← Zurück zum Katalog', description: 'Beschreibung', details: 'Details', specifications: 'Spezifikationen', coa_in_box: 'Gratis chargengenaues COA in jeder Box', results_for: 'Treffer für', product: 'Produkt', price: 'Preis', proceed_checkout: 'Zur Kasse gehen', contact_label: 'Kontakt', shipping_method: 'Versandart', payment: 'Zahlung', cart_empty_sub: 'Durchsuche den Katalog und füge extern getestete Forschungswirkstoffe hinzu — ein chargengenaues COA liegt jeder Bestellung bei.',
       all: 'Alle', the_catalog: 'Der Katalog', all_research: 'Alle Forschungswirkstoffe', shop_empty: 'In dieser Kategorie ist noch nichts — neue Ware kommt regelmäßig hinzu.',
-      hero_eyebrow: 'Drittanbieter-getestet · Nur für Forschungszwecke', hero_h1: 'Jedes Vial kommt mit <span class="outline">Beweis</span>, nicht mit Versprechen.',
+      hero_eyebrow: 'Drittanbieter-getestet · Nur für Forschungszwecke', hero_h1: 'Jedes Vial kommt mit <span class="outline">Beweis</span>, nicht nur Versprechen.',
       hero_lede: 'TOP Pep bezieht und testet seine Forschungspeptide durch unabhängige Laboranalysen. Ein Analysezertifikat für getestete Chargen ist direkt auf der Produktseite einsehbar — echte Ergebnisse, keine bloßen Behauptungen.',
       next_business_day: 'Nächster Werktag', next_day_dispatch: 'Versand am nächsten Werktag',
       ag_eyebrow: 'Nur für Forschungszwecke', ag_h: 'Du musst mindestens 18 Jahre alt sein',
@@ -397,7 +401,11 @@
       shp_s2h: 'Kosten &amp; Gratisversand', shp_s2p: 'Der Standardversand mit Sendungsverfolgung erfolgt zum Pauschalpreis und ist ab 250 € gratis. Express- und Großbritannien-Optionen stehen an der Kasse zur Verfügung.',
       shp_s3h: 'Verpackung', shp_s3p: 'Alle Bestellungen werden diskret und ohne Produkthinweise auf der Außenseite versendet. Die Wirkstoffe kommen gefriergetrocknet und lagerstabil an, versiegelt gegen Licht und Feuchtigkeit — keine Kühlkette erforderlich.',
       shp_s4h: 'Sendungsverfolgung', shp_s4p: 'Ein Tracking-Link wird per E-Mail versendet, sobald dein Paket an den Versanddienst übergeben wird. Die Laufzeiten variieren je nach Ziel und Dienstleister.',
-      shp_s5h: 'Rücksendungen', shp_s5p: 'Da es sich um empfindliche Forschungsmaterialien handelt, können wir geöffnete Vials nicht zurücknehmen. Melde dich innerhalb von 7 Tagen bei uns, wenn eine Bestellung beschädigt oder falsch ankommt, und wir bringen es in Ordnung.'
+      shp_s5h: 'Rücksendungen', shp_s5p: 'Da es sich um empfindliche Forschungsmaterialien handelt, können wir geöffnete Vials nicht zurücknehmen. Melde dich innerhalb von 7 Tagen bei uns, wenn eine Bestellung beschädigt oder falsch ankommt, und wir bringen es in Ordnung.',
+      nav_impressum: 'Impressum', im_h1: 'Impressum',
+      im_operator: 'Seitenbetreiber', im_address: 'Geschäftsanschrift', im_email: 'E-Mail',
+      im_reg: 'Handelsregisternummer', im_vat: 'USt-IdNr.', im_responsible: 'Inhaltlich verantwortlich',
+      im_onrequest: 'Auf Anfrage', im_note: 'Dieses Impressum wird vor dem kommerziellen Start um Handelsregister- und USt-IdNr. ergänzt.'
     },
     ro: {
       nav_shop: 'Catalog', nav_coa: 'COA', nav_quality: 'Calitate', nav_shipping: 'Livrare', nav_wholesale: 'En-gros', nav_partner: 'Program parteneri',
@@ -424,7 +432,7 @@
       disclaimer: 'Toate produsele sunt vândute strict pentru utilizare în cercetare de laborator și in-vitro. Nimic de pe acest site nu este un medicament, aliment, cosmetic sau dispozitiv medical și nimic nu este destinat utilizării, consumului sau administrării umane ori veterinare. Prin plasarea comenzii confirmi că ești cercetător calificat.',
       rights: 'Doar pentru cercetare.', reset: 'Resetează', back_catalog: '← Înapoi la catalog', description: 'Descriere', details: 'Detalii', specifications: 'Specificații', coa_in_box: 'COA gratuit, per lot, în fiecare cutie', results_for: 'rezultate pentru', product: 'Produs', price: 'Preț', proceed_checkout: 'Continuă spre finalizare', contact_label: 'Contact', shipping_method: 'Metodă de livrare', payment: 'Plată', cart_empty_sub: 'Răsfoiește catalogul pentru a adăuga compuși de cercetare testați independent — fiecare comandă include un COA per lot.',
       all: 'Toate', the_catalog: 'Catalogul', all_research: 'Toți compușii de cercetare', shop_empty: 'Încă nimic în această categorie — adăugăm stoc nou regulat.',
-      hero_eyebrow: 'Testat de terți · Doar pentru uz de cercetare', hero_h1: 'Fiecare flacon vine cu <span class="outline">dovezi</span>, nu cu promisiuni.',
+      hero_eyebrow: 'Testat de terți · Doar pentru uz de cercetare', hero_h1: 'Fiecare flacon vine cu <span class="outline">dovezi</span>, nu doar promisiuni.',
       hero_lede: 'TOP Pep se aprovizionează și testează peptidele de cercetare prin analize efectuate în laboratoare independente. Un certificat de analiză pentru loturile testate este publicat direct pe pagina produsului — rezultate reale, nu simple afirmații.',
       next_business_day: 'Următoarea zi lucrătoare', next_day_dispatch: 'Expediere în următoarea zi lucrătoare',
       ag_eyebrow: 'Doar pentru uz de cercetare', ag_h: 'Trebuie să ai cel puțin 18 ani pentru a intra',
@@ -573,7 +581,11 @@
       shp_s2h: 'Tarife &amp; livrare gratuită', shp_s2p: 'Livrarea standard cu urmărire este la tarif fix și gratuită pentru comenzile de peste 250 €. Opțiunile Express și Regatul Unit sunt disponibile la finalizarea comenzii.',
       shp_s3h: 'Ambalare', shp_s3p: 'Toate comenzile sunt expediate discret, fără nicio referire la produs pe exterior. Compușii ajung liofilizați și stabili la raft, sigilați împotriva luminii și umidității — nu este nevoie de lanț de frig.',
       shp_s4h: 'Urmărire', shp_s4p: 'Un link de urmărire îți este trimis pe e-mail când coletul este predat curierului. Timpii de tranzit variază în funcție de destinație și curier.',
-      shp_s5h: 'Retururi', shp_s5p: 'Deoarece acestea sunt materiale de cercetare sensibile, nu putem accepta returul flacoanelor deschise. Contactează-ne în 7 zile dacă o comandă ajunge deteriorată sau greșită și o vom rezolva.'
+      shp_s5h: 'Retururi', shp_s5p: 'Deoarece acestea sunt materiale de cercetare sensibile, nu putem accepta returul flacoanelor deschise. Contactează-ne în 7 zile dacă o comandă ajunge deteriorată sau greșită și o vom rezolva.',
+      nav_impressum: 'Date legale', im_h1: 'Date legale',
+      im_operator: 'Operatorul site-ului', im_address: 'Adresă sediu', im_email: 'E-mail',
+      im_reg: 'Nr. înregistrare (Reg. Com.)', im_vat: 'Cod TVA (CUI)', im_responsible: 'Responsabil de conținut',
+      im_onrequest: 'La cerere', im_note: 'Aceste date legale vor fi completate cu numărul de la Registrul Comerțului și codul TVA înainte de lansarea comercială.'
     }
   };
   var LOCALES = { en: 'en-GB', de: 'de-AT', ro: 'ro-RO' };
@@ -600,7 +612,8 @@
     terms:    { t: { en: 'Terms & conditions', de: 'AGB', ro: 'Termeni & condiții' }, d: {} },
     privacy:  { t: { en: 'Privacy policy', de: 'Datenschutzerklärung', ro: 'Politică de confidențialitate' }, d: {} },
     'legal-agreement':  { t: { en: 'Research-use agreement', de: 'Forschungsnutzungs-Vereinbarung', ro: 'Acord de utilizare în cercetare' }, d: {} },
-    'shipping-policy':  { t: { en: 'Shipping policy', de: 'Versandrichtlinie', ro: 'Politică de livrare' }, d: {} }
+    'shipping-policy':  { t: { en: 'Shipping policy', de: 'Versandrichtlinie', ro: 'Politică de livrare' }, d: {} },
+    impressum: { t: { en: 'Legal notice', de: 'Impressum', ro: 'Date legale' }, d: {} }
   };
   function applyPageMeta() {
     try { document.documentElement.lang = lang; } catch (e) {}
@@ -672,8 +685,13 @@
   var page = document.body.dataset.page || '';
 
   function tickerHTML() {
-    var seq = TICKS.map(function (t) { return '<span class="ticker-item">' + t + '</span>'; }).join('');
-    return '<div class="ticker" aria-hidden="true"><div class="ticker-track"><span>' + seq + '</span><span>' + seq + '</span></div></div>';
+    // repeat the items enough that one half already exceeds even ultra-wide
+    // screens (2560px+); each half also gets min-width:100% in CSS as a floor.
+    var one = TICKS.map(function (t) { return '<span class="ticker-item">' + t + '</span>'; }).join('');
+    var seq = '';
+    for (var i = 0; i < 8; i++) seq += one;
+    // two identical halves → translateX(-50%) loops seamlessly
+    return '<div class="ticker" aria-hidden="true"><div class="ticker-track"><span class="ticker-seq">' + seq + '</span><span class="ticker-seq">' + seq + '</span></div></div>';
   }
 
   var FLAGS = { en: '🇬🇧', de: '🇩🇪', ro: '🇷🇴' };
@@ -764,7 +782,7 @@
       '</div>';
   }
 
-  function openCoaLightbox(p) {
+  function openCoaLightbox(p, startIndex) {
     if (!p || !p.coa) return;
     var lb = $('#coaLightbox');
     var tests = p.coaAll || [p.coa];
@@ -783,7 +801,8 @@
     } else {
       tabsEl.innerHTML = ''; tabsEl.style.display = 'none';
     }
-    show(tests.length - 1);
+    var startI = (typeof startIndex === 'number' && startIndex >= 0 && startIndex < tests.length) ? startIndex : tests.length - 1;
+    show(startI);
     lb.classList.add('open'); document.body.classList.add('no-scroll');
   }
   function closeCoaLightbox() { $('#coaLightbox').classList.remove('open'); document.body.classList.remove('no-scroll'); }
@@ -802,7 +821,7 @@
         '</div>' +
         '<p class="footer-disclaimer">' + t('disclaimer') + '</p>' +
         '<div class="footer-bottom"><span>© 2026 TOP Pep. ' + t('rights') + '</span><div class="legal-links">' +
-          '<a href="/terms/">' + lg[0] + '</a><a href="/privacy/">' + lg[1] + '</a><a href="/shipping-policy/">' + lg[2] + '</a><a href="/legal-agreement/">' + lg[3] + '</a>' +
+          '<a href="/impressum/">' + t('nav_impressum') + '</a><a href="/terms/">' + lg[0] + '</a><a href="/privacy/">' + lg[1] + '</a><a href="/shipping-policy/">' + lg[2] + '</a><a href="/legal-agreement/">' + lg[3] + '</a>' +
         '</div></div>' +
       '</div></footer>';
   }
@@ -945,7 +964,7 @@
     onCart(function () {
       var c = Cart.count();
       pill.classList.toggle('filled', c > 0);
-      $('.cart-meta', pill).textContent = c > 0 ? (c + ' · ' + money(Cart.subtotal())) : '';
+      $('.cart-meta', pill).innerHTML = c > 0 ? ('<span class="cart-count">' + c + '</span><span class="cart-sum"> · ' + money(Cart.subtotal()) + '</span>') : '';
       pill.setAttribute('aria-label', 'Open cart, ' + c + ' items');
     });
     pill.addEventListener('click', openDrawer);
@@ -1201,9 +1220,17 @@
       var cnt = $('#coaCount'); if (cnt) cnt.textContent = '';
       $('#coaGrid').innerHTML = list.map(function (p) {
         if (p.coa) {
-          var img = p.coa.img ? T.imgUrl(p.coa.img) : '';
-          return '<article class="coa-card verified" data-slug="' + p.slug + '" tabindex="0" role="button" aria-label="' + esc(displayName(p)) + ' — Janoshik #' + p.coa.task + '">' +
+          var tests = p.coaAll || [p.coa];
+          var sel = tests.length - 1; // default to the last (largest) size shown
+          var img = tests[sel].img ? T.imgUrl(tests[sel].img) : '';
+          var sizes = tests.length > 1
+            ? '<div class="coa-sizes">' + tests.map(function (tst, i) {
+                return '<button type="button" class="coa-size' + (i === sel ? ' active' : '') + '" data-i="' + i + '">' + esc(tst.size || ('#' + (i + 1))) + '</button>';
+              }).join('') + '</div>'
+            : '';
+          return '<article class="coa-card verified" data-slug="' + p.slug + '" data-sel="' + sel + '" tabindex="0" role="button" aria-label="' + esc(displayName(p)) + ' — Janoshik #' + p.coa.task + '">' +
             '<div class="coa-frame">' + (img ? '<img class="coa-cert" src="' + img + '" alt="COA ' + esc(displayName(p)) + '">' : I.doc) + '</div>' +
+            sizes +
             '<div class="coa-name">' + displayName(p) + '</div></article>';
         }
         return '<article class="coa-card pending">' +
@@ -1212,12 +1239,23 @@
           '<div class="coa-name">' + displayName(p) + '</div></article>';
       }).join('');
       $$('.coa-card.verified').forEach(function (card) {
-        var open = function () {
-          var p = list.filter(function (x) { return x.slug === card.dataset.slug; })[0];
-          openCoaLightbox(p);
-        };
+        var p = list.filter(function (x) { return x.slug === card.dataset.slug; })[0];
+        var tests = p.coaAll || [p.coa];
+        var open = function () { openCoaLightbox(p, parseInt(card.dataset.sel, 10) || 0); };
         card.addEventListener('click', open);
         card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+        // size chips: swap the preview image without opening the lightbox
+        $$('.coa-size', card).forEach(function (chip) {
+          chip.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var i = parseInt(chip.dataset.i, 10);
+            card.dataset.sel = i;
+            $$('.coa-size', card).forEach(function (x) { x.classList.remove('active'); });
+            chip.classList.add('active');
+            var cert = $('.coa-cert', card);
+            if (cert && tests[i].img) cert.src = T.imgUrl(tests[i].img);
+          });
+        });
       });
       var filter = $('#coaSearch');
       if (filter) filter.addEventListener('input', function () {
