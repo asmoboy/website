@@ -923,6 +923,18 @@
     document.body.insertAdjacentHTML('afterbegin', tickerHTML() + headerHTML() + searchModalHTML() + drawerHTML() + sizeSheetHTML() + coaLightboxHTML());
     document.body.insertAdjacentHTML('beforeend', footerHTML());
 
+    // keep a constant, calm scroll speed (~28px/s) no matter how wide the
+    // repeated content is — a fixed animation-duration would speed up
+    // whenever the item list needs more repeats to cover very wide screens.
+    (function tuneTickerSpeed() {
+      var track = $('.ticker-track');
+      var half = $('.ticker-seq', track);
+      if (!track || !half) return;
+      var TICKER_SPEED_PX_S = 28;
+      var seconds = Math.round(half.getBoundingClientRect().width / TICKER_SPEED_PX_S);
+      track.style.animationDuration = seconds + 's';
+    })();
+
     // age gate on first visit
     if (!localStorage.getItem('toppep_age_ok')) {
       document.body.insertAdjacentHTML('beforeend', ageGateHTML());
