@@ -135,7 +135,8 @@
         aliases: ['ghk', 'serum', 'topical', 'copper serum', 'hautserum', 'ser topical'],
         blurb: 'Ready-to-use GHK-Cu topical serum for dermal research applications. 30 ml pump bottle.' }),
 
-    P({ slug: 'bacteriostatic-water', name: 'Bacteriostatic Water', category: 'Lab Supplies', group: 'Lab Supplies',
+    P({ slug: 'bacteriostatic-water', name: 'Bacteriostatic Water', nameI18n: { de: 'Bakteriostatisches Wasser', ro: 'Apă bacteriostatică' },
+        category: 'Lab Supplies', group: 'Lab Supplies',
         img: IMG + 'Bacteriostatic Water 10mg.png', purity: '0.9% benzyl alcohol', form: 'Multi-dose vial', stock: 120,
         aliases: ['bacteriostatic', 'bac water', 'water', 'diluent', 'apa'],
         options: [ {label:'3 ml',price:4.99,ron:25.99}, {label:'10 ml',price:14.99,ron:77.99} ],
