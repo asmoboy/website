@@ -377,7 +377,7 @@
       tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer COA-Bibliothek.',
       tab_details_body: 'Wird als versiegeltes {form} in einem manipulationssicheren Vial geliefert. Rekonstituiere nach deinem eigenen Protokoll mit bakteriostatischem Wasser; wir geben keine Dosierungshinweise, da alle Produkte ausschließlich für die Laborforschung verkauft werden.',
       spec_storage: 'Lagerung', spec_storage_val: '–20 °C, vor Licht schützen', spec_use: 'Verwendung', spec_use_val: 'Nur Forschung', spec_coa_testing: 'In Prüfung',
-      legal_updated: 'Zuletzt aktualisiert · 01.07.2026', legal_operated: 'TOP Pep ist eine Marke der ORCA MARKETING AGENCY S.R.L.',
+      legal_updated: 'Zuletzt aktualisiert · 01.07.2026', legal_operated: 'TOP Pep wird von ORCA MARKETING AGENCY S.R.L. betrieben.',
       tc_h1: 'AGB',
       tc_s1h: 'Nur für Forschungszwecke', tc_s1p: 'Alle Produkte werden ausschließlich für die In-vitro-Labor- und Analyseforschung verkauft. Nichts davon ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit deiner Bestellung bestätigst du, dass du ein qualifizierter Forscher bist und das Material entsprechend handhabst.',
       tc_s2h: 'Voraussetzungen', tc_s2p: 'Du musst in deinem Rechtsraum volljährig und berechtigt sein, Forschungschemikalien an deinem Standort zu erwerben. Du bist dafür verantwortlich, dass der Erhalt und die Verwendung jedes Wirkstoffs in deinem Land rechtmäßig sind.',
