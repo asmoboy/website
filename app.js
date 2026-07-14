@@ -64,7 +64,7 @@
       coa_verified: 'Verified', coa_in_testing: 'In testing', coa_report_soon: 'awaiting Janoshik — report coming soon',
       coa_verified_count: 'lots verified', coa_coming_soon: 'Coming Soon', coa_open_janoshik: 'Open on Janoshik official site', promo_code: 'Promo code', promo_enter: 'Enter code', apply: 'Apply', search_lot_ph: 'Search by compound',
       remove: 'Remove', qty: 'Qty', research_only: 'Research use only', free_shipping_over: 'Free shipping over',
-      place_order: 'Place order', order_placed: 'Order placed ✓', secured_demo: 'Secured demo checkout — no payment is taken.',
+      place_order: 'Place order', order_placed: 'Order placed ✓', secured_demo: 'You’ll get our bank details and a unique payment reference on the next step. No card details are stored.',
       order_summary: 'Order summary', shipping_word: 'Shipping', total: 'Total', free_word: 'Free',
       join: 'Join', nl_title: 'Lab updates, not noise.', nl_sub: 'New lots and COA releases once or twice a month. No spam, unsubscribe anytime.', nl_done: 'Subscribed — check your inbox to confirm.',
       footer_desc: 'Research peptides sourced from accredited manufacturers, independently verified, and shipped discreetly.',
@@ -193,6 +193,11 @@
       pay_bank: 'Bank transfer', pay_bank_body: 'Transfer details are emailed after you place the order; we dispatch on receipt of cleared funds.',
       pay_crypto: 'Crypto', pay_crypto_body: 'Pay in BTC, ETH or USDT. A wallet address and the exact amount are shown after you place the order.',
       cc_num: 'Card number', cc_exp: 'Expiry', cc_cvc: 'CVC', co_added: 'Added',
+      pay_confirm_title: 'Complete your bank transfer', pay_confirm_intro: 'Your order is reserved. Transfer the total below and add the payment reference so we can match it to your order — we dispatch as soon as the money arrives.',
+      pay_amount: 'Amount', pay_reference: 'Payment reference', pay_account: 'Account name', pay_iban: 'IBAN', pay_bic: 'BIC / SWIFT', pay_bankname: 'Bank',
+      pay_copy: 'Copy', pay_copied: 'Copied ✓', pay_ref_hint: 'Add this exact reference as the payment description so we can find your transfer.',
+      pay_order_no: 'Order number', pay_status_pending: 'Awaiting payment', pay_note_keep: 'Note your payment reference — you’ll need it for the transfer. We’ll email you as soon as the payment is confirmed.',
+      pay_back_home: 'Back to home', pay_view_faq: 'Payment questions? Read the FAQ', place_order_bt: 'Place order &amp; get bank details',
       tab_coa_tested: 'This lot is third-party tested by Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">View the verified report</a>.',
       tab_coa_testing: 'This compound is currently in testing at Janoshik — the verified report will be published in our COA library as soon as it lands.',
       tab_details_body: 'Supplied as a sealed {form} in a tamper-evident vial. Reconstitute with bacteriostatic water according to your own protocol; we provide no dosing guidance, as all products are sold strictly for laboratory research use.',
@@ -244,7 +249,7 @@
       coa_verified: 'Verifiziert', coa_in_testing: 'In Prüfung', coa_report_soon: 'wird von Janoshik geprüft — Bericht folgt in Kürze',
       coa_verified_count: 'Chargen verifiziert', coa_coming_soon: 'Demnächst', coa_open_janoshik: 'Auf der offiziellen Janoshik-Seite öffnen', promo_code: 'Gutscheincode', promo_enter: 'Code eingeben', apply: 'Anwenden', search_lot_ph: 'Suche nach Wirkstoff',
       remove: 'Entfernen', qty: 'Menge', research_only: 'Nur für Forschungszwecke', free_shipping_over: 'Gratisversand ab',
-      place_order: 'Bestellung aufgeben', order_placed: 'Bestellung aufgegeben ✓', secured_demo: 'Sicherer Demo-Checkout — es wird keine Zahlung eingezogen.',
+      place_order: 'Bestellung aufgeben', order_placed: 'Bestellung aufgegeben ✓', secured_demo: 'Im nächsten Schritt erhältst du unsere Bankdaten und eine eindeutige Zahlungsreferenz. Es werden keine Kartendaten gespeichert.',
       order_summary: 'Bestellübersicht', shipping_word: 'Versand', total: 'Gesamt', free_word: 'Gratis',
       join: 'Abonnieren', nl_title: 'Labor-Updates, kein Spam.', nl_sub: 'Neue Chargen und COA-Berichte ein- bis zweimal im Monat. Kein Spam, jederzeit abbestellbar.', nl_done: 'Abonniert — bitte bestätige in deinem Postfach.',
       footer_desc: 'Forschungspeptide von akkreditierten Herstellern, unabhängig geprüft und diskret versendet.',
@@ -373,6 +378,11 @@
       pay_bank: 'Banküberweisung', pay_bank_body: 'Die Überweisungsdaten erhältst du nach der Bestellung per E-Mail; wir versenden nach Zahlungseingang.',
       pay_crypto: 'Krypto', pay_crypto_body: 'Zahle in BTC, ETH oder USDT. Wallet-Adresse und der genaue Betrag werden nach der Bestellung angezeigt.',
       cc_num: 'Kartennummer', cc_exp: 'Gültig bis', cc_cvc: 'Prüfziffer', co_added: 'Hinzugefügt',
+      pay_confirm_title: 'Schließe deine Überweisung ab', pay_confirm_intro: 'Deine Bestellung ist reserviert. Überweise den Gesamtbetrag unten und gib die Zahlungsreferenz als Verwendungszweck an, damit wir sie deiner Bestellung zuordnen können — wir versenden, sobald das Geld eingegangen ist.',
+      pay_amount: 'Betrag', pay_reference: 'Zahlungsreferenz', pay_account: 'Kontoinhaber', pay_iban: 'IBAN', pay_bic: 'BIC / SWIFT', pay_bankname: 'Bank',
+      pay_copy: 'Kopieren', pay_copied: 'Kopiert ✓', pay_ref_hint: 'Gib genau diese Referenz als Verwendungszweck an, damit wir deine Überweisung finden.',
+      pay_order_no: 'Bestellnummer', pay_status_pending: 'Zahlung ausstehend', pay_note_keep: 'Notiere dir deine Zahlungsreferenz — du brauchst sie für die Überweisung. Wir melden uns per E-Mail, sobald die Zahlung bestätigt ist.',
+      pay_back_home: 'Zurück zur Startseite', pay_view_faq: 'Fragen zur Zahlung? Zu den FAQ', place_order_bt: 'Bestellen &amp; Bankdaten erhalten',
       tab_coa_tested: 'Diese Charge wurde von Janoshik durch einen Drittanbieter getestet (Task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Verifizierten Bericht ansehen</a>.',
       tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer COA-Bibliothek.',
       tab_details_body: 'Wird als versiegeltes {form} in einem manipulationssicheren Vial geliefert. Rekonstituiere nach deinem eigenen Protokoll mit bakteriostatischem Wasser; wir geben keine Dosierungshinweise, da alle Produkte ausschließlich für die Laborforschung verkauft werden.',
@@ -424,7 +434,7 @@
       coa_verified: 'Verificat', coa_in_testing: 'În testare', coa_report_soon: 'în așteptare la Janoshik — raportul urmează în curând',
       coa_verified_count: 'loturi verificate', coa_coming_soon: 'În curând', coa_open_janoshik: 'Deschide pe site-ul oficial Janoshik', promo_code: 'Cod promoțional', promo_enter: 'Introdu codul', apply: 'Aplică', search_lot_ph: 'Caută după compus',
       remove: 'Elimină', qty: 'Cant.', research_only: 'Doar pentru cercetare', free_shipping_over: 'Livrare gratuită peste',
-      place_order: 'Plasează comanda', order_placed: 'Comandă plasată ✓', secured_demo: 'Checkout demo securizat — nu se percepe nicio plată.',
+      place_order: 'Plasează comanda', order_placed: 'Comandă plasată ✓', secured_demo: 'La pasul următor primești datele noastre bancare și o referință de plată unică. Nu se stochează date de card.',
       order_summary: 'Sumar comandă', shipping_word: 'Transport', total: 'Total', free_word: 'Gratuit',
       join: 'Abonează-te', nl_title: 'Noutăți de laborator, fără spam.', nl_sub: 'Loturi noi și rapoarte COA o dată sau de două ori pe lună. Fără spam, te dezabonezi oricând.', nl_done: 'Te-ai abonat — verifică e-mailul pentru confirmare.',
       footer_desc: 'Peptide de cercetare de la producători acreditați, verificate independent și livrate discret.',
@@ -553,6 +563,11 @@
       pay_bank: 'Transfer bancar', pay_bank_body: 'Detaliile de transfer îți sunt trimise pe e-mail după plasarea comenzii; expediem la confirmarea plății.',
       pay_crypto: 'Cripto', pay_crypto_body: 'Plătește în BTC, ETH sau USDT. Adresa portofelului și suma exactă apar după plasarea comenzii.',
       cc_num: 'Număr card', cc_exp: 'Expiră', cc_cvc: 'CVC', co_added: 'Adăugat',
+      pay_confirm_title: 'Finalizează transferul bancar', pay_confirm_intro: 'Comanda ta este rezervată. Transferă totalul de mai jos și adaugă referința de plată ca detaliu, ca să o putem asocia comenzii tale — expediem imediat ce banii ajung.',
+      pay_amount: 'Sumă', pay_reference: 'Referință de plată', pay_account: 'Nume titular cont', pay_iban: 'IBAN', pay_bic: 'BIC / SWIFT', pay_bankname: 'Bancă',
+      pay_copy: 'Copiază', pay_copied: 'Copiat ✓', pay_ref_hint: 'Adaugă exact această referință ca detaliu al plății, ca să găsim transferul tău.',
+      pay_order_no: 'Număr comandă', pay_status_pending: 'În așteptarea plății', pay_note_keep: 'Notează-ți referința de plată — îți va trebui pentru transfer. Îți scriem pe e-mail imediat ce plata este confirmată.',
+      pay_back_home: 'Înapoi la pagina principală', pay_view_faq: 'Întrebări despre plată? Vezi FAQ', place_order_bt: 'Plasează comanda &amp; obține datele bancare',
       tab_coa_tested: 'Acest lot este testat de terți la Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Vezi raportul verificat</a>.',
       tab_coa_testing: 'Acest compus este în curs de testare la Janoshik — raportul verificat va fi publicat în biblioteca noastră COA imediat ce este gata.',
       tab_details_body: 'Livrat ca {form} sigilat într-un flacon cu sigiliu de siguranță. Reconstituie cu apă bacteriostatică conform propriului protocol; nu oferim indicații de dozare, deoarece toate produsele se vând strict pentru cercetare de laborator.',
@@ -673,11 +688,54 @@
     },
     remove: function (key) { this.items = this.items.filter(function (i) { return i.key !== key; }); this.save(); },
     count: function () { return this.items.reduce(function (n, i) { return n + i.qty; }, 0); },
-    subtotal: function () { return this.items.reduce(function (n, i) { return n + lv(i) * i.qty; }, 0); }
+    subtotal: function () { return this.items.reduce(function (n, i) { return n + lv(i) * i.qty; }, 0); },
+    clear: function () { this.items = []; this.save(); }
   };
   var listeners = [];
   function emit() { listeners.forEach(function (fn) { fn(); }); }
   function onCart(fn) { listeners.push(fn); fn(); }
+
+  /* =================================================================
+     ORDERS — bank-transfer order records.
+     Stored in localStorage (key toppep_orders) so the confirmation page
+     and the /admin/ view can read them. When T.orderApiUrl is set
+     (Phase 2), each order is also POSTed to the backend, which owns the
+     real unique constraint and status. Payment refs are additionally
+     de-duplicated locally against already-stored orders.
+  ================================================================= */
+  var Orders = {
+    KEY: 'toppep_orders',
+    all: function () { try { return JSON.parse(localStorage.getItem(this.KEY) || '[]'); } catch (e) { return []; } },
+    save: function (list) { localStorage.setItem(this.KEY, JSON.stringify(list)); },
+    byRef: function (ref) { return this.all().filter(function (o) { return o.ref === ref; })[0]; },
+    uniqueRef: function () {
+      var ref, guard = 0;
+      do { ref = T.genPaymentRef(); guard++; } while (this.byRef(ref) && guard < 50);
+      return ref;
+    },
+    add: function (order) {
+      var list = this.all();
+      list.unshift(order);
+      this.save(list);
+      // Phase 2: hand the order to the backend if configured.
+      if (T.orderApiUrl) {
+        try {
+          fetch(T.orderApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+          }).catch(function () {});
+        } catch (e) {}
+      }
+      return order;
+    },
+    setStatus: function (ref, status) {
+      var list = this.all(), hit = null;
+      list.forEach(function (o) { if (o.ref === ref) { o.status = status; o.paidAt = status === 'paid' ? Date.now() : o.paidAt; hit = o; } });
+      this.save(list);
+      return hit;
+    }
+  };
 
   /* =================================================================
      CHROME MARKUP
@@ -1543,6 +1601,137 @@
 
   /* ---- checkout render ---- */
   var INS_COST = CUR === 'ron' ? 25.99 : 4.99;
+  /* ---- copy-to-clipboard button ---- */
+  function copyRow(label, value) {
+    return '<div class="pay-row">' +
+        '<div class="pay-row-label">' + label + '</div>' +
+        '<div class="pay-row-val"><span class="pay-val">' + esc(value) + '</span>' +
+          '<button type="button" class="pay-copy" data-copy="' + esc(value) + '">' + t('pay_copy') + '</button></div>' +
+      '</div>';
+  }
+  function wireCopyButtons(root) {
+    $$('.pay-copy', root).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var v = btn.getAttribute('data-copy');
+        var done = function () {
+          var old = btn.textContent;
+          btn.textContent = t('pay_copied');
+          btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(v).then(done, function () { fallbackCopy(v); done(); });
+        } else { fallbackCopy(v); done(); }
+      });
+    });
+  }
+  function fallbackCopy(v) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = v; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    } catch (e) {}
+  }
+
+  /* ---- place a bank-transfer order ---- */
+  function placeBankOrder(sub, ship, ins) {
+    if (!Cart.items.length) return;
+    var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    var fields = ['coEmail', 'coFirst', 'coLast', 'coAddr', 'coCity', 'coZip'];
+    var ok = true, firstBad = null;
+    fields.forEach(function (id) {
+      var el = $('#' + id); if (!el) return;
+      var bad = !el.value.trim() || (id === 'coEmail' && !emailRe.test(el.value.trim()));
+      el.classList.toggle('wf-error', bad);
+      if (bad && !firstBad) firstBad = el;
+      if (bad) ok = false;
+    });
+    var note = $('#placeOrderNote');
+    if (!ok) {
+      if (note) { note.style.color = '#e0533d'; note.textContent = t('form_invalid'); }
+      if (firstBad) firstBad.focus();
+      return;
+    }
+    var total = sub + ship + ins;
+    var countrySel = $('#coCountry');
+    var order = {
+      ref: Orders.uniqueRef(),
+      orderNo: 'TP' + String(Date.now()).slice(-8),
+      status: 'pending',
+      createdAt: Date.now(),
+      lang: lang,
+      currency: CUR,
+      email: $('#coEmail').value.trim(),
+      name: ($('#coFirst').value.trim() + ' ' + $('#coLast').value.trim()).trim(),
+      org: ($('#coOrg') && $('#coOrg').value.trim()) || '',
+      address: $('#coAddr').value.trim(),
+      city: $('#coCity').value.trim(),
+      zip: $('#coZip').value.trim(),
+      country: countrySel ? (countrySel.options[countrySel.selectedIndex] || {}).getAttribute('data-country') || countrySel.value : '',
+      items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i) }; }),
+      subtotal: sub, shipping: ship, insurance: ins, total: total,
+      totalText: money(total)
+    };
+    Orders.add(order);
+    emailOrderToInbox(order);
+    Cart.clear();
+    showBankTransferConfirmation(order);
+  }
+
+  /* ---- email the new order to the internal order inbox ---- */
+  function emailOrderToInbox(order) {
+    var lines = order.items.map(function (i) { return i.qty + '× ' + i.name + ' — ' + money(i.price * i.qty); }).join('\n');
+    var payload = {
+      _subject: 'NEW ORDER ' + order.ref + ' — ' + order.totalText + ' (pending)',
+      'Payment reference': order.ref,
+      'Order number': order.orderNo,
+      'Status': 'PENDING — awaiting bank transfer',
+      'Total': order.totalText,
+      'Customer': order.name,
+      'Email': order.email,
+      'Institution': order.org,
+      'Address': order.address + ', ' + order.zip + ' ' + order.city + ', ' + order.country,
+      'Items': lines,
+      'Language': order.lang
+    };
+    try {
+      fetch('https://formsubmit.co/ajax/' + T.orderInbox, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  /* ---- "Complete your bank transfer" confirmation view ---- */
+  function showBankTransferConfirmation(order) {
+    var b = T.bank;
+    var main = $('#main');
+    if (!main) return;
+    document.title = t('pay_confirm_title') + ' — TOP Pep';
+    main.innerHTML = '<div class="wrap"><div class="pay-confirm">' +
+      '<span class="pay-eyebrow">' + t('pay_status_pending') + '</span>' +
+      '<h1>' + t('pay_confirm_title') + '</h1>' +
+      '<p class="pay-intro">' + t('pay_confirm_intro') + '</p>' +
+      '<div class="pay-card">' +
+        copyRow(t('pay_amount'), order.totalText) +
+        copyRow(t('pay_reference'), order.ref) +
+        copyRow(t('pay_account'), b.accountName) +
+        copyRow(t('pay_iban'), b.iban) +
+        copyRow(t('pay_bic'), b.bic) +
+        '<div class="pay-row"><div class="pay-row-label">' + t('pay_bankname') + '</div><div class="pay-row-val"><span class="pay-val">' + esc(b.bank) + '</span></div></div>' +
+      '</div>' +
+      '<p class="pay-ref-hint">' + I.check + t('pay_ref_hint') + '</p>' +
+      '<div class="pay-meta"><span>' + t('pay_order_no') + ': <b>' + esc(order.orderNo) + '</b></span></div>' +
+      '<p class="pay-note-keep">' + t('pay_note_keep') + '</p>' +
+      '<div class="pay-actions"><a class="btn" href="/">' + t('pay_back_home') + '</a><a class="btn btn-outline" href="/faq/">' + t('pay_view_faq') + '</a></div>' +
+    '</div></div>';
+    wireCopyButtons(main);
+    window.scrollTo(0, 0);
+    // hide the floating checkout summary/search remnants if any
+    var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
+  }
+
   function renderCheckout() {
     var sub = Cart.subtotal();
     var os = $('#orderSummary');
@@ -1558,10 +1747,10 @@
         '<div class="sum-row"><span class="muted">' + t('shipping_word') + '</span><span id="osShip">' + (ship ? money(ship) : t('free_word')) + '</span></div>' +
         (ins ? '<div class="sum-row"><span class="muted">' + t('ship_protect') + '</span><span>' + money(ins) + '</span></div>' : '') +
         '<div class="sum-row total"><span>' + t('total') + '</span><span>' + money(sub + ship + ins) + '</span></div>' +
-        '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order') + '</button>' +
-        '<p class="drawer-note" style="margin-top:12px;">' + t('secured_demo') + '</p>';
+        '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_bt') + '</button>' +
+        '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;">' + t('secured_demo') + '</p>';
       var po = $('#placeOrder');
-      if (po) po.addEventListener('click', function () { po.textContent = t('order_placed'); });
+      if (po) po.addEventListener('click', function () { placeBankOrder(sub, ship, ins); });
     }
     var insPrice = $('#insPrice');
     if (insPrice) insPrice.textContent = money(INS_COST);

@@ -16,6 +16,21 @@
   /* currency follows language: Romanian → lei, else → euro */
   var CUR = (localStorage.getItem('toppep_lang') === 'ro') ? 'ron' : 'eur';
 
+  /* =================================================================
+     PAYMENT CONFIG — single source of truth for bank-transfer details.
+     Referenced by the checkout confirmation, order emails and /admin/.
+  ================================================================= */
+  var PAYMENT_BANK_DETAILS = {
+    accountName: 'Petru Birgauan',
+    iban: 'BE37 9050 9304 4528',
+    bic: 'TRWIBEB1XXX',
+    bank: 'Wise (TransferWise)'
+  };
+  var ORDER_INBOX = 'orders@top-pep.com';
+  /* Phase 2: set to your order-API endpoint (e.g. Supabase edge function).
+     While empty, orders are recorded via email + localStorage only. */
+  var ORDER_API_URL = '';
+
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   var IMG = '/Produktbilder/', COA = '/Janotest/';
 
@@ -292,6 +307,21 @@
     freeShip: CUR === 'ron' ? 1230 : 250,
     shipCost: CUR === 'ron' ? 35 : 15.90,
     telegram: '@TOP_Pep',
+    bank: PAYMENT_BANK_DETAILS,
+    orderInbox: ORDER_INBOX,
+    orderApiUrl: ORDER_API_URL,
+    /* unique payment reference: TOP- + 8 unambiguous chars (no 0/O/1/I) */
+    genPaymentRef: function () {
+      var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', out = '';
+      var rnd = (window.crypto && window.crypto.getRandomValues)
+        ? window.crypto.getRandomValues(new Uint32Array(8))
+        : null;
+      for (var i = 0; i < 8; i++) {
+        var r = rnd ? rnd[i] : Math.floor(Math.random() * 4294967296);
+        out += alphabet[r % alphabet.length];
+      }
+      return 'TOP-' + out;
+    },
     janoshikBlur: '/janoshikblur.png',
     strip: strip,
     imgUrl: function (path) { return enc(path); },

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Orders admin — TOP Pep</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=15">
+<style>
+  .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 90px; }
+  .admin-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .admin-head img { height: 42px; width: auto; }
+  .admin-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .admin-tools { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 22px; }
+  .admin-tools input { flex: 1; min-width: 220px; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; font-family: var(--font-body); font-size: 15px; }
+  .admin-filter { display: flex; gap: 6px; }
+  .admin-filter button { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 9px 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--white); color: var(--muted); }
+  .admin-filter button.active { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
+  .order-card { border: 1px solid var(--line-strong); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+  .order-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .order-ref { font-family: var(--font-mono); font-weight: 700; font-size: 15px; letter-spacing: 0.04em; }
+  .order-badge { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 999px; }
+  .order-badge.pending { background: #fdf0e6; color: #b5651d; }
+  .order-badge.paid { background: #e7f6ee; color: #1a7f4b; }
+  .order-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 24px; margin: 14px 0; font-size: 14px; }
+  .order-grid .k { color: var(--muted); }
+  .order-items { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }
+  .order-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .admin-empty { color: var(--muted); padding: 40px 0; text-align: center; }
+  .admin-note { margin-top: 40px; padding: 16px 18px; border: 1px dashed var(--line-strong); border-radius: 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  @media (max-width: 560px) { .order-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-head"><img src="/logo.png" alt="TOP Pep"><h1 style="font-size:1.4rem;">Orders</h1></div>
+  <p class="admin-sub">Bank-transfer orders on this device. Search by payment reference, mark as paid once the money is in the account, then send the thank-you email.</p>
+  <div class="admin-tools">
+    <input id="search" type="search" placeholder="Search by reference, name or email…" aria-label="Search orders">
+    <div class="admin-filter">
+      <button data-f="all" class="active">All</button>
+      <button data-f="pending">Pending</button>
+      <button data-f="paid">Paid</button>
+    </div>
+  </div>
+  <div id="list"></div>
+  <div class="admin-note">
+    <b>Note:</b> this view reads orders stored in <i>this</i> browser. For a central list accessible from anywhere — plus a real database-level unique constraint and automatic emails — connect the Phase-2 backend (set <code>ORDER_API_URL</code> in <code>data.js</code>). See <code>/backend/README.md</code>.
+  </div>
+</div>
+
+<script src="/data.js?v=15"></script>
+<script>
+(function () {
+  var KEY = 'toppep_orders';
+  var T = window.TOPPEP;
+  function all() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+  function saveAll(list) { localStorage.setItem(KEY, JSON.stringify(list)); }
+  function money(n, cur) { return cur === 'ron' ? n.toFixed(2) + ' Lei' : n.toFixed(2) + '€'; }
+  function fmtDate(ts) { try { return new Date(ts).toLocaleString(); } catch (e) { return ''; } }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
+
+  // thank-you email templates, in the order's language
+  var MAIL = {
+    en: function (o) {
+      return {
+        subject: 'Payment received — order ' + o.ref,
+        body: 'Hi ' + o.name + ',\n\nThank you — we\'ve received your payment for order ' + o.orderNo + ' (payment reference ' + o.ref + ').\n\nYour order:\n' + itemLines(o) + '\nTotal paid: ' + o.totalText + '\n\nNext step: we\'re now preparing your parcel and it will be dispatched within 1 business day. You\'ll get a tracking link by email as soon as it ships.\n\nThanks for choosing TOP Pep.\n— The TOP Pep team'
+      };
+    },
+    de: function (o) {
+      return {
+        subject: 'Zahlung erhalten — Bestellung ' + o.ref,
+        body: 'Hallo ' + o.name + ',\n\nvielen Dank — wir haben deine Zahlung für Bestellung ' + o.orderNo + ' (Zahlungsreferenz ' + o.ref + ') erhalten.\n\nDeine Bestellung:\n' + itemLines(o) + '\nBezahlter Gesamtbetrag: ' + o.totalText + '\n\nNächster Schritt: Wir bereiten dein Paket jetzt vor, der Versand erfolgt innerhalb von 1 Werktag. Du erhältst den Tracking-Link per E-Mail, sobald es unterwegs ist.\n\nDanke, dass du dich für TOP Pep entschieden hast.\n— Dein TOP-Pep-Team'
+      };
+    },
+    ro: function (o) {
+      return {
+        subject: 'Plată primită — comanda ' + o.ref,
+        body: 'Bună ' + o.name + ',\n\nMulțumim — am primit plata pentru comanda ' + o.orderNo + ' (referință de plată ' + o.ref + ').\n\nComanda ta:\n' + itemLines(o) + '\nTotal plătit: ' + o.totalText + '\n\nUrmătorul pas: pregătim coletul, care va fi expediat în cel mult 1 zi lucrătoare. Vei primi linkul de urmărire pe e-mail imediat ce pleacă.\n\nMulțumim că ai ales TOP Pep.\n— Echipa TOP Pep'
+      };
+    }
+  };
+  function itemLines(o) { return (o.items || []).map(function (i) { return '  ' + i.qty + '× ' + i.name + ' — ' + money(i.price * i.qty, o.currency); }).join('\n') + '\n'; }
+
+  var state = { q: '', filter: 'all' };
+  function render() {
+    var list = all().filter(function (o) {
+      if (state.filter !== 'all' && o.status !== state.filter) return false;
+      if (state.q) {
+        var hay = (o.ref + ' ' + o.orderNo + ' ' + o.name + ' ' + o.email).toLowerCase();
+        if (hay.indexOf(state.q.toLowerCase()) === -1) return false;
+      }
+      return true;
+    });
+    var root = document.getElementById('list');
+    if (!list.length) { root.innerHTML = '<div class="admin-empty">No orders' + (state.q || state.filter !== 'all' ? ' match this filter.' : ' yet.') + '</div>'; return; }
+    root.innerHTML = list.map(function (o) {
+      var addr = esc(o.address + ', ' + o.zip + ' ' + o.city + ', ' + o.country);
+      return '<div class="order-card">' +
+        '<div class="order-top"><span class="order-ref">' + esc(o.ref) + '</span>' +
+          '<span class="order-badge ' + o.status + '">' + (o.status === 'paid' ? 'Paid' : 'Pending') + '</span></div>' +
+        '<div class="order-grid">' +
+          '<div><span class="k">Order:</span> ' + esc(o.orderNo) + '</div>' +
+          '<div><span class="k">Total:</span> <b>' + esc(o.totalText) + '</b></div>' +
+          '<div><span class="k">Customer:</span> ' + esc(o.name) + '</div>' +
+          '<div><span class="k">Email:</span> ' + esc(o.email) + '</div>' +
+          '<div><span class="k">Placed:</span> ' + fmtDate(o.createdAt) + '</div>' +
+          '<div><span class="k">Address:</span> ' + addr + '</div>' +
+        '</div>' +
+        '<div class="order-items">' + (o.items || []).map(function (i) { return esc(i.qty + '× ' + i.name); }).join(' · ') + '</div>' +
+        '<div class="order-actions">' +
+          (o.status === 'pending'
+            ? '<button class="btn btn-sm" data-paid="' + esc(o.ref) + '">Mark as paid</button>'
+            : '<button class="btn btn-sm btn-outline" data-mail="' + esc(o.ref) + '">Resend thank-you email</button>') +
+        '</div>' +
+      '</div>';
+    }).join('');
+    wire();
+  }
+  function sendThanks(o) {
+    var tpl = (MAIL[o.lang] || MAIL.en)(o);
+    window.location.href = 'mailto:' + encodeURIComponent(o.email) + '?subject=' + encodeURIComponent(tpl.subject) + '&body=' + encodeURIComponent(tpl.body);
+  }
+  function wire() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-paid]'), function (b) {
+      b.addEventListener('click', function () {
+        var ref = b.getAttribute('data-paid');
+        var list = all(), order = null;
+        list.forEach(function (o) { if (o.ref === ref) { o.status = 'paid'; o.paidAt = Date.now(); order = o; } });
+        saveAll(list);
+        render();
+        if (order) sendThanks(order);
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mail]'), function (b) {
+      b.addEventListener('click', function () {
+        var o = all().filter(function (x) { return x.ref === b.getAttribute('data-mail'); })[0];
+        if (o) sendThanks(o);
+      });
+    });
+  }
+  document.getElementById('search').addEventListener('input', function () { state.q = this.value.trim(); render(); });
+  Array.prototype.forEach.call(document.querySelectorAll('.admin-filter button'), function (b) {
+    b.addEventListener('click', function () {
+      state.filter = b.getAttribute('data-f');
+      Array.prototype.forEach.call(document.querySelectorAll('.admin-filter button'), function (x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>
