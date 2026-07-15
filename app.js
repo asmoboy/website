@@ -720,7 +720,7 @@
       // Phase 2: hand the order to the backend if configured.
       if (T.orderApiUrl) {
         try {
-          fetch(T.orderApiUrl, {
+          fetch(T.orderApiUrl + '/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(order)
