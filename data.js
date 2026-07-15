@@ -29,7 +29,7 @@
   var ORDER_INBOX = 'orders@top-pep.com';
   /* Phase 2: set to your order-API endpoint (e.g. Supabase edge function).
      While empty, orders are recorded via email + localStorage only. */
-  var ORDER_API_URL = '';
+  var ORDER_API_URL = 'https://order-api.top-pep.workers.dev';
 
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   var IMG = '/Produktbilder/', COA = '/Janotest/';
