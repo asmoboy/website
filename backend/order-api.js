@@ -11,10 +11,13 @@
  * All secrets are read from `env` (Worker secrets/vars) — never hardcoded.
  * Set them with `wrangler secret put <NAME>` (see backend/README.md).
  *
- * Card payments (Stripe hosted Checkout):
+ * Card payments (Stripe embedded Payment Element — no redirect):
  *
- *   POST   /stripe/checkout    → create a Checkout Session, return its URL
- *   POST   /stripe/webhook     → Stripe calls this on payment; marks paid + emails
+ *   POST   /stripe/payment-intent → create a PaymentIntent, return client_secret
+ *   POST   /stripe/webhook        → Stripe calls this on payment; marks paid + emails
+ *
+ * PRIVACY: Stripe only ever receives the amount + our order reference —
+ * never the product names or basket contents (see computeAmountCents).
  *
  * Required env bindings:
  *   SUPABASE_URL          – e.g. https://xxxx.supabase.co
@@ -85,58 +88,18 @@ async function stripeApi(env, path, params) {
 // major currency units (e.g. euros) → minor units (cents) Stripe expects
 function toMinorUnits(amount) { return Math.round(Number(amount) * 100); }
 
-function buildLineItems(payload) {
-  const currency = (payload.currency || 'eur').toLowerCase();
-  const items = (payload.items || []).map((i) => ({
-    quantity: Math.max(1, parseInt(i.qty, 10) || 1),
-    price_data: {
-      currency,
-      unit_amount: toMinorUnits(i.price),
-      product_data: { name: String(i.name || 'Item').slice(0, 250) },
-    },
-  }));
-  if (Number(payload.shipping) > 0) {
-    items.push({ quantity: 1, price_data: { currency, unit_amount: toMinorUnits(payload.shipping), product_data: { name: payload.shipping_label || 'Shipping' } } });
-  }
-  if (Number(payload.insurance) > 0) {
-    items.push({ quantity: 1, price_data: { currency, unit_amount: toMinorUnits(payload.insurance), product_data: { name: payload.insurance_label || 'Shipping protection' } } });
-  }
-  return items;
-}
-
-// ---- POST /stripe/checkout ----
-async function createCheckoutSession(env, db, payload) {
-  const base = pickOrderFields(payload);
-  if (!base.email || !base.name || base.total === undefined) {
-    return { error: 'missing required fields', status: 400 };
-  }
-  const line_items = buildLineItems(payload);
-  if (!line_items.length) return { error: 'no items', status: 400 };
-
-  // Persist a pending order first (if Supabase is wired) so the reference is
-  // DB-unique and the /admin list + webhook can find it. Without a DB we fall
-  // back to a best-effort local ref (uniqueness caveat — see README).
-  let ref;
-  if (db) {
-    const created = await createOrder(db, payload);
-    if (created.error) return created;
-    ref = created.order.ref;
-  } else {
-    ref = genRef();
-  }
-
-  const site = (env.SITE_URL || env.ALLOWED_ORIGIN || 'https://top-pep.com').replace(/\/$/, '');
-  const session = await stripeApi(env, '/checkout/sessions', {
-    mode: 'payment',
-    client_reference_id: ref,
-    customer_email: base.email,
-    line_items,
-    metadata: { ref, order_no: base.order_no || '', lang: base.lang || 'en' },
-    success_url: `${site}/checkout/?stripe=success&ref=${ref}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${site}/checkout/?stripe=cancel`,
-  });
-
-  return { ok: true, url: session.url, ref };
+/* Total to charge, in minor units, summed server-side from the individual
+   items (never a client-supplied total).
+   PRIVACY: only this sum ever reaches Stripe — no product names, no basket
+   contents. Stripe sees an amount + our order reference, nothing more. */
+function computeAmountCents(payload) {
+  let total = (payload.items || []).reduce(function (n, i) {
+    const qty = Math.max(1, parseInt(i.qty, 10) || 1);
+    return n + toMinorUnits(i.price) * qty;
+  }, 0);
+  if (Number(payload.shipping) > 0) total += toMinorUnits(payload.shipping);
+  if (Number(payload.insurance) > 0) total += toMinorUnits(payload.insurance);
+  return total;
 }
 
 // ---- POST /stripe/payment-intent — embedded Payment Element (no redirect) ----
@@ -147,11 +110,9 @@ async function createPaymentIntent(env, db, payload) {
   if (!base.email || !base.name || base.total === undefined) {
     return { error: 'missing required fields', status: 400 };
   }
-  const line_items = buildLineItems(payload);
-  if (!line_items.length) return { error: 'no items', status: 400 };
   const currency = (payload.currency || 'eur').toLowerCase();
-  // charge the server-computed sum of the line items, never a client total
-  const amount = line_items.reduce((n, li) => n + li.price_data.unit_amount * li.quantity, 0);
+  const amount = computeAmountCents(payload);
+  if (amount < 1) return { error: 'no items', status: 400 };
 
   let ref;
   if (db) {
@@ -357,13 +318,6 @@ export default {
 
     try {
       // ---- Stripe: card checkout + webhook (no Supabase required) ----
-      if (request.method === 'POST' && url.pathname === '/stripe/checkout') {
-        const body = await request.json();
-        const res = await createCheckoutSession(env, db, body);
-        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
-        return jsonResponse(res, { status: 201 }, env);
-      }
-
       if (request.method === 'POST' && url.pathname === '/stripe/payment-intent') {
         const body = await request.json();
         const res = await createPaymentIntent(env, db, body);
@@ -377,7 +331,10 @@ export default {
         return jsonResponse(res, {}, env);
       }
 
-      // ---- order records (require Supabase) ----
+      // ---- order records (these, and only these, require Supabase) ----
+      if (!/^\/orders(\/|$)/.test(url.pathname)) {
+        return jsonResponse({ error: 'not found' }, { status: 404 }, env);
+      }
       if (!db) {
         return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
       }

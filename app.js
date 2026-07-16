@@ -181,7 +181,7 @@
       ab_p3: 'Our customers are labs, students, and independent researchers who care what’s actually in the vial. We build for the person who checks the lot number — because that person is right to.',
       ab_l2: 'Browse the COA library',
       co_h1: 'Checkout', co_email: 'Email address', co_news: 'Email me new lot &amp; COA releases', ship_addr: 'Shipping address',
-      co_inst: 'Institution / lab (optional)', co_addr: 'Address', co_city: 'City', co_zip: 'Postal code', co_country: 'Country',
+      co_inst: 'Institution / lab (optional)', co_addr: 'Street', co_city: 'City', co_zip: 'Postal code', co_country: 'Country',
       co_ship1: 'Tracked standard', co_ship1s: 'All EU countries, 24–48h dispatch', co_ship1p: 'Free over €250',
       co_ship2: 'Express', co_ship2s: 'Priority, insulated, 1–2 days', co_ship3: 'United Kingdom', co_ship3s: 'Tracked, 3–5 days',
       co_addons: 'Add to your order', co_add: 'Add', co_card: 'Card',
@@ -198,8 +198,11 @@
       pay_copy: 'Copy', pay_copied: 'Copied ✓', pay_ref_hint: 'Add this exact reference as the payment description so we can find your transfer.',
       pay_order_no: 'Order number', pay_status_pending: 'Awaiting payment', pay_note_keep: 'Note your payment reference — you’ll need it for the transfer. We’ll email you as soon as the payment is confirmed.',
       pay_back_home: 'Back to home', pay_view_faq: 'Payment questions? Read the FAQ', place_order_bt: 'Place order &amp; get bank details',
-      pay_card_body: 'Enter your card details below — you stay on this page. Your card data goes straight to Stripe; we never see or store it.',
       place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
+      co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
+      err_zip: 'That postal code doesn’t match the selected country. Please check it.',
+      err_house: 'Please include a house number (e.g. 12, 12a).',
+      err_phone: 'Please enter a valid phone number, or leave the field empty.',
       pay_card_error: 'Sorry, we couldn’t start the card payment. Please try again or use bank transfer.',
       pay_paid_title: 'Payment received', pay_paid_intro: 'Thank you — your card payment went through. We’re preparing your parcel now and it ships within 1 business day; you’ll get a tracking link by email.',
       pay_cancel_note: 'Payment cancelled — nothing was charged. You can try again or choose bank transfer.',
@@ -371,7 +374,7 @@
       ab_p3: 'Unsere Kunden sind Labore, Studierende und unabhängige Forschende, denen wichtig ist, was wirklich im Vial steckt. Wir bauen für die Person, die die Chargennummer nachschlägt — denn sie hat recht damit.',
       ab_l2: 'Zur COA-Bibliothek',
       co_h1: 'Kasse', co_email: 'E-Mail-Adresse', co_news: 'Per E-Mail über neue Chargen &amp; COAs informieren', ship_addr: 'Lieferadresse',
-      co_inst: 'Institution / Labor (optional)', co_addr: 'Adresse', co_city: 'Stadt', co_zip: 'Postleitzahl', co_country: 'Land',
+      co_inst: 'Institution / Labor (optional)', co_addr: 'Straße', co_city: 'Stadt', co_zip: 'Postleitzahl', co_country: 'Land',
       co_ship1: 'Standard mit Tracking', co_ship1s: 'Alle EU-Länder, Versand in 24–48 h', co_ship1p: 'Gratis ab 250 €',
       co_ship2: 'Express', co_ship2s: 'Priorität, isoliert, 1–2 Tage', co_ship3: 'Vereinigtes Königreich', co_ship3s: 'Mit Tracking, 3–5 Tage',
       co_addons: 'Zur Bestellung hinzufügen', co_add: 'Hinzufügen', co_card: 'Karte',
@@ -388,8 +391,11 @@
       pay_copy: 'Kopieren', pay_copied: 'Kopiert ✓', pay_ref_hint: 'Gib genau diese Referenz als Verwendungszweck an, damit wir deine Überweisung finden.',
       pay_order_no: 'Bestellnummer', pay_status_pending: 'Zahlung ausstehend', pay_note_keep: 'Notiere dir deine Zahlungsreferenz — du brauchst sie für die Überweisung. Wir melden uns per E-Mail, sobald die Zahlung bestätigt ist.',
       pay_back_home: 'Zurück zur Startseite', pay_view_faq: 'Fragen zur Zahlung? Zu den FAQ', place_order_bt: 'Bestellen &amp; Bankdaten erhalten',
-      pay_card_body: 'Gib deine Kartendaten unten ein — du bleibst auf dieser Seite. Deine Kartendaten gehen direkt an Stripe; wir sehen und speichern sie nie.',
       pay_processing: 'Zahlung wird verarbeitet…',
+      co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
+      err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
+      err_house: 'Bitte gib eine Hausnummer an (z. B. 12, 12a).',
+      err_phone: 'Bitte gib eine gültige Telefonnummer ein oder lass das Feld leer.',
       place_order_card: 'Mit Karte zahlen', pay_redirecting: 'Weiterleitung zur sicheren Zahlung…',
       pay_card_error: 'Die Kartenzahlung konnte leider nicht gestartet werden. Bitte versuche es erneut oder nutze die Banküberweisung.',
       pay_paid_title: 'Zahlung erhalten', pay_paid_intro: 'Vielen Dank — deine Kartenzahlung war erfolgreich. Wir bereiten dein Paket vor; Versand innerhalb von 1 Werktag, den Tracking-Link bekommst du per E-Mail.',
@@ -562,7 +568,7 @@
       ab_p3: 'Clienții noștri sunt laboratoare, studenți și cercetători independenți cărora le pasă ce e de fapt în flacon. Construim pentru omul care verifică numărul de lot — pentru că are dreptate să o facă.',
       ab_l2: 'Vezi biblioteca COA',
       co_h1: 'Finalizare comandă', co_email: 'Adresă de e-mail', co_news: 'Vreau să primesc pe e-mail noutăți despre loturi și COA-uri', ship_addr: 'Adresă de livrare',
-      co_inst: 'Instituție / laborator (opțional)', co_addr: 'Adresă', co_city: 'Oraș', co_zip: 'Cod poștal', co_country: 'Țară',
+      co_inst: 'Instituție / laborator (opțional)', co_addr: 'Stradă', co_city: 'Oraș', co_zip: 'Cod poștal', co_country: 'Țară',
       co_ship1: 'Standard cu tracking', co_ship1s: 'Toate țările UE, expediere în 24–48h', co_ship1p: 'Gratuit peste 250 €',
       co_ship2: 'Express', co_ship2s: 'Prioritar, izolat, 1–2 zile', co_ship3: 'Regatul Unit', co_ship3s: 'Cu tracking, 3–5 zile',
       co_addons: 'Adaugă la comandă', co_add: 'Adaugă', co_card: 'Card',
@@ -579,8 +585,11 @@
       pay_copy: 'Copiază', pay_copied: 'Copiat ✓', pay_ref_hint: 'Adaugă exact această referință ca detaliu al plății, ca să găsim transferul tău.',
       pay_order_no: 'Număr comandă', pay_status_pending: 'În așteptarea plății', pay_note_keep: 'Notează-ți referința de plată — îți va trebui pentru transfer. Îți scriem pe e-mail imediat ce plata este confirmată.',
       pay_back_home: 'Înapoi la pagina principală', pay_view_faq: 'Întrebări despre plată? Vezi FAQ', place_order_bt: 'Plasează comanda &amp; obține datele bancare',
-      pay_card_body: 'Introdu datele cardului mai jos — rămâi pe această pagină. Datele cardului merg direct la Stripe; noi nu le vedem și nu le stocăm niciodată.',
       pay_processing: 'Se procesează plata…',
+      co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
+      err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
+      err_house: 'Te rugăm să incluzi numărul casei (ex. 12, 12a).',
+      err_phone: 'Introdu un număr de telefon valid sau lasă câmpul gol.',
       place_order_card: 'Plătește cu cardul', pay_redirecting: 'Redirecționare către plata securizată…',
       pay_card_error: 'Ne pare rău, nu am putut începe plata cu cardul. Încearcă din nou sau folosește transferul bancar.',
       pay_paid_title: 'Plată primită', pay_paid_intro: 'Mulțumim — plata cu cardul a reușit. Pregătim coletul acum; se expediază în 1 zi lucrătoare și vei primi linkul de urmărire pe e-mail.',
@@ -1462,6 +1471,29 @@
     catch (e) { return d.toDateString(); }
   }
 
+  /* ---- accepted card brands, shown above the add-to-cart button ---- */
+  function payBadges() {
+    function badge(inner, label) {
+      return '<span class="pay-badge" role="img" aria-label="' + label + '">' +
+        '<svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true" focusable="false">' +
+          '<rect x=".5" y=".5" width="37" height="23" rx="3.5" fill="#fff" stroke="#e3e3e8"/>' + inner +
+        '</svg></span>';
+    }
+    var F = 'Arial,Helvetica,sans-serif';
+    return '<div class="pay-badges" aria-label="' + t('accepted_cards') + '">' +
+      badge('<text x="19" y="16" text-anchor="middle" font-family="' + F + '" font-size="9" font-weight="bold" font-style="italic" fill="#1A1F71">VISA</text>', 'Visa') +
+      badge('<circle cx="15" cy="12" r="6" fill="#EB001B"/><circle cx="23" cy="12" r="6" fill="#F79E1B"/>' +
+            '<path d="M19 7.53a6 6 0 000 8.94 6 6 0 000-8.94z" fill="#FF5F00"/>', 'Mastercard') +
+      badge('<rect x="2" y="2" width="34" height="20" rx="2" fill="#006FCF"/>' +
+            '<text x="19" y="15.5" text-anchor="middle" font-family="' + F + '" font-size="7" font-weight="bold" fill="#fff">AMEX</text>', 'American Express') +
+      badge('<circle cx="15" cy="12" r="6" fill="#ED0006"/><circle cx="23" cy="12" r="6" fill="#0099DF"/>' +
+            '<path d="M19 7.53a6 6 0 000 8.94 6 6 0 000-8.94z" fill="#6C6BBD"/>', 'Maestro') +
+      badge('<rect x="4.5" y="4" width="9" height="16" rx="2" fill="#0E4C96"/>' +
+            '<rect x="14.5" y="4" width="9" height="16" rx="2" fill="#D0021B"/>' +
+            '<rect x="24.5" y="4" width="9" height="16" rx="2" fill="#009944"/>', 'JCB') +
+    '</div>';
+  }
+
   function renderProduct(p) {
     document.title = p.name + ' — TOP Pep';
     var root = $('#productRoot');
@@ -1489,6 +1521,7 @@
               '<div class="swatches">' + p.options.map(function (o, i) { return '<button class="swatch" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + o.label + '</button>'; }).join('') + '</div>' +
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
+          payBadges() +
           '<div class="pd-buy-simple">' +
             '<div class="stepper pd-stepper-lg"><button data-pstep="-1" aria-label="-">–</button><span class="qty pd-qty">1</span><button data-pstep="1" aria-label="+">+</button></div>' +
             '<button class="btn btn-block" id="pdAdd">' + t('add_to_cart') + '</button>' +
@@ -1627,48 +1660,24 @@
 
   /* ---- checkout render ---- */
   var INS_COST = CUR === 'ron' ? 25.99 : 4.99;
-  /* ---- copy-to-clipboard button ---- */
-  function copyRow(label, value) {
-    return '<div class="pay-row">' +
-        '<div class="pay-row-label">' + label + '</div>' +
-        '<div class="pay-row-val"><span class="pay-val">' + esc(value) + '</span>' +
-          '<button type="button" class="pay-copy" data-copy="' + esc(value) + '">' + t('pay_copy') + '</button></div>' +
-      '</div>';
-  }
-  function wireCopyButtons(root) {
-    $$('.pay-copy', root).forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var v = btn.getAttribute('data-copy');
-        var done = function () {
-          var old = btn.textContent;
-          btn.textContent = t('pay_copied');
-          btn.classList.add('copied');
-          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1600);
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(v).then(done, function () { fallbackCopy(v); done(); });
-        } else { fallbackCopy(v); done(); }
-      });
-    });
-  }
-  function fallbackCopy(v) {
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = v; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    } catch (e) {}
-  }
+  /* ---- postal-code formats per country (checkout address validation) ---- */
+  var POSTAL = {
+    Austria: /^\d{4}$/, Belgium: /^\d{4}$/, Bulgaria: /^\d{4}$/, Croatia: /^\d{5}$/,
+    Cyprus: /^\d{4}$/, Czechia: /^\d{3} ?\d{2}$/, Denmark: /^\d{4}$/, Estonia: /^\d{5}$/,
+    Finland: /^\d{5}$/, France: /^\d{5}$/, Germany: /^\d{5}$/, Greece: /^\d{3} ?\d{2}$/,
+    Hungary: /^\d{4}$/, Ireland: /^[A-Za-z]\d{2} ?[A-Za-z0-9]{4}$/, Italy: /^\d{5}$/,
+    Latvia: /^(LV-)?\d{4}$/i, Lithuania: /^(LT-)?\d{5}$/i, Luxembourg: /^(L-)?\d{4}$/i,
+    Malta: /^[A-Za-z]{3} ?\d{4}$/, Netherlands: /^\d{4} ?[A-Za-z]{2}$/, Poland: /^\d{2}-?\d{3}$/,
+    Portugal: /^\d{4}-?\d{3}$/, Romania: /^\d{6}$/, Slovakia: /^\d{3} ?\d{2}$/,
+    Slovenia: /^(SI-)?\d{4}$/i, Spain: /^\d{5}$/, Sweden: /^\d{3} ?\d{2}$/,
+    'United Kingdom': /^[A-Za-z]{1,2}\d[A-Za-z\d]? ?\d[A-Za-z]{2}$/
+  };
 
-  /* ---- which payment method is selected (open accordion) ---- */
-  function selectedPayMethod() {
-    var open = document.querySelector('.accordion-item.open');
-    return (open && open.getAttribute('data-pay')) || 'bank';
-  }
-
-  /* ---- reflect the selected method in the place-order button label ---- */
-  function syncPlaceOrderBtn() {
-    var po = $('#placeOrder'); if (!po) return;
-    po.innerHTML = selectedPayMethod() === 'card' ? t('place_order_card') : t('place_order_bt');
+  function selectedCountry() {
+    var sel = $('#coCountry');
+    if (!sel) return '';
+    var opt = sel.options[sel.selectedIndex];
+    return (opt && opt.getAttribute('data-country')) || sel.value || '';
   }
 
   /* ---- validate the checkout form + build the order object (shared) ----
@@ -1676,23 +1685,37 @@
   function buildCheckoutOrder(sub, ship, ins) {
     if (!Cart.items.length) return null;
     var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-    var fields = ['coEmail', 'coFirst', 'coLast', 'coAddr', 'coCity', 'coZip'];
-    var ok = true, firstBad = null;
-    fields.forEach(function (id) {
+    var country = selectedCountry();
+    var val = function (id) { var el = $('#' + id); return el ? el.value.trim() : ''; };
+    var firstBad = null, msg = '';
+
+    function flag(id, bad, message) {
       var el = $('#' + id); if (!el) return;
-      var bad = !el.value.trim() || (id === 'coEmail' && !emailRe.test(el.value.trim()));
-      el.classList.toggle('wf-error', bad);
-      if (bad && !firstBad) firstBad = el;
-      if (bad) ok = false;
+      el.classList.toggle('wf-error', !!bad);
+      if (bad && !firstBad) { firstBad = el; msg = message || t('form_invalid'); }
+    }
+
+    // required fields (house number is now mandatory)
+    ['coEmail', 'coFirst', 'coLast', 'coAddr', 'coHouse', 'coCity', 'coZip'].forEach(function (id) {
+      flag(id, !val(id), t('form_invalid'));
     });
+    // email format
+    if (val('coEmail')) flag('coEmail', !emailRe.test(val('coEmail')), t('form_invalid'));
+    // house number must actually contain a digit ("12", "12a", "12/3")
+    if (val('coHouse')) flag('coHouse', !/\d/.test(val('coHouse')), t('err_house'));
+    // postal code must match the selected country's format
+    if (val('coZip') && POSTAL[country]) flag('coZip', !POSTAL[country].test(val('coZip')), t('err_zip'));
+    // phone is optional — invalid only when filled in AND malformed (always
+    // call flag() so clearing the field also clears a stale error mark)
+    flag('coPhone', !!val('coPhone') && !/^\+?[\d\s()\/.-]{6,20}$/.test(val('coPhone')), t('err_phone'));
+
     var note = $('#placeOrderNote');
-    if (!ok) {
-      if (note) { note.style.color = '#e0533d'; note.textContent = t('form_invalid'); }
-      if (firstBad) firstBad.focus();
+    if (firstBad) {
+      if (note) { note.style.color = '#e0533d'; note.textContent = msg; }
+      firstBad.focus();
       return null;
     }
     var total = sub + ship + ins;
-    var countrySel = $('#coCountry');
     return {
       ref: Orders.uniqueRef(),
       orderNo: 'TP' + String(Date.now()).slice(-8),
@@ -1700,13 +1723,14 @@
       createdAt: Date.now(),
       lang: lang,
       currency: CUR,
-      email: $('#coEmail').value.trim(),
-      name: ($('#coFirst').value.trim() + ' ' + $('#coLast').value.trim()).trim(),
-      org: ($('#coOrg') && $('#coOrg').value.trim()) || '',
-      address: $('#coAddr').value.trim(),
-      city: $('#coCity').value.trim(),
-      zip: $('#coZip').value.trim(),
-      country: countrySel ? (countrySel.options[countrySel.selectedIndex] || {}).getAttribute('data-country') || countrySel.value : '',
+      email: val('coEmail'),
+      name: (val('coFirst') + ' ' + val('coLast')).trim(),
+      org: val('coOrg'),
+      phone: val('coPhone'),
+      address: (val('coAddr') + ' ' + val('coHouse')).trim(),
+      city: val('coCity'),
+      zip: val('coZip'),
+      country: country,
       items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i) }; }),
       subtotal: sub, shipping: ship, insurance: ins, total: total,
       totalText: money(total)
@@ -1807,16 +1831,6 @@
     });
   }
 
-  /* ---- place a bank-transfer order ---- */
-  function placeBankOrder(sub, ship, ins) {
-    var order = buildCheckoutOrder(sub, ship, ins);
-    if (!order) return;
-    Orders.add(order);
-    emailOrderToInbox(order);
-    Cart.clear();
-    showBankTransferConfirmation(order);
-  }
-
   /* ---- email the new order to the internal order inbox ----
      opts.status / opts.subjectTag let the card flow reuse this with a
      different label (default = bank transfer, pending). */
@@ -1833,6 +1847,7 @@
       'Total': order.totalText,
       'Customer': order.name,
       'Email': order.email,
+      'Phone': order.phone || '—',
       'Institution': order.org,
       'Address': order.address + ', ' + order.zip + ' ' + order.city + ', ' + order.country,
       'Items': lines,
@@ -1845,35 +1860,6 @@
         body: JSON.stringify(payload)
       }).catch(function () {});
     } catch (e) {}
-  }
-
-  /* ---- "Complete your bank transfer" confirmation view ---- */
-  function showBankTransferConfirmation(order) {
-    var b = T.bank;
-    var main = $('#main');
-    if (!main) return;
-    document.title = t('pay_confirm_title') + ' — TOP Pep';
-    main.innerHTML = '<div class="wrap"><div class="pay-confirm">' +
-      '<span class="pay-eyebrow">' + t('pay_status_pending') + '</span>' +
-      '<h1>' + t('pay_confirm_title') + '</h1>' +
-      '<p class="pay-intro">' + t('pay_confirm_intro') + '</p>' +
-      '<div class="pay-card">' +
-        copyRow(t('pay_amount'), order.totalText) +
-        copyRow(t('pay_reference'), order.ref) +
-        copyRow(t('pay_account'), b.accountName) +
-        copyRow(t('pay_iban'), b.iban) +
-        copyRow(t('pay_bic'), b.bic) +
-        '<div class="pay-row"><div class="pay-row-label">' + t('pay_bankname') + '</div><div class="pay-row-val"><span class="pay-val">' + esc(b.bank) + '</span></div></div>' +
-      '</div>' +
-      '<p class="pay-ref-hint">' + I.check + t('pay_ref_hint') + '</p>' +
-      '<div class="pay-meta"><span>' + t('pay_order_no') + ': <b>' + esc(order.orderNo) + '</b></span></div>' +
-      '<p class="pay-note-keep">' + t('pay_note_keep') + '</p>' +
-      '<div class="pay-actions"><a class="btn" href="/">' + t('pay_back_home') + '</a><a class="btn btn-outline" href="/faq/">' + t('pay_view_faq') + '</a></div>' +
-    '</div></div>';
-    wireCopyButtons(main);
-    window.scrollTo(0, 0);
-    // hide the floating checkout summary/search remnants if any
-    var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
   }
 
   /* ---- "Payment received" view after returning from Stripe ---- */
@@ -1919,24 +1905,17 @@
         '<div class="sum-row"><span class="muted">' + t('shipping_word') + '</span><span id="osShip">' + (ship ? money(ship) : t('free_word')) + '</span></div>' +
         (ins ? '<div class="sum-row"><span class="muted">' + t('ship_protect') + '</span><span>' + money(ins) + '</span></div>' : '') +
         '<div class="sum-row total"><span>' + t('total') + '</span><span>' + money(sub + ship + ins) + '</span></div>' +
-        '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_bt') + '</button>' +
-        '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;">' + t('secured_demo') + '</p>';
+        '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_card') + '</button>' +
+        // stays empty until there's something worth saying (status / error)
+        '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;"></p>';
       var po = $('#placeOrder');
-      if (po) po.addEventListener('click', function () {
-        if (selectedPayMethod() === 'card') placeCardOrder(sub, ship, ins);
-        else placeBankOrder(sub, ship, ins);
-      });
+      if (po) po.addEventListener('click', function () { placeCardOrder(sub, ship, ins); });
     }
-    // reveal the card option only when Stripe (incl. Stripe.js) is available
+    // card is the only method: show the Stripe fields straight away
     if (stripeReady()) {
-      var cardItem = document.querySelector('.accordion-item[data-pay="card"]');
-      if (cardItem) {
-        cardItem.hidden = false;
-        if (cardItem.classList.contains('open')) mountPaymentElement();
-      }
+      mountPaymentElement();
       updateStripeAmount(); // keep the charge in sync with shipping/insurance
     }
-    syncPlaceOrderBtn();
     var insPrice = $('#insPrice');
     if (insPrice) insPrice.textContent = money(INS_COST);
     if (insEl && !insEl.dataset.wired) {
@@ -1954,17 +1933,6 @@
         $$('.radio-card[data-group="' + group + '"]').forEach(function (x) { x.classList.remove('selected'); });
         rc.classList.add('selected');
         var input = $('input', rc); if (input) input.checked = true;
-      });
-    });
-    // accordion (payment)
-    $$('.accordion-head').forEach(function (h) {
-      h.addEventListener('click', function () {
-        var item = h.closest('.accordion-item');
-        var open = item.classList.contains('open');
-        $$('.accordion-item').forEach(function (x) { x.classList.remove('open'); });
-        if (!open) item.classList.add('open');
-        if (!open && item.getAttribute('data-pay') === 'card') mountPaymentElement();
-        syncPlaceOrderBtn();
       });
     });
     // upsell add

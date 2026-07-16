@@ -1000,3 +1000,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 .wrap.section { padding-left: 40px; padding-right: 40px; }
 @media (max-width: 1080px) { .wrap.section { padding-left: 28px; padding-right: 28px; } }
 @media (max-width: 640px) { .wrap.section { padding-left: 18px; padding-right: 18px; } }
+
+/* ---- accepted card brands (above the add-to-cart button) ---- */
+.pay-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 12px; }
+.pay-badge { display: inline-flex; line-height: 0; }
+.pay-badge svg { display: block; border-radius: 4px; }
+
+/* ---- checkout: street + house number, card errors ---- */
+.field-row:has(.field-house) { grid-template-columns: 3fr 1fr; }
+.pay-card-err:empty { display: none; }
+.pay-card-err { margin-top: 10px; font-size: 14px; }
