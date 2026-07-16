@@ -110,6 +110,8 @@ async function createPaymentIntent(env, db, payload) {
   if (!base.email || !base.name || base.total === undefined) {
     return { error: 'missing required fields', status: 400 };
   }
+  const addrError = validateAddress(base);
+  if (addrError) return { error: addrError, status: 400 };
   const currency = (payload.currency || 'eur').toLowerCase();
   const amount = computeAmountCents(payload);
   if (amount < 1) return { error: 'no items', status: 400 };
@@ -201,12 +203,43 @@ function pickOrderFields(payload) {
   return out;
 }
 
+// ---- server-side address sanity (mirrors the front-end checks) ----
+// The browser already validates, but a hand-crafted request must not get
+// through with an obviously broken address. Format only — the zip↔city
+// cross-check stays client-side (it is advisory and depends on a 3rd party).
+const POSTAL_SERVER = {
+  Austria: /^\d{4}$/, Belgium: /^\d{4}$/, Bulgaria: /^\d{4}$/, Croatia: /^\d{5}$/,
+  Cyprus: /^\d{4}$/, Czechia: /^\d{3} ?\d{2}$/, Denmark: /^\d{4}$/, Estonia: /^\d{5}$/,
+  Finland: /^\d{5}$/, France: /^\d{5}$/, Germany: /^\d{5}$/, Greece: /^\d{3} ?\d{2}$/,
+  Hungary: /^\d{4}$/, Ireland: /^[A-Za-z]\d{2} ?[A-Za-z0-9]{4}$/, Italy: /^\d{5}$/,
+  Latvia: /^(LV-)?\d{4}$/i, Lithuania: /^(LT-)?\d{5}$/i, Luxembourg: /^(L-)?\d{4}$/i,
+  Malta: /^[A-Za-z]{3} ?\d{4}$/, Netherlands: /^\d{4} ?[A-Za-z]{2}$/, Poland: /^\d{2}-?\d{3}$/,
+  Portugal: /^\d{4}-?\d{3}$/, Romania: /^\d{6}$/, Slovakia: /^\d{3} ?\d{2}$/,
+  Slovenia: /^(SI-)?\d{4}$/i, Spain: /^\d{5}$/, Sweden: /^\d{3} ?\d{2}$/, Switzerland: /^\d{4}$/,
+  'United Kingdom': /^[A-Za-z]{1,2}\d[A-Za-z\d]? ?\d[A-Za-z]{2}$/,
+};
+
+function validateAddress(payload) {
+  const address = String(payload.address || '').trim();
+  const zip = String(payload.zip || '').trim();
+  const country = String(payload.country || '').trim();
+  if (!address) return 'address is required';
+  // the front-end sends "Street 12" (street + house no. joined)
+  if (!/\d/.test(address)) return 'address is missing a house number';
+  if (!zip) return 'postal code is required';
+  const re = POSTAL_SERVER[country];
+  if (re && !re.test(zip)) return `postal code does not match the format for ${country}`;
+  return null;
+}
+
 // ---- POST /orders ----
 async function createOrder(db, payload) {
   const base = pickOrderFields(payload);
   if (!base.email || !base.name || !base.order_no || base.total === undefined) {
     return { error: 'missing required fields', status: 400 };
   }
+  const addrError = validateAddress(base);
+  if (addrError) return { error: addrError, status: 400 };
 
   // Retry on the (astronomically unlikely) unique-constraint clash.
   for (let attempt = 0; attempt < 5; attempt++) {

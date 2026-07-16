@@ -201,6 +201,12 @@
       place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
       co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
+      err_zip_fmt: 'Postal code for {country} must be {n} digits.',
+      warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
+      warn_zip_unknown: 'Postal code {zip} was not found — please check.',
+      zip_use_anyway: 'Use address anyway',
+      zip_checking: 'Checking address…',
+      err_house_req: 'Please enter a house number.',
       err_house: 'Please include a house number (e.g. 12, 12a).',
       err_phone: 'Please enter a valid phone number, or leave the field empty.',
       pay_card_error: 'Sorry, we couldn’t start the card payment. Please try again or use bank transfer.',
@@ -394,6 +400,12 @@
       pay_processing: 'Zahlung wird verarbeitet…',
       co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
+      err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
+      warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
+      warn_zip_unknown: 'Postleitzahl {zip} nicht gefunden — bitte prüfen.',
+      zip_use_anyway: 'Adresse trotzdem verwenden',
+      zip_checking: 'Adresse wird geprüft…',
+      err_house_req: 'Bitte Hausnummer angeben.',
       err_house: 'Bitte gib eine Hausnummer an (z. B. 12, 12a).',
       err_phone: 'Bitte gib eine gültige Telefonnummer ein oder lass das Feld leer.',
       place_order_card: 'Mit Karte zahlen', pay_redirecting: 'Weiterleitung zur sicheren Zahlung…',
@@ -588,6 +600,12 @@
       pay_processing: 'Se procesează plata…',
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
+      err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
+      warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
+      warn_zip_unknown: 'Codul poștal {zip} nu a fost găsit — te rugăm să verifici.',
+      zip_use_anyway: 'Folosește totuși adresa',
+      zip_checking: 'Se verifică adresa…',
+      err_house_req: 'Te rugăm să introduci numărul casei.',
       err_house: 'Te rugăm să incluzi numărul casei (ex. 12, 12a).',
       err_phone: 'Introdu un număr de telefon valid sau lasă câmpul gol.',
       place_order_card: 'Plătește cu cardul', pay_redirecting: 'Redirecționare către plata securizată…',
@@ -1670,7 +1688,15 @@
     Malta: /^[A-Za-z]{3} ?\d{4}$/, Netherlands: /^\d{4} ?[A-Za-z]{2}$/, Poland: /^\d{2}-?\d{3}$/,
     Portugal: /^\d{4}-?\d{3}$/, Romania: /^\d{6}$/, Slovakia: /^\d{3} ?\d{2}$/,
     Slovenia: /^(SI-)?\d{4}$/i, Spain: /^\d{5}$/, Sweden: /^\d{3} ?\d{2}$/,
+    Switzerland: /^\d{4}$/,
     'United Kingdom': /^[A-Za-z]{1,2}\d[A-Za-z\d]? ?\d[A-Za-z]{2}$/
+  };
+  /* human-readable expected format, for the error message */
+  var POSTAL_HINT = {
+    Austria: '4', Belgium: '4', Bulgaria: '4', Cyprus: '4', Denmark: '4', Hungary: '4',
+    Latvia: '4', Luxembourg: '4', Slovenia: '4', Switzerland: '4',
+    Croatia: '5', Estonia: '5', Finland: '5', France: '5', Germany: '5', Italy: '5',
+    Lithuania: '5', Spain: '5', Romania: '6'
   };
 
   function selectedCountry() {
@@ -1678,6 +1704,142 @@
     if (!sel) return '';
     var opt = sel.options[sel.selectedIndex];
     return (opt && opt.getAttribute('data-country')) || sel.value || '';
+  }
+
+  /* ISO-2 codes for the zippopotam.us postcode↔city lookup */
+  var ISO2 = {
+    Austria: 'at', Belgium: 'be', Bulgaria: 'bg', Croatia: 'hr', Cyprus: 'cy', Czechia: 'cz',
+    Denmark: 'dk', Estonia: 'ee', Finland: 'fi', France: 'fr', Germany: 'de', Greece: 'gr',
+    Hungary: 'hu', Ireland: 'ie', Italy: 'it', Latvia: 'lv', Lithuania: 'lt', Luxembourg: 'lu',
+    Malta: 'mt', Netherlands: 'nl', Poland: 'pl', Portugal: 'pt', Romania: 'ro', Slovakia: 'sk',
+    Slovenia: 'si', Spain: 'es', Sweden: 'se', Switzerland: 'ch', 'United Kingdom': 'gb'
+  };
+
+  /* a house number must contain a digit; 12, 12a, 12/3, 12-14 all count */
+  var HOUSE_RE = /\d/;
+
+  /* ---- per-field error / warning messages under the input ---- */
+  function fieldMsg(id, cls, html) {
+    var el = $('#' + id); if (!el) return;
+    var box = el.closest('.field') || el.parentNode;
+    var old = box.querySelector('.field-err, .field-warn, .field-checking');
+    if (old) old.remove();
+    el.classList.toggle('wf-error', cls === 'field-err');
+    if (!html) return;
+    var p = document.createElement('p');
+    p.className = cls;
+    p.innerHTML = html;
+    box.appendChild(p);
+  }
+  function clearFieldMsg(id) { fieldMsg(id, '', ''); }
+
+  /* ---- zip ↔ city cross-check via zippopotam.us (free, no key) ----
+     Warns only: a network failure or unknown postcode must never block an
+     order, so every failure path resolves to "no complaint". */
+  var zipCheckCache = {};
+  function normalise(s) {
+    return (s || '').toLowerCase()
+      .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]/g, '');
+  }
+  function lookupZipCity(country, zip) {
+    var iso = ISO2[country];
+    if (!iso) return Promise.resolve(null); // country we can't look up → skip
+    var key = iso + '/' + zip;
+    if (zipCheckCache[key]) return Promise.resolve(zipCheckCache[key]);
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 4000);
+    return fetch('https://api.zippopotam.us/' + iso + '/' + encodeURIComponent(zip),
+                 ctrl ? { signal: ctrl.signal } : {})
+      .then(function (r) {
+        clearTimeout(timer);
+        if (r.status === 404) return { unknown: true };
+        if (!r.ok) return null;               // API hiccup → don't complain
+        return r.json().then(function (d) {
+          return { places: (d.places || []).map(function (p) { return p['place name']; }) };
+        });
+      })
+      .then(function (res) { if (res) zipCheckCache[key] = res; return res; })
+      .catch(function () { clearTimeout(timer); return null; }); // offline → don't block
+  }
+
+  /* "Postal code for Germany must be 5 digits." — falls back to the generic
+     message for countries whose format isn't a plain digit count (NL, UK…). */
+  function zipFormatMsg(country) {
+    var n = POSTAL_HINT[country];
+    if (!n) return t('err_zip');
+    // use the label the customer actually sees ("Deutschland", not "Germany")
+    var sel = $('#coCountry');
+    var shown = (sel && sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].textContent.trim()) || country;
+    return t('err_zip_fmt').replace('{country}', shown).replace('{n}', n);
+  }
+
+  /* ---- blur validation on the address fields ---- */
+  function wireAddressValidation() {
+    var form = $('#coZip') && $('#coZip').form;
+    if (!form || form.dataset.addrWired) return;
+    form.dataset.addrWired = '1';
+
+    var house = $('#coHouse');
+    if (house) house.addEventListener('blur', function () {
+      var v = house.value.trim();
+      if (!v) return fieldMsg('coHouse', 'field-err', t('err_house_req'));
+      if (!HOUSE_RE.test(v)) return fieldMsg('coHouse', 'field-err', t('err_house'));
+      clearFieldMsg('coHouse');
+    });
+
+    function zipBlur() {
+      var zip = ($('#coZip').value || '').trim();
+      var country = selectedCountry();
+      if (!zip) return;
+      if (POSTAL[country] && !POSTAL[country].test(zip)) {
+        return fieldMsg('coZip', 'field-err', zipFormatMsg(country));
+      }
+      clearFieldMsg('coZip');
+      if (!($('#coCity').value || '').trim()) return;
+      fieldMsg('coZip', 'field-checking', t('zip_checking'));
+      checkZipCity().then(function (warn) {
+        if (warn) showZipWarning(warn); else clearFieldMsg('coZip');
+      });
+    }
+    ['coZip', 'coCity'].forEach(function (id) {
+      var el = $('#' + id); if (!el) return;
+      el.addEventListener('blur', zipBlur);
+      // typing clears a stale complaint immediately
+      el.addEventListener('input', function () { addressWarnAccepted = false; clearFieldMsg(id); });
+    });
+    var c = $('#coCountry');
+    if (c) c.addEventListener('change', function () { addressWarnAccepted = false; clearFieldMsg('coZip'); zipBlur(); });
+  }
+
+  /* zip↔city mismatch only warns — the customer can insist and carry on */
+  var addressWarnAccepted = false;
+  function showZipWarning(warn) {
+    fieldMsg('coZip', 'field-warn', warn + '<button type="button" id="zipAnyway">' + t('zip_use_anyway') + '</button>');
+    var b = $('#zipAnyway');
+    if (b) b.addEventListener('click', function () {
+      addressWarnAccepted = true;
+      clearFieldMsg('coZip');
+    });
+  }
+
+  /* Returns a promise: '' = fine, otherwise a warning string. */
+  function checkZipCity() {
+    var country = selectedCountry(), zip = ($('#coZip') || {}).value, city = ($('#coCity') || {}).value;
+    zip = (zip || '').trim(); city = (city || '').trim();
+    if (!zip || !city || !POSTAL[country] || !POSTAL[country].test(zip)) return Promise.resolve('');
+    return lookupZipCity(country, zip).then(function (res) {
+      if (!res) return '';                                   // unreachable → silent
+      if (res.unknown) return t('warn_zip_unknown').replace('{zip}', esc(zip));
+      var want = normalise(city);
+      var hit = res.places.some(function (p) {
+        var n = normalise(p);
+        return n.indexOf(want) > -1 || want.indexOf(n) > -1; // "Wien" vs "Wien, Innere Stadt"
+      });
+      if (hit) return '';
+      return t('warn_zip_city').replace('{zip}', esc(zip)).replace('{city}', esc(res.places[0] || ''));
+    });
   }
 
   /* ---- validate the checkout form + build the order object (shared) ----
@@ -1691,20 +1853,26 @@
 
     function flag(id, bad, message) {
       var el = $('#' + id); if (!el) return;
-      el.classList.toggle('wf-error', !!bad);
-      if (bad && !firstBad) { firstBad = el; msg = message || t('form_invalid'); }
+      if (bad) {
+        fieldMsg(id, 'field-err', message || t('form_invalid'));
+        if (!firstBad) { firstBad = el; msg = message || t('form_invalid'); }
+      } else {
+        clearFieldMsg(id);
+      }
     }
 
-    // required fields (house number is now mandatory)
+    // required fields (house number is mandatory)
     ['coEmail', 'coFirst', 'coLast', 'coAddr', 'coHouse', 'coCity', 'coZip'].forEach(function (id) {
-      flag(id, !val(id), t('form_invalid'));
+      flag(id, !val(id), id === 'coHouse' ? t('err_house_req') : t('form_invalid'));
     });
     // email format
     if (val('coEmail')) flag('coEmail', !emailRe.test(val('coEmail')), t('form_invalid'));
-    // house number must actually contain a digit ("12", "12a", "12/3")
-    if (val('coHouse')) flag('coHouse', !/\d/.test(val('coHouse')), t('err_house'));
+    // house number must contain a digit ("12", "12a", "12/3", "12-14")
+    if (val('coHouse')) flag('coHouse', !HOUSE_RE.test(val('coHouse')), t('err_house'));
     // postal code must match the selected country's format
-    if (val('coZip') && POSTAL[country]) flag('coZip', !POSTAL[country].test(val('coZip')), t('err_zip'));
+    if (val('coZip') && POSTAL[country]) {
+      flag('coZip', !POSTAL[country].test(val('coZip')), zipFormatMsg(country));
+    }
     // phone is optional — invalid only when filled in AND malformed (always
     // call flag() so clearing the field also clears a stale error mark)
     flag('coPhone', !!val('coPhone') && !/^\+?[\d\s()\/.-]{6,20}$/.test(val('coPhone')), t('err_phone'));
@@ -1715,6 +1883,7 @@
       firstBad.focus();
       return null;
     }
+    if (note) note.textContent = '';
     var total = sub + ship + ins;
     return {
       ref: Orders.uniqueRef(),
@@ -1770,11 +1939,11 @@
     });
     stripeElements.create('payment', {
       layout: 'tabs',
-      // Link off: removes its inline sign-up block and the "by providing your
-      // phone number…" consent text. Stripe has no way to keep Link but hide
-      // that block — it is all-or-nothing.
-      wallets: { link: 'never' },
-      terms: { card: 'never' }
+      // Link stays on (kept deliberately — its inline sign-up block and consent
+      // text come with it; Stripe offers no way to keep Link but hide them).
+      terms: { card: 'never' },
+      // tab order left→right; everything else lands in the overflow menu
+      paymentMethodOrder: ['card', 'apple_pay', 'google_pay', 'revolut_pay']
     }).mount('#payment-element');
     stripeMounted = true;
   }
@@ -1784,10 +1953,30 @@
     if (cents >= 1) stripeElements.update({ amount: cents });
   }
 
-  /* ---- pay by card, in place via the Payment Element ---- */
+  /* ---- submit gate: local checks must pass; the zip↔city check only warns,
+     and the customer can override it with "use address anyway" ---- */
   function placeCardOrder(sub, ship, ins) {
     var order = buildCheckoutOrder(sub, ship, ins);
-    if (!order) return;
+    if (!order) return; // house number / zip format / required fields block here
+    if (addressWarnAccepted) return payWithCard(order);
+
+    var btn = $('#placeOrder'), note = $('#placeOrderNote');
+    if (btn) btn.disabled = true;
+    if (note) { note.style.color = ''; note.textContent = t('zip_checking'); }
+    checkZipCity().then(function (warn) {
+      if (btn) btn.disabled = false;
+      if (note) note.textContent = '';
+      if (warn) {                       // warn once, let them insist
+        showZipWarning(warn);
+        var z = $('#coZip'); if (z) z.scrollIntoView({ block: 'center' });
+        return;
+      }
+      payWithCard(order);
+    });
+  }
+
+  /* ---- pay by card, in place via the Payment Element ---- */
+  function payWithCard(order) {
     var note = $('#placeOrderNote');
     var errEl = $('#card-errors');
     var btn = $('#placeOrder');
@@ -1918,6 +2107,7 @@
       var po = $('#placeOrder');
       if (po) po.addEventListener('click', function () { placeCardOrder(sub, ship, ins); });
     }
+    wireAddressValidation();
     // card is the only method: show the Stripe fields straight away
     if (stripeReady()) {
       mountPaymentElement();

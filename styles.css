@@ -1010,3 +1010,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .field-row:has(.field-house) { grid-template-columns: 3fr 1fr; }
 .pay-card-err:empty { display: none; }
 .pay-card-err { margin-top: 10px; font-size: 14px; }
+
+/* ---- live address validation (checkout) ---- */
+.field input.wf-error, .field select.wf-error { border: 2px solid #dc2626 !important; }
+.field input.wf-ok { border-color: #16a34a !important; }
+.field-err { color: #dc2626; font-size: 13px; margin-top: 6px; line-height: 1.4; }
+.field-warn { color: #b45309; font-size: 13px; margin-top: 6px; line-height: 1.4; }
+.field-warn button { background: none; border: 0; padding: 0; margin-left: 6px;
+  color: var(--accent, #5E17EB); text-decoration: underline; cursor: pointer; font: inherit; }
+.field-checking { color: var(--muted, #6b7280); font-size: 13px; margin-top: 6px; }
