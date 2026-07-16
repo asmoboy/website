@@ -200,6 +200,9 @@
       pay_back_home: 'Back to home', pay_view_faq: 'Payment questions? Read the FAQ', place_order_bt: 'Place order &amp; get bank details',
       place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
       co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
+      preorder_note: 'This item is ordered in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
+      preorder_order: 'Your order contains items we order in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
+      preorder_item: '9–14 working days',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
       warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
@@ -399,6 +402,9 @@
       pay_back_home: 'Zurück zur Startseite', pay_view_faq: 'Fragen zur Zahlung? Zu den FAQ', place_order_bt: 'Bestellen &amp; Bankdaten erhalten',
       pay_processing: 'Zahlung wird verarbeitet…',
       co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
+      preorder_note: 'Dieser Artikel wird für dich bestellt. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
+      preorder_order: 'Deine Bestellung enthält Artikel, die für dich bestellt werden. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
+      preorder_item: '9–14 Werktage',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
       warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
@@ -599,6 +605,9 @@
       pay_back_home: 'Înapoi la pagina principală', pay_view_faq: 'Întrebări despre plată? Vezi FAQ', place_order_bt: 'Plasează comanda &amp; obține datele bancare',
       pay_processing: 'Se procesează plata…',
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
+      preorder_note: 'Acest articol este comandat special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
+      preorder_order: 'Comanda ta conține articole comandate special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
+      preorder_item: '9–14 zile lucrătoare',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -1539,6 +1548,7 @@
               '<div class="swatches">' + p.options.map(function (o, i) { return '<button class="swatch" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + o.label + '</button>'; }).join('') + '</div>' +
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
+          '<div id="pdPreorder"></div>' +
           payBadges() +
           '<div class="pd-buy-simple">' +
             '<div class="stepper pd-stepper-lg"><button data-pstep="-1" aria-label="-">–</button><span class="qty pd-qty">1</span><button data-pstep="1" aria-label="+">+</button></div>' +
@@ -1566,7 +1576,20 @@
 
     var selPrice = $('#pdSelPrice', root);
     var addBtn = $('#pdAdd', root);
+
+    /* pre-order notice follows the chosen size (10 mg may ship now while
+       15 mg is pre-order); for a size-less product it just reflects the product */
+    function syncPreorder() {
+      var box = $('#pdPreorder', root);
+      if (!box) return;
+      var pre = isVar
+        ? (selected ? T.isPreorder(p.slug, selected.label) : false)
+        : T.isPreorder(p.slug, null);
+      box.innerHTML = pre ? '<div class="preorder-note">' + t('preorder_note') + '</div>' : '';
+    }
+
     function syncSel() {
+      syncPreorder();
       if (!isVar) return;
       if (selected) {
         selPrice.innerHTML = (selected.oldPrice ? '<span class="old" style="font-size:16px;color:var(--text-secondary);text-decoration:line-through;margin-right:8px;">' + money(lvOld(selected)) + '</span>' : '') + money(lv(selected));
@@ -2092,10 +2115,14 @@
     var ship = sub >= T.freeShip ? 0 : T.shipCost;
     var insEl = $('#shipInsurance');
     var ins = insEl && insEl.checked ? INS_COST : 0;
+    var hasPreorder = Cart.items.some(function (i) { return T.isPreorder(i.slug, i.option); });
     if (os) {
       os.innerHTML = '<h2>' + t('order_summary') + '</h2>' +
+        (hasPreorder ? '<div class="preorder-note">' + t('preorder_order') + '</div>' : '') +
         (Cart.items.length ? Cart.items.map(function (i) {
-          return '<div class="os-line"><div class="thumb">' + pimgLine(i) + '</div><div><div class="os-name">' + lineName(i) + (i.option ? ' · ' + i.option : '') + '</div><div class="os-qty">' + t('qty') + ' ' + i.qty + '</div></div><div class="os-price">' + money(lv(i) * i.qty) + '</div></div>';
+          return '<div class="os-line"><div class="thumb">' + pimgLine(i) + '</div><div><div class="os-name">' + lineName(i) + (i.option ? ' · ' + i.option : '') + '</div><div class="os-qty">' + t('qty') + ' ' + i.qty + '</div>' +
+            (T.isPreorder(i.slug, i.option) ? '<div class="os-preorder">' + t('preorder_item') + '</div>' : '') +
+            '</div><div class="os-price">' + money(lv(i) * i.qty) + '</div></div>';
         }).join('') : '<p class="text-muted" style="padding:12px 0;">' + t('cart_empty') + '.</p>') +
         '<div class="sum-row" style="margin-top:10px;"><span class="muted">' + t('subtotal') + '</span><span>' + money(sub) + '</span></div>' +
         '<div class="sum-row"><span class="muted">' + t('shipping_word') + '</span><span id="osShip">' + (ship ? money(ship) : t('free_word')) + '</span></div>' +

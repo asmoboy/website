@@ -1019,3 +1019,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .field-warn button { background: none; border: 0; padding: 0; margin-left: 6px;
   color: var(--accent, #5E17EB); text-decoration: underline; cursor: pointer; font: inherit; }
 .field-checking { color: var(--muted, #6b7280); font-size: 13px; margin-top: 6px; }
+
+/* ---- pre-order notice (no badge, just the box) ---- */
+.preorder-note { border: 1px solid #f0b429; background: rgba(240,180,41,.08);
+  border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; line-height: 1.5; }
+.preorder-note b { font-weight: 600; }
+.os-preorder { color: #b45309; font-size: 12.5px; margin-top: 2px; }

@@ -37,6 +37,26 @@
      checkout once BOTH this and ORDER_API_URL are set. */
   var STRIPE_PUBLISHABLE_KEY = 'pk_test_51Tg51f1UsXHHcaKWEXsoqHe685rARobHkjmoFr2CqL7oOR8sj9d4bbL251BIUSyiXt6GpDQaJFOGnvbTD9MvBYmX00MJReT8Sp';
 
+  /* =================================================================
+     STOCK — everything is pre-order EXCEPT the SKUs listed here.
+     Value `true` = the whole product ships now; an array = only those
+     option labels ship now, every other size is pre-order.
+     Keep the labels byte-identical to the `options[].label` values below.
+  ================================================================= */
+  var IN_STOCK = {
+    'retatrutide': ['10 mg'],
+    'ghk-cu': ['50 mg'],
+    'ghk-cu-serum': true,
+    'tirzepatide': ['20 mg'],
+    'bacteriostatic-water': ['10 ml']
+  };
+  function isPreorder(slug, optionLabel) {
+    var e = IN_STOCK[slug];
+    if (e === true) return false;      // whole product in stock
+    if (!e) return true;               // not listed → pre-order
+    return e.indexOf(optionLabel) === -1;
+  }
+
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   var IMG = '/Produktbilder/', COA = '/Janotest/';
 
@@ -317,6 +337,7 @@
     orderInbox: ORDER_INBOX,
     orderApiUrl: ORDER_API_URL,
     stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
+    isPreorder: isPreorder,
     /* unique payment reference: TOP- + 8 unambiguous chars (no 0/O/1/I) */
     genPaymentRef: function () {
       var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', out = '';
