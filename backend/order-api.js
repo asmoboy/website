@@ -126,7 +126,8 @@ async function createPaymentIntent(env, db, payload) {
   const intent = await stripeApi(env, '/payment_intents', {
     amount,
     currency,
-    description: 'TOP Pep order ' + ref,
+    // dashboard shows the bare order reference only (e.g. TOP-R28VXUQB)
+    description: ref,
     receipt_email: base.email,
     // allow_redirects:'never' keeps it inline (cards only, no redirect methods)
     automatic_payment_methods: { enabled: true, allow_redirects: 'never' },

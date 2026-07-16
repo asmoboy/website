@@ -1768,7 +1768,14 @@
       mode: 'payment', amount: cents, currency: CUR,
       appearance: { theme: 'stripe', variables: { colorPrimary: '#5E17EB', borderRadius: '10px' } }
     });
-    stripeElements.create('payment', { layout: 'tabs' }).mount('#payment-element');
+    stripeElements.create('payment', {
+      layout: 'tabs',
+      // Link off: removes its inline sign-up block and the "by providing your
+      // phone number…" consent text. Stripe has no way to keep Link but hide
+      // that block — it is all-or-nothing.
+      wallets: { link: 'never' },
+      terms: { card: 'never' }
+    }).mount('#payment-element');
     stripeMounted = true;
   }
   function updateStripeAmount() {
