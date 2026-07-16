@@ -198,8 +198,8 @@
       pay_copy: 'Copy', pay_copied: 'Copied ✓', pay_ref_hint: 'Add this exact reference as the payment description so we can find your transfer.',
       pay_order_no: 'Order number', pay_status_pending: 'Awaiting payment', pay_note_keep: 'Note your payment reference — you’ll need it for the transfer. We’ll email you as soon as the payment is confirmed.',
       pay_back_home: 'Back to home', pay_view_faq: 'Payment questions? Read the FAQ', place_order_bt: 'Place order &amp; get bank details',
-      pay_card_body: 'You’ll be redirected to Stripe’s secure checkout to pay by card. We never see or store your card details.',
-      place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…',
+      pay_card_body: 'Enter your card details below — you stay on this page. Your card data goes straight to Stripe; we never see or store it.',
+      place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
       pay_card_error: 'Sorry, we couldn’t start the card payment. Please try again or use bank transfer.',
       pay_paid_title: 'Payment received', pay_paid_intro: 'Thank you — your card payment went through. We’re preparing your parcel now and it ships within 1 business day; you’ll get a tracking link by email.',
       pay_cancel_note: 'Payment cancelled — nothing was charged. You can try again or choose bank transfer.',
@@ -388,7 +388,8 @@
       pay_copy: 'Kopieren', pay_copied: 'Kopiert ✓', pay_ref_hint: 'Gib genau diese Referenz als Verwendungszweck an, damit wir deine Überweisung finden.',
       pay_order_no: 'Bestellnummer', pay_status_pending: 'Zahlung ausstehend', pay_note_keep: 'Notiere dir deine Zahlungsreferenz — du brauchst sie für die Überweisung. Wir melden uns per E-Mail, sobald die Zahlung bestätigt ist.',
       pay_back_home: 'Zurück zur Startseite', pay_view_faq: 'Fragen zur Zahlung? Zu den FAQ', place_order_bt: 'Bestellen &amp; Bankdaten erhalten',
-      pay_card_body: 'Du wirst zur sicheren Stripe-Kasse weitergeleitet, um mit Karte zu zahlen. Wir sehen und speichern deine Kartendaten nie.',
+      pay_card_body: 'Gib deine Kartendaten unten ein — du bleibst auf dieser Seite. Deine Kartendaten gehen direkt an Stripe; wir sehen und speichern sie nie.',
+      pay_processing: 'Zahlung wird verarbeitet…',
       place_order_card: 'Mit Karte zahlen', pay_redirecting: 'Weiterleitung zur sicheren Zahlung…',
       pay_card_error: 'Die Kartenzahlung konnte leider nicht gestartet werden. Bitte versuche es erneut oder nutze die Banküberweisung.',
       pay_paid_title: 'Zahlung erhalten', pay_paid_intro: 'Vielen Dank — deine Kartenzahlung war erfolgreich. Wir bereiten dein Paket vor; Versand innerhalb von 1 Werktag, den Tracking-Link bekommst du per E-Mail.',
@@ -578,7 +579,8 @@
       pay_copy: 'Copiază', pay_copied: 'Copiat ✓', pay_ref_hint: 'Adaugă exact această referință ca detaliu al plății, ca să găsim transferul tău.',
       pay_order_no: 'Număr comandă', pay_status_pending: 'În așteptarea plății', pay_note_keep: 'Notează-ți referința de plată — îți va trebui pentru transfer. Îți scriem pe e-mail imediat ce plata este confirmată.',
       pay_back_home: 'Înapoi la pagina principală', pay_view_faq: 'Întrebări despre plată? Vezi FAQ', place_order_bt: 'Plasează comanda &amp; obține datele bancare',
-      pay_card_body: 'Vei fi redirecționat către checkout-ul securizat Stripe pentru a plăti cu cardul. Nu vedem și nu stocăm niciodată datele cardului tău.',
+      pay_card_body: 'Introdu datele cardului mai jos — rămâi pe această pagină. Datele cardului merg direct la Stripe; noi nu le vedem și nu le stocăm niciodată.',
+      pay_processing: 'Se procesează plata…',
       place_order_card: 'Plătește cu cardul', pay_redirecting: 'Redirecționare către plata securizată…',
       pay_card_error: 'Ne pare rău, nu am putut începe plata cu cardul. Încearcă din nou sau folosește transferul bancar.',
       pay_paid_title: 'Plată primită', pay_paid_intro: 'Mulțumim — plata cu cardul a reușit. Pregătim coletul acum; se expediază în 1 zi lucrătoare și vei primi linkul de urmărire pe e-mail.',
@@ -1711,36 +1713,97 @@
     };
   }
 
-  /* ---- pay by card via Stripe hosted Checkout ----
-     Sends the order to the Worker, which creates a Checkout Session and
-     returns a URL we redirect to. Card data is entered on Stripe, never here. */
+  /* =================================================================
+     STRIPE — embedded card payment (Payment Element, no redirect).
+     The card fields render on this page inside Stripe's secure element;
+     raw card data goes straight to Stripe and never touches our code.
+  ================================================================= */
+  var stripeJs = null, stripeElements = null, stripeMounted = false;
+
+  function stripeReady() {
+    return !!(window.Stripe && T.stripePublishableKey && T.orderApiUrl);
+  }
+  function ensureStripe() {
+    if (!stripeJs && stripeReady()) stripeJs = Stripe(T.stripePublishableKey);
+    return stripeJs;
+  }
+  /* current order total in the smallest currency unit (cents / bani) */
+  function checkoutCents() {
+    var sub = Cart.subtotal();
+    var ship = sub >= T.freeShip ? 0 : T.shipCost;
+    var insEl = $('#shipInsurance');
+    var ins = insEl && insEl.checked ? INS_COST : 0;
+    return Math.round((sub + ship + ins) * 100);
+  }
+  function mountPaymentElement() {
+    if (stripeMounted || !ensureStripe()) return;
+    if (!document.getElementById('payment-element')) return;
+    var cents = checkoutCents();
+    if (cents < 1) return; // nothing to charge yet
+    stripeElements = stripeJs.elements({
+      mode: 'payment', amount: cents, currency: CUR,
+      appearance: { theme: 'stripe', variables: { colorPrimary: '#5E17EB', borderRadius: '10px' } }
+    });
+    stripeElements.create('payment', { layout: 'tabs' }).mount('#payment-element');
+    stripeMounted = true;
+  }
+  function updateStripeAmount() {
+    if (!stripeElements) return;
+    var cents = checkoutCents();
+    if (cents >= 1) stripeElements.update({ amount: cents });
+  }
+
+  /* ---- pay by card, in place via the Payment Element ---- */
   function placeCardOrder(sub, ship, ins) {
     var order = buildCheckoutOrder(sub, ship, ins);
     if (!order) return;
     var note = $('#placeOrderNote');
+    var errEl = $('#card-errors');
     var btn = $('#placeOrder');
-    if (btn) { btn.disabled = true; }
-    if (note) { note.style.color = ''; note.textContent = t('pay_redirecting'); }
-    // remember the pending order locally so /admin can also see it
-    Orders.add(order);
-    var payload = {
-      order_no: order.orderNo, currency: order.currency, total: order.total,
-      total_text: order.totalText, email: order.email, name: order.name, org: order.org,
-      address: order.address, city: order.city, zip: order.zip, country: order.country,
-      lang: order.lang, items: order.items,
-      shipping: order.shipping, insurance: order.insurance,
-      shipping_label: t('shipping_word'), insurance_label: t('ship_protect')
-    };
-    fetch(T.orderApiUrl + '/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload)
-    }).then(function (r) { return r.json(); }).then(function (res) {
-      if (res && res.url) { window.location.href = res.url; return; }
-      throw new Error((res && res.error) || 'no url');
-    }).catch(function () {
-      if (btn) { btn.disabled = false; }
-      if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_card_error'); }
+    function fail(msg) {
+      if (btn) btn.disabled = false;
+      if (note) note.textContent = '';
+      if (errEl) { errEl.style.color = '#e0533d'; errEl.textContent = msg || t('pay_card_error'); }
+    }
+    if (!stripeJs || !stripeElements) { fail(t('pay_card_error')); return; }
+    if (btn) btn.disabled = true;
+    if (errEl) errEl.textContent = '';
+    if (note) { note.style.color = ''; note.textContent = t('pay_processing'); }
+
+    var serverRef = null;
+    stripeElements.submit().then(function (r) {
+      if (r.error) throw r.error;
+      var payload = {
+        ref: order.ref,
+        order_no: order.orderNo, currency: order.currency, total: order.total,
+        total_text: order.totalText, email: order.email, name: order.name, org: order.org,
+        address: order.address, city: order.city, zip: order.zip, country: order.country,
+        lang: order.lang, items: order.items,
+        shipping: order.shipping, insurance: order.insurance,
+        shipping_label: t('shipping_word'), insurance_label: t('ship_protect')
+      };
+      return fetch(T.orderApiUrl + '/stripe/payment-intent', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (resp) { return resp.json(); });
+    }).then(function (res) {
+      if (!res || !res.clientSecret) throw new Error((res && res.error) || 'no client secret');
+      serverRef = res.ref;
+      order.ref = res.ref;
+      // store as pending so the success page can still email even if a 3DS
+      // step forces a redirect back to return_url
+      Orders.add(order);
+      return stripeJs.confirmPayment({
+        elements: stripeElements,
+        clientSecret: res.clientSecret,
+        confirmParams: { return_url: location.origin + '/checkout/?stripe=success&ref=' + res.ref },
+        redirect: 'if_required'
+      });
+    }).then(function (result) {
+      if (result.error) throw result.error;
+      showStripePaid(serverRef); // succeeded in place, no redirect
+    }).catch(function (err) {
+      fail(err && err.message);
     });
   }
 
@@ -1864,10 +1927,14 @@
         else placeBankOrder(sub, ship, ins);
       });
     }
-    // reveal the card option only when Stripe is actually configured
-    if (T.orderApiUrl && T.stripePublishableKey) {
+    // reveal the card option only when Stripe (incl. Stripe.js) is available
+    if (stripeReady()) {
       var cardItem = document.querySelector('.accordion-item[data-pay="card"]');
-      if (cardItem) cardItem.hidden = false;
+      if (cardItem) {
+        cardItem.hidden = false;
+        if (cardItem.classList.contains('open')) mountPaymentElement();
+      }
+      updateStripeAmount(); // keep the charge in sync with shipping/insurance
     }
     syncPlaceOrderBtn();
     var insPrice = $('#insPrice');
@@ -1896,6 +1963,7 @@
         var open = item.classList.contains('open');
         $$('.accordion-item').forEach(function (x) { x.classList.remove('open'); });
         if (!open) item.classList.add('open');
+        if (!open && item.getAttribute('data-pay') === 'card') mountPaymentElement();
         syncPlaceOrderBtn();
       });
     });

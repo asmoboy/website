@@ -139,6 +139,42 @@ async function createCheckoutSession(env, db, payload) {
   return { ok: true, url: session.url, ref };
 }
 
+// ---- POST /stripe/payment-intent — embedded Payment Element (no redirect) ----
+// The card fields render on our own page via Stripe.js; this returns the
+// client_secret the front-end needs to confirm the payment in place.
+async function createPaymentIntent(env, db, payload) {
+  const base = pickOrderFields(payload);
+  if (!base.email || !base.name || base.total === undefined) {
+    return { error: 'missing required fields', status: 400 };
+  }
+  const line_items = buildLineItems(payload);
+  if (!line_items.length) return { error: 'no items', status: 400 };
+  const currency = (payload.currency || 'eur').toLowerCase();
+  // charge the server-computed sum of the line items, never a client total
+  const amount = line_items.reduce((n, li) => n + li.price_data.unit_amount * li.quantity, 0);
+
+  let ref;
+  if (db) {
+    const created = await createOrder(db, payload);
+    if (created.error) return created;
+    ref = created.order.ref;
+  } else {
+    ref = payload.ref || genRef();
+  }
+
+  const intent = await stripeApi(env, '/payment_intents', {
+    amount,
+    currency,
+    description: 'TOP Pep order ' + ref,
+    receipt_email: base.email,
+    // allow_redirects:'never' keeps it inline (cards only, no redirect methods)
+    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    metadata: { ref, order_no: base.order_no || '', lang: base.lang || 'en' },
+  });
+
+  return { ok: true, clientSecret: intent.client_secret, ref, amount };
+}
+
 // ---- POST /stripe/webhook — Stripe's server-to-server payment confirmation ----
 // Verifies the signature (HMAC-SHA256 over `${t}.${payload}`) so we only ever
 // fulfil orders Stripe genuinely confirmed as paid.
@@ -166,9 +202,10 @@ async function handleStripeWebhook(env, db, request) {
   if (!ok) return { error: 'invalid signature', status: 400 };
 
   const event = JSON.parse(raw);
-  if (event.type === 'checkout.session.completed') {
-    const ref = event.data.object.client_reference_id
-      || (event.data.object.metadata && event.data.object.metadata.ref);
+  // hosted Checkout → checkout.session.completed; embedded Element → payment_intent.succeeded
+  if (event.type === 'checkout.session.completed' || event.type === 'payment_intent.succeeded') {
+    const obj = event.data.object;
+    const ref = obj.client_reference_id || (obj.metadata && obj.metadata.ref);
     if (ref && db) {
       // idempotent: markPaid just sets status=paid and emails once
       await markPaid(db, ref, env).catch(() => {});
@@ -323,6 +360,13 @@ export default {
       if (request.method === 'POST' && url.pathname === '/stripe/checkout') {
         const body = await request.json();
         const res = await createCheckoutSession(env, db, body);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, { status: 201 }, env);
+      }
+
+      if (request.method === 'POST' && url.pathname === '/stripe/payment-intent') {
+        const body = await request.json();
+        const res = await createPaymentIntent(env, db, body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, { status: 201 }, env);
       }
