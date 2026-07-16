@@ -1,0 +1,16 @@
+name = "order-api"
+main = "order-api.js"
+compatibility_date = "2024-11-01"
+
+# Secrets (set with `wrangler secret put <NAME>`, never here):
+#   SUPABASE_URL
+#   SUPABASE_SERVICE_KEY
+#   ADMIN_TOKEN
+#   RESEND_API_KEY
+#   STRIPE_SECRET_KEY       # sk_... — card payments (NEVER commit this)
+#   STRIPE_WEBHOOK_SECRET   # whsec_... — verifies Stripe's /stripe/webhook calls
+#
+# Optional plain vars — non-secret, safe to keep in this file:
+[vars]
+ALLOWED_ORIGIN = "https://www.top-pep.com"   # canonical domain (apex redirects here)
+SITE_URL = "https://www.top-pep.com"          # used for Stripe success/cancel redirects

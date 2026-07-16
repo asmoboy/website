@@ -1,0 +1,17 @@
+{
+  "name": "toppep-order-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TOP Pep order API — Cloudflare Worker + Supabase",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  },
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}

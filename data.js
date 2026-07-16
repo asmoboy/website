@@ -27,9 +27,15 @@
     bank: 'Wise (TransferWise)'
   };
   var ORDER_INBOX = 'orders@top-pep.com';
-  /* Phase 2: set to your order-API endpoint (e.g. Supabase edge function).
-     While empty, orders are recorded via email + localStorage only. */
+  /* Phase 2: the deployed Cloudflare Worker (order records + Stripe checkout).
+     While empty, orders are recorded via email + localStorage only, and card
+     payment stays hidden (Stripe needs the Worker to run). */
   var ORDER_API_URL = 'https://order-api.top-pep.workers.dev';
+  /* Stripe PUBLISHABLE key — safe to expose in the browser (pk_...).
+     The SECRET key (sk_...) must NEVER live here; it goes in the Worker only
+     via `wrangler secret put STRIPE_SECRET_KEY`. Card payment appears at
+     checkout once BOTH this and ORDER_API_URL are set. */
+  var STRIPE_PUBLISHABLE_KEY = 'pk_test_51Tg51f1UsXHHcaKWEXsoqHe685rARobHkjmoFr2CqL7oOR8sj9d4bbL251BIUSyiXt6GpDQaJFOGnvbTD9MvBYmX00MJReT8Sp';
 
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   var IMG = '/Produktbilder/', COA = '/Janotest/';
@@ -310,6 +316,7 @@
     bank: PAYMENT_BANK_DETAILS,
     orderInbox: ORDER_INBOX,
     orderApiUrl: ORDER_API_URL,
+    stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
     /* unique payment reference: TOP- + 8 unambiguous chars (no 0/O/1/I) */
     genPaymentRef: function () {
       var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', out = '';

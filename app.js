@@ -198,6 +198,11 @@
       pay_copy: 'Copy', pay_copied: 'Copied ✓', pay_ref_hint: 'Add this exact reference as the payment description so we can find your transfer.',
       pay_order_no: 'Order number', pay_status_pending: 'Awaiting payment', pay_note_keep: 'Note your payment reference — you’ll need it for the transfer. We’ll email you as soon as the payment is confirmed.',
       pay_back_home: 'Back to home', pay_view_faq: 'Payment questions? Read the FAQ', place_order_bt: 'Place order &amp; get bank details',
+      pay_card_body: 'You’ll be redirected to Stripe’s secure checkout to pay by card. We never see or store your card details.',
+      place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…',
+      pay_card_error: 'Sorry, we couldn’t start the card payment. Please try again or use bank transfer.',
+      pay_paid_title: 'Payment received', pay_paid_intro: 'Thank you — your card payment went through. We’re preparing your parcel now and it ships within 1 business day; you’ll get a tracking link by email.',
+      pay_cancel_note: 'Payment cancelled — nothing was charged. You can try again or choose bank transfer.',
       tab_coa_tested: 'This lot is third-party tested by Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">View the verified report</a>.',
       tab_coa_testing: 'This compound is currently in testing at Janoshik — the verified report will be published in our COA library as soon as it lands.',
       tab_details_body: 'Supplied as a sealed {form} in a tamper-evident vial. Reconstitute with bacteriostatic water according to your own protocol; we provide no dosing guidance, as all products are sold strictly for laboratory research use.',
@@ -383,6 +388,11 @@
       pay_copy: 'Kopieren', pay_copied: 'Kopiert ✓', pay_ref_hint: 'Gib genau diese Referenz als Verwendungszweck an, damit wir deine Überweisung finden.',
       pay_order_no: 'Bestellnummer', pay_status_pending: 'Zahlung ausstehend', pay_note_keep: 'Notiere dir deine Zahlungsreferenz — du brauchst sie für die Überweisung. Wir melden uns per E-Mail, sobald die Zahlung bestätigt ist.',
       pay_back_home: 'Zurück zur Startseite', pay_view_faq: 'Fragen zur Zahlung? Zu den FAQ', place_order_bt: 'Bestellen &amp; Bankdaten erhalten',
+      pay_card_body: 'Du wirst zur sicheren Stripe-Kasse weitergeleitet, um mit Karte zu zahlen. Wir sehen und speichern deine Kartendaten nie.',
+      place_order_card: 'Mit Karte zahlen', pay_redirecting: 'Weiterleitung zur sicheren Zahlung…',
+      pay_card_error: 'Die Kartenzahlung konnte leider nicht gestartet werden. Bitte versuche es erneut oder nutze die Banküberweisung.',
+      pay_paid_title: 'Zahlung erhalten', pay_paid_intro: 'Vielen Dank — deine Kartenzahlung war erfolgreich. Wir bereiten dein Paket vor; Versand innerhalb von 1 Werktag, den Tracking-Link bekommst du per E-Mail.',
+      pay_cancel_note: 'Zahlung abgebrochen — es wurde nichts belastet. Du kannst es erneut versuchen oder die Banküberweisung wählen.',
       tab_coa_tested: 'Diese Charge wurde von Janoshik durch einen Drittanbieter getestet (Task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Verifizierten Bericht ansehen</a>.',
       tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer COA-Bibliothek.',
       tab_details_body: 'Wird als versiegeltes {form} in einem manipulationssicheren Vial geliefert. Rekonstituiere nach deinem eigenen Protokoll mit bakteriostatischem Wasser; wir geben keine Dosierungshinweise, da alle Produkte ausschließlich für die Laborforschung verkauft werden.',
@@ -568,6 +578,11 @@
       pay_copy: 'Copiază', pay_copied: 'Copiat ✓', pay_ref_hint: 'Adaugă exact această referință ca detaliu al plății, ca să găsim transferul tău.',
       pay_order_no: 'Număr comandă', pay_status_pending: 'În așteptarea plății', pay_note_keep: 'Notează-ți referința de plată — îți va trebui pentru transfer. Îți scriem pe e-mail imediat ce plata este confirmată.',
       pay_back_home: 'Înapoi la pagina principală', pay_view_faq: 'Întrebări despre plată? Vezi FAQ', place_order_bt: 'Plasează comanda &amp; obține datele bancare',
+      pay_card_body: 'Vei fi redirecționat către checkout-ul securizat Stripe pentru a plăti cu cardul. Nu vedem și nu stocăm niciodată datele cardului tău.',
+      place_order_card: 'Plătește cu cardul', pay_redirecting: 'Redirecționare către plata securizată…',
+      pay_card_error: 'Ne pare rău, nu am putut începe plata cu cardul. Încearcă din nou sau folosește transferul bancar.',
+      pay_paid_title: 'Plată primită', pay_paid_intro: 'Mulțumim — plata cu cardul a reușit. Pregătim coletul acum; se expediază în 1 zi lucrătoare și vei primi linkul de urmărire pe e-mail.',
+      pay_cancel_note: 'Plată anulată — nu a fost debitat nimic. Poți încerca din nou sau alege transferul bancar.',
       tab_coa_tested: 'Acest lot este testat de terți la Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Vezi raportul verificat</a>.',
       tab_coa_testing: 'Acest compus este în curs de testare la Janoshik — raportul verificat va fi publicat în biblioteca noastră COA imediat ce este gata.',
       tab_details_body: 'Livrat ca {form} sigilat într-un flacon cu sigiliu de siguranță. Reconstituie cu apă bacteriostatică conform propriului protocol; nu oferim indicații de dozare, deoarece toate produsele se vând strict pentru cercetare de laborator.',
@@ -1276,7 +1291,16 @@
 
     cart: function () { renderCartPage(); onCart(renderCartPage); },
 
-    checkout: function () { renderCheckout(); },
+    checkout: function () {
+      var params = new URLSearchParams(location.search);
+      var stripe = params.get('stripe');
+      if (stripe === 'success') { showStripePaid(params.get('ref')); return; }
+      renderCheckout();
+      if (stripe === 'cancel') {
+        var note = $('#placeOrderNote');
+        if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_cancel_note'); }
+      }
+    },
 
     account: function () {
       var params = new URLSearchParams(location.search);
@@ -1633,9 +1657,22 @@
     } catch (e) {}
   }
 
-  /* ---- place a bank-transfer order ---- */
-  function placeBankOrder(sub, ship, ins) {
-    if (!Cart.items.length) return;
+  /* ---- which payment method is selected (open accordion) ---- */
+  function selectedPayMethod() {
+    var open = document.querySelector('.accordion-item.open');
+    return (open && open.getAttribute('data-pay')) || 'bank';
+  }
+
+  /* ---- reflect the selected method in the place-order button label ---- */
+  function syncPlaceOrderBtn() {
+    var po = $('#placeOrder'); if (!po) return;
+    po.innerHTML = selectedPayMethod() === 'card' ? t('place_order_card') : t('place_order_bt');
+  }
+
+  /* ---- validate the checkout form + build the order object (shared) ----
+     Returns the order, or null when validation fails (and flags the fields). */
+  function buildCheckoutOrder(sub, ship, ins) {
+    if (!Cart.items.length) return null;
     var emailRe = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
     var fields = ['coEmail', 'coFirst', 'coLast', 'coAddr', 'coCity', 'coZip'];
     var ok = true, firstBad = null;
@@ -1650,11 +1687,11 @@
     if (!ok) {
       if (note) { note.style.color = '#e0533d'; note.textContent = t('form_invalid'); }
       if (firstBad) firstBad.focus();
-      return;
+      return null;
     }
     var total = sub + ship + ins;
     var countrySel = $('#coCountry');
-    var order = {
+    return {
       ref: Orders.uniqueRef(),
       orderNo: 'TP' + String(Date.now()).slice(-8),
       status: 'pending',
@@ -1672,20 +1709,64 @@
       subtotal: sub, shipping: ship, insurance: ins, total: total,
       totalText: money(total)
     };
+  }
+
+  /* ---- pay by card via Stripe hosted Checkout ----
+     Sends the order to the Worker, which creates a Checkout Session and
+     returns a URL we redirect to. Card data is entered on Stripe, never here. */
+  function placeCardOrder(sub, ship, ins) {
+    var order = buildCheckoutOrder(sub, ship, ins);
+    if (!order) return;
+    var note = $('#placeOrderNote');
+    var btn = $('#placeOrder');
+    if (btn) { btn.disabled = true; }
+    if (note) { note.style.color = ''; note.textContent = t('pay_redirecting'); }
+    // remember the pending order locally so /admin can also see it
+    Orders.add(order);
+    var payload = {
+      order_no: order.orderNo, currency: order.currency, total: order.total,
+      total_text: order.totalText, email: order.email, name: order.name, org: order.org,
+      address: order.address, city: order.city, zip: order.zip, country: order.country,
+      lang: order.lang, items: order.items,
+      shipping: order.shipping, insurance: order.insurance,
+      shipping_label: t('shipping_word'), insurance_label: t('ship_protect')
+    };
+    fetch(T.orderApiUrl + '/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json(); }).then(function (res) {
+      if (res && res.url) { window.location.href = res.url; return; }
+      throw new Error((res && res.error) || 'no url');
+    }).catch(function () {
+      if (btn) { btn.disabled = false; }
+      if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_card_error'); }
+    });
+  }
+
+  /* ---- place a bank-transfer order ---- */
+  function placeBankOrder(sub, ship, ins) {
+    var order = buildCheckoutOrder(sub, ship, ins);
+    if (!order) return;
     Orders.add(order);
     emailOrderToInbox(order);
     Cart.clear();
     showBankTransferConfirmation(order);
   }
 
-  /* ---- email the new order to the internal order inbox ---- */
-  function emailOrderToInbox(order) {
+  /* ---- email the new order to the internal order inbox ----
+     opts.status / opts.subjectTag let the card flow reuse this with a
+     different label (default = bank transfer, pending). */
+  function emailOrderToInbox(order, opts) {
+    opts = opts || {};
+    var status = opts.status || 'PENDING — awaiting bank transfer';
+    var subjectTag = opts.subjectTag || 'pending';
     var lines = order.items.map(function (i) { return i.qty + '× ' + i.name + ' — ' + money(i.price * i.qty); }).join('\n');
     var payload = {
-      _subject: 'NEW ORDER ' + order.ref + ' — ' + order.totalText + ' (pending)',
+      _subject: 'NEW ORDER ' + order.ref + ' — ' + order.totalText + ' (' + subjectTag + ')',
       'Payment reference': order.ref,
       'Order number': order.orderNo,
-      'Status': 'PENDING — awaiting bank transfer',
+      'Status': status,
       'Total': order.totalText,
       'Customer': order.name,
       'Email': order.email,
@@ -1732,6 +1813,34 @@
     var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
   }
 
+  /* ---- "Payment received" view after returning from Stripe ---- */
+  function showStripePaid(ref) {
+    Cart.clear();
+    if (ref) {
+      Orders.setStatus(ref, 'paid');
+      // notify the order inbox with the full shipping details (Stripe's
+      // dashboard has the payment but not the delivery address)
+      var paidOrder = Orders.byRef(ref);
+      if (paidOrder && !paidOrder._notified) {
+        emailOrderToInbox(paidOrder, { status: 'PAID via card (Stripe) — ready to ship', subjectTag: 'PAID card' });
+        paidOrder._notified = true;
+        Orders.save(Orders.all().map(function (o) { return o.ref === ref ? paidOrder : o; }));
+      }
+    }
+    var main = $('#main');
+    if (!main) return;
+    document.title = t('pay_paid_title') + ' — TOP Pep';
+    main.innerHTML = '<div class="wrap"><div class="pay-confirm">' +
+      '<span class="pay-eyebrow">' + t('pay_paid_title') + '</span>' +
+      '<h1>' + t('pay_paid_title') + '</h1>' +
+      '<p class="pay-intro">' + t('pay_paid_intro') + '</p>' +
+      (ref ? '<div class="pay-meta"><span>' + t('pay_reference') + ': <b>' + esc(ref) + '</b></span></div>' : '') +
+      '<div class="pay-actions"><a class="btn" href="/">' + t('pay_back_home') + '</a><a class="btn btn-outline" href="/faq/">' + t('pay_view_faq') + '</a></div>' +
+    '</div></div>';
+    window.scrollTo(0, 0);
+    var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
+  }
+
   function renderCheckout() {
     var sub = Cart.subtotal();
     var os = $('#orderSummary');
@@ -1750,8 +1859,17 @@
         '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_bt') + '</button>' +
         '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;">' + t('secured_demo') + '</p>';
       var po = $('#placeOrder');
-      if (po) po.addEventListener('click', function () { placeBankOrder(sub, ship, ins); });
+      if (po) po.addEventListener('click', function () {
+        if (selectedPayMethod() === 'card') placeCardOrder(sub, ship, ins);
+        else placeBankOrder(sub, ship, ins);
+      });
     }
+    // reveal the card option only when Stripe is actually configured
+    if (T.orderApiUrl && T.stripePublishableKey) {
+      var cardItem = document.querySelector('.accordion-item[data-pay="card"]');
+      if (cardItem) cardItem.hidden = false;
+    }
+    syncPlaceOrderBtn();
     var insPrice = $('#insPrice');
     if (insPrice) insPrice.textContent = money(INS_COST);
     if (insEl && !insEl.dataset.wired) {
@@ -1778,6 +1896,7 @@
         var open = item.classList.contains('open');
         $$('.accordion-item').forEach(function (x) { x.classList.remove('open'); });
         if (!open) item.classList.add('open');
+        syncPlaceOrderBtn();
       });
     });
     // upsell add
