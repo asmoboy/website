@@ -200,12 +200,9 @@
       pay_back_home: 'Back to home', pay_view_faq: 'Payment questions? Read the FAQ', place_order_bt: 'Place order &amp; get bank details',
       place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
       co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
-      preorder_note: 'This item is ordered in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
-      preorder_order: 'Your order contains items we order in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
-      preorder_item: '9–14 working days',
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
-      in_stock_note: 'In stock — available in a warehouse near you.',
-      in_stock_short: 'Near you',
+      ship_24h: 'Ships in 24h',
+      lowstock_note: 'Some items in your order are low in stock. They may need to be reordered — if so, shipping takes 7–9 working days.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
       warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
@@ -405,12 +402,9 @@
       pay_back_home: 'Zurück zur Startseite', pay_view_faq: 'Fragen zur Zahlung? Zu den FAQ', place_order_bt: 'Bestellen &amp; Bankdaten erhalten',
       pay_processing: 'Zahlung wird verarbeitet…',
       co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
-      preorder_note: 'Dieser Artikel wird für dich bestellt. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
-      preorder_order: 'Deine Bestellung enthält Artikel, die für dich bestellt werden. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
-      preorder_item: '9–14 Werktage',
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
-      in_stock_note: 'Auf Lager — verfügbar in einem Lager in deiner Nähe.',
-      in_stock_short: 'In deiner Nähe',
+      ship_24h: 'Versand in 24h',
+      lowstock_note: 'Einige Artikel in deiner Bestellung sind knapp auf Lager. Es kann sein, dass wir sie nachbestellen müssen — dann dauert der Versand 7–9 Werktage.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
       warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
@@ -611,12 +605,9 @@
       pay_back_home: 'Înapoi la pagina principală', pay_view_faq: 'Întrebări despre plată? Vezi FAQ', place_order_bt: 'Plasează comanda &amp; obține datele bancare',
       pay_processing: 'Se procesează plata…',
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
-      preorder_note: 'Acest articol este comandat special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
-      preorder_order: 'Comanda ta conține articole comandate special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
-      preorder_item: '9–14 zile lucrătoare',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
-      in_stock_note: 'În stoc — disponibil într-un depozit din apropierea ta.',
-      in_stock_short: 'Lângă tine',
+      ship_24h: 'Expediere în 24h',
+      lowstock_note: 'Unele articole din comanda ta sunt pe terminate. S-ar putea să fie nevoie să le recomandăm — în acest caz expedierea durează 7–9 zile lucrătoare.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -1528,7 +1519,16 @@
     var ship = getShipInfo();
 
     var topPrice = isVar ? T.priceLabel(p) : ((p.oldPrice ? '<span class="old">' + money(lvOld(p)) + '</span> ' : '') + '<span class="cur">' + money(lv(p)) + '</span>');
-    var shipStatus = ship.shipsToday ? t('in_stock_today') : t('ships_next');
+    // which sizes are actually stocked — named next to "in stock · ships today"
+    var stockedSizes = isVar
+      ? p.options.filter(function (o) { return !T.isPreorder(p.slug, o.label) && !T.isSoldOut(p.slug, o.label); })
+                 .map(function (o) { return o.label; })
+      : [];
+    var anyStock = isVar ? stockedSizes.length > 0 : !T.isPreorder(p.slug, null) && !T.isSoldOut(p.slug, null);
+    // only claim "in stock · ships today" when something really is in stock
+    var shipStatus = anyStock
+      ? (ship.shipsToday ? t('in_stock_today') : t('ships_next')) + (stockedSizes.length ? ' · ' + stockedSizes.join(', ') : '')
+      : '';
 
     root.innerHTML = '' +
       '<div class="pd">' +
@@ -1546,15 +1546,15 @@
               '<div class="swatches">' + p.options.map(function (o, i) {
                 var so = T.isSoldOut(p.slug, o.label);
                 var pre = T.isPreorder(p.slug, o.label);
-                // state sits above the size, so you can see at a glance which
-                // one is actually in stock nearby
+                // label sits ABOVE the bubble, not inside it; only stocked
+                // sizes get a promise, sold-out ones a warning, the rest none
                 var state = so ? '<span class="sw-state sw-out">' + t('sold_out') + '</span>'
-                          : pre ? '<span class="sw-state sw-pre">' + t('preorder_item') + '</span>'
-                                : '<span class="sw-state sw-in">' + t('in_stock_short') + '</span>';
-                return '<button class="swatch' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
+                          : pre ? '<span class="sw-state sw-none"></span>'
+                                : '<span class="sw-state sw-in">' + t('ship_24h') + '</span>';
+                return '<div class="swatch-wrap">' + state +
+                  '<button class="swatch' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
                   (so ? ' disabled aria-disabled="true"' : '') +
-                  ' aria-pressed="' + (i === firstBuyable && !so) + '">' +
-                  state + '<span class="sw-label">' + o.label + '</span></button>';
+                  ' aria-pressed="' + (i === firstBuyable && !so) + '">' + o.label + '</button></div>';
               }).join('') + '</div>' +
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
@@ -1565,7 +1565,7 @@
           '</div>' +
           '<div class="pd-cats">' + t('categories') + ': <a href="/shop/">' + t('cat_' + T.strip(p.category)) + '</a>, <a href="/shop/">' + groupLabel(p) + '</a></div>' +
           '<div class="pd-ship">' +
-            '<div class="ship-line">' + I.clock + '<span>' + shipStatus + '</span></div>' +
+            (shipStatus ? '<div class="ship-line">' + I.clock + '<span>' + shipStatus + '</span></div>' : '') +
             '<div class="ship-line">' + I.truck + '<span>' + t('two_day') + ' <b>' + fmtDate(ship.deliver) + '</b></span></div>' +
           '</div>' +
           '<div class="spec-grid">' +
@@ -1594,15 +1594,10 @@
       var label = isVar ? (selected && selected.label) : null;
       var slug = p.slug;
       if (isVar && !selected) { box.innerHTML = ''; return; }
-      if (T.isSoldOut(slug, label)) {
-        box.innerHTML = '<div class="sold-out-note">' + t('sold_out_note') + '</div>';
-      } else if (T.isPreorder(slug, label)) {
-        box.innerHTML = '<div class="preorder-note">' + t('preorder_note') + '</div>';
-      } else {
-        // sized products already show "in deiner Nähe" above each size —
-        // only the size-less ones still need the box
-        box.innerHTML = isVar ? '' : '<div class="instock-note">' + t('in_stock_note') + '</div>';
-      }
+      // no pre-order text on the product page any more — the "may need
+      // reordering" wording lives at checkout. Only sold-out still speaks up.
+      box.innerHTML = T.isSoldOut(slug, label)
+        ? '<div class="sold-out-note">' + t('sold_out_note') + '</div>' : '';
     }
 
     function syncSel() {
@@ -2145,10 +2140,9 @@
     var hasPreorder = Cart.items.some(function (i) { return T.isPreorder(i.slug, i.option); });
     if (os) {
       os.innerHTML = '<h2>' + t('order_summary') + '</h2>' +
-        (hasPreorder ? '<div class="preorder-note">' + t('preorder_order') + '</div>' : '') +
+        (hasPreorder ? '<div class="preorder-note">' + t('lowstock_note') + '</div>' : '') +
         (Cart.items.length ? Cart.items.map(function (i) {
           return '<div class="os-line"><div class="thumb">' + pimgLine(i) + '</div><div><div class="os-name">' + lineName(i) + (i.option ? ' · ' + i.option : '') + '</div><div class="os-qty">' + t('qty') + ' ' + i.qty + '</div>' +
-            (T.isPreorder(i.slug, i.option) ? '<div class="os-preorder">' + t('preorder_item') + '</div>' : '') +
             '</div><div class="os-price">' + money(lv(i) * i.qty) + '</div></div>';
         }).join('') : '<p class="text-muted" style="padding:12px 0;">' + t('cart_empty') + '.</p>') +
         '<div class="sum-row" style="margin-top:10px;"><span class="muted">' + t('subtotal') + '</span><span>' + money(sub) + '</span></div>' +

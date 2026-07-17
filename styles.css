@@ -1019,7 +1019,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .preorder-note { border: 1px solid #f0b429; background: rgba(240,180,41,.08);
   border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; line-height: 1.5; }
 .preorder-note b { font-weight: 600; }
-.os-preorder { color: #b45309; font-size: 12.5px; margin-top: 2px; }
 
 /* ---- sold out (cannot be bought, unlike pre-order) ---- */
 .swatch.is-sold-out, .sheet-opt.is-sold-out { opacity: .45; cursor: not-allowed; text-decoration: line-through; }
@@ -1028,18 +1027,10 @@ ul { margin: 0; padding: 0; list-style: none; }
   border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; }
 .so-soldout { color: #6b7280; font-size: 12px; margin-left: 6px; }
 
-/* ---- in-stock notice (third state next to pre-order / sold out) ---- */
-.instock-note { border: 1px solid #16a34a; background: rgba(22,163,74,.07);
-  border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; line-height: 1.5; }
-
-/* ---- availability shown above each size option ---- */
-.swatch { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1.2; }
-.sw-state { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; font-weight: 700; }
-.sw-label { font-size: 12px; }
+/* ---- availability label sits ABOVE the size bubble, not inside it ---- */
+.swatch-wrap { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
+.sw-state { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; font-weight: 700; min-height: 11px; }
 .sw-in { color: #16a34a; }
-.sw-pre { color: #b45309; }
 .sw-out { color: #9ca3af; }
-/* on the selected (brand-coloured) swatch the state must stay readable */
-.swatch[aria-pressed="true"] .sw-state { color: rgba(255,255,255,.85); }
-.swatch.is-sold-out { text-decoration: none; }
-.swatch.is-sold-out .sw-label { text-decoration: line-through; }
+.sw-none { visibility: hidden; }   /* keeps the bubbles on one line */
+.swatch.is-sold-out { text-decoration: line-through; }
