@@ -1047,6 +1047,31 @@ ul { margin: 0; padding: 0; list-style: none; }
   border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; line-height: 1.5; }
 .preorder-note b { font-weight: 600; }
 
+/* ---- availability system (delivery-expectation communication) ---- */
+/* product-page size chip: on-backorder short label sits where the promise goes */
+.sw-back { color: #b5651d; }
+/* availability badge on cards + product page */
+.avail-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+  font-weight: 600; line-height: 1.35; padding: 6px 10px; border-radius: 8px;
+  border: 1px solid transparent; margin: 8px 0 2px; }
+.avail-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor; flex: 0 0 auto; }
+.avail-badge.avail-in { color: #1a7f37; background: rgba(26,127,55,.09); border-color: rgba(26,127,55,.22); }
+.avail-badge.avail-back { color: #b5651d; background: rgba(181,101,29,.09); border-color: rgba(181,101,29,.24); }
+.card-info .avail-badge { font-size: 11px; padding: 5px 9px; margin: 6px 0 2px; }
+/* backorder freshness reassurance under the product-page badge */
+.pd-avail { margin: 4px 0 2px; }
+.avail-note { font-size: 13px; line-height: 1.5; color: var(--muted); margin: 8px 0 2px; max-width: 46ch; }
+/* prominent checkout warning box (chargeback protection) */
+.co-backorder-warn { border: 1px solid #e0952a; background: rgba(224,149,42,.10);
+  color: #8a4b12; border-radius: 12px; padding: 14px 16px; margin: 16px 0 4px;
+  font-size: 14px; line-height: 1.55; font-weight: 500; }
+/* order-summary discount line + promo feedback */
+.os-discount { color: #1a7f37; font-weight: 600; }
+.promo-msg { margin: 8px 0 0; font-size: 13px; line-height: 1.4; }
+.promo-msg.ok { color: #1a7f37; }
+.promo-msg.err { color: #e0533d; }
+
 /* ---- sold out (cannot be bought, unlike pre-order) ---- */
 .swatch.is-sold-out, .sheet-opt.is-sold-out { opacity: .45; cursor: not-allowed; text-decoration: line-through; }
 .swatch.is-sold-out:hover, .sheet-opt.is-sold-out:hover { background: none; }

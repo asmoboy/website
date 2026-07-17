@@ -75,6 +75,16 @@
   function inStock(slug, optionLabel) {
     return !isPreorder(slug, optionLabel) && !isSoldOut(slug, optionLabel);
   }
+  /* Three-state availability for the delivery-expectation UI, derived from the
+     same IN_STOCK / SOLD_OUT maps (still the single source of truth — manage
+     stock there). Returns 'in_stock' (ships in 2–3 business days),
+     'backorder' (ordered in for the customer, 10–14 day delivery) or
+     'sold_out' (cannot be bought). */
+  function stockStatus(slug, optionLabel) {
+    if (isSoldOut(slug, optionLabel)) return 'sold_out';
+    if (isPreorder(slug, optionLabel)) return 'backorder';
+    return 'in_stock';
+  }
 
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   var IMG = '/Produktbilder/', COA = '/Janotest/';
@@ -358,6 +368,7 @@
     isPreorder: isPreorder,
     isSoldOut: isSoldOut,
     inStock: inStock,
+    stockStatus: stockStatus,
     /* unique payment reference: TOP- + 8 unambiguous chars (no 0/O/1/I) */
     genPaymentRef: function () {
       var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', out = '';

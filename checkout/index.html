@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=29">
+<link rel="stylesheet" href="/styles.css?v=30">
 </head>
 <body data-page="checkout">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -75,7 +75,8 @@
               <svg class="promo-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 15l6-6 6 6"/></svg>
             </button>
             <div class="promo-body">
-              <div class="promo-inline"><input type="text" placeholder="Enter code" data-i18n-ph="promo_enter" aria-label="Promo code"><button class="btn" data-i18n="apply">Apply</button></div>
+              <div class="promo-inline"><input id="promoInput" type="text" placeholder="Enter code" data-i18n-ph="promo_enter" aria-label="Promo code"><button class="btn" id="promoApply" data-i18n="apply">Apply</button></div>
+              <p class="promo-msg" id="promoMsg" aria-live="polite"></p>
             </div>
           </div>
           <!-- Payment-method chooser (rendered by app.js). Card is always
@@ -96,7 +97,7 @@
   </div>
 </main>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="/data.js?v=29"></script>
-<script src="/app.js?v=29"></script>
+<script src="/data.js?v=30"></script>
+<script src="/app.js?v=30"></script>
 </body>
 </html>

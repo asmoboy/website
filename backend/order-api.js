@@ -92,11 +92,23 @@ function toMinorUnits(amount) { return Math.round(Number(amount) * 100); }
    items (never a client-supplied total).
    PRIVACY: only this sum ever reaches Stripe — no product names, no basket
    contents. Stripe sees an amount + our order reference, nothing more. */
+// promo codes are validated HERE, server-side — the front-end only requests a
+// code; this is the authority on whether/how much it discounts.
+const PROMO_CODES = { STIFI: 0.10 };
+function promoRate(code) {
+  const key = String(code || '').trim().toUpperCase();
+  return PROMO_CODES[key] || 0;
+}
+
 function computeAmountCents(payload) {
-  let total = (payload.items || []).reduce(function (n, i) {
+  let items = (payload.items || []).reduce(function (n, i) {
     const qty = Math.max(1, parseInt(i.qty, 10) || 1);
     return n + toMinorUnits(i.price) * qty;
   }, 0);
+  // percentage discount applies to the item subtotal only (not shipping)
+  const rate = promoRate(payload.promo);
+  if (rate > 0) items -= Math.round(items * rate);
+  let total = items;
   if (Number(payload.shipping) > 0) total += toMinorUnits(payload.shipping);
   if (Number(payload.insurance) > 0) total += toMinorUnits(payload.insurance);
   return total;

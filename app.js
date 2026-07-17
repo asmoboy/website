@@ -62,7 +62,7 @@
       categories: 'Categories', continue_shopping: 'Continue shopping', search_ph: 'Search compounds…',
       popular: 'Popular items', no_results: 'No compounds match', results: 'results',
       coa_verified: 'Verified', coa_in_testing: 'In testing', coa_report_soon: 'awaiting Janoshik — report coming soon',
-      coa_verified_count: 'lots verified', coa_coming_soon: 'Coming Soon', coa_open_janoshik: 'Open on Janoshik official site', promo_code: 'Promo code', promo_enter: 'Enter code', apply: 'Apply', search_lot_ph: 'Search by compound',
+      coa_verified_count: 'lots verified', coa_coming_soon: 'Coming Soon', coa_open_janoshik: 'Open on Janoshik official site', promo_code: 'Promo code', promo_enter: 'Enter code', apply: 'Apply', promo_applied: 'Code applied — 10% off', promo_invalid: 'That code isn’t valid.', discount_word: 'Discount', search_lot_ph: 'Search by compound',
       remove: 'Remove', qty: 'Qty', research_only: 'Research use only', free_shipping_over: 'Free shipping over',
       place_order: 'Place order', order_placed: 'Order placed ✓', secured_demo: 'You’ll get our bank details and a unique payment reference on the next step. No card details are stored.',
       order_summary: 'Order summary', shipping_word: 'Shipping', total: 'Total', free_word: 'Free',
@@ -201,9 +201,13 @@
       place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
       co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
-      ship_24h: 'Ships in 24h',
-      on_order: 'On order · 7–9 days',
-      lowstock_note: 'Some items in your order are low in stock. They may need to be reordered — if so, shipping takes 7–9 working days.',
+      ship_24h: 'Ships in 2–3 business days',
+      on_order: 'Ordered in · 10–14 days',
+      avail_instock: 'In stock – ships in 2–3 business days',
+      avail_backorder: 'Ordered in for you – 10–14 day delivery',
+      avail_backorder_note: 'This batch is requested only after you order, to guarantee maximum freshness and quality.',
+      co_backorder_warn: 'Please note: one or more items in your cart are currently not in stock. Estimated delivery: 10–14 days (in exceptional cases up to 15 days). By completing your purchase you accept this delivery time.',
+      lowstock_note: 'Some items in your order are ordered in for you. Estimated delivery for those items is 10–14 days.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
       warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
@@ -271,7 +275,7 @@
       categories: 'Kategorien', continue_shopping: 'Weiter einkaufen', search_ph: 'Wirkstoffe suchen…',
       popular: 'Beliebte Produkte', no_results: 'Keine Treffer für', results: 'Treffer',
       coa_verified: 'Verifiziert', coa_in_testing: 'In Prüfung', coa_report_soon: 'wird von Janoshik geprüft — Bericht folgt in Kürze',
-      coa_verified_count: 'Chargen verifiziert', coa_coming_soon: 'Demnächst', coa_open_janoshik: 'Auf der offiziellen Janoshik-Seite öffnen', promo_code: 'Gutscheincode', promo_enter: 'Code eingeben', apply: 'Anwenden', search_lot_ph: 'Suche nach Wirkstoff',
+      coa_verified_count: 'Chargen verifiziert', coa_coming_soon: 'Demnächst', coa_open_janoshik: 'Auf der offiziellen Janoshik-Seite öffnen', promo_code: 'Gutscheincode', promo_enter: 'Code eingeben', apply: 'Anwenden', promo_applied: 'Code eingelöst — 10% Rabatt', promo_invalid: 'Dieser Code ist ungültig.', discount_word: 'Rabatt', search_lot_ph: 'Suche nach Wirkstoff',
       remove: 'Entfernen', qty: 'Menge', research_only: 'Nur für Forschungszwecke', free_shipping_over: 'Gratisversand ab',
       place_order: 'Bestellung aufgeben', order_placed: 'Bestellung aufgegeben ✓', secured_demo: 'Im nächsten Schritt erhältst du unsere Bankdaten und eine eindeutige Zahlungsreferenz. Es werden keine Kartendaten gespeichert.',
       order_summary: 'Bestellübersicht', shipping_word: 'Versand', total: 'Gesamt', free_word: 'Gratis',
@@ -410,9 +414,13 @@
       pay_processing: 'Zahlung wird verarbeitet…',
       co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
-      ship_24h: 'Versand in 24h',
-      on_order: 'Auf Bestellung · 7–9 Tage',
-      lowstock_note: 'Einige Artikel in deiner Bestellung sind knapp auf Lager. Es kann sein, dass wir sie nachbestellen müssen — dann dauert der Versand 7–9 Werktage.',
+      ship_24h: 'Versand in 2-3 Werktagen',
+      on_order: 'Wird bestellt · 10-14 Tage',
+      avail_instock: 'Auf Lager – Versand in 2-3 Werktagen',
+      avail_backorder: 'Wird für dich bestellt – Lieferzeit 10-14 Tage',
+      avail_backorder_note: 'Diese Charge wird erst nach deiner Bestellung angefordert, um maximale Frische/Qualität zu garantieren.',
+      co_backorder_warn: 'Achtung: Ein oder mehrere Artikel in deinem Warenkorb sind aktuell nicht auf Lager. Geschätzte Lieferzeit: 10-14 Tage (in Ausnahmefällen bis zu 15 Tage). Mit dem Kauf akzeptierst du diese Lieferzeit.',
+      lowstock_note: 'Einige Artikel in deiner Bestellung werden für dich bestellt. Die geschätzte Lieferzeit für diese Artikel beträgt 10-14 Tage.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
       warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
@@ -481,7 +489,7 @@
       categories: 'Categorii', continue_shopping: 'Continuă cumpărăturile', search_ph: 'Caută compuși…',
       popular: 'Produse populare', no_results: 'Niciun rezultat pentru', results: 'rezultate',
       coa_verified: 'Verificat', coa_in_testing: 'În testare', coa_report_soon: 'în așteptare la Janoshik — raportul urmează în curând',
-      coa_verified_count: 'loturi verificate', coa_coming_soon: 'În curând', coa_open_janoshik: 'Deschide pe site-ul oficial Janoshik', promo_code: 'Cod promoțional', promo_enter: 'Introdu codul', apply: 'Aplică', search_lot_ph: 'Caută după compus',
+      coa_verified_count: 'loturi verificate', coa_coming_soon: 'În curând', coa_open_janoshik: 'Deschide pe site-ul oficial Janoshik', promo_code: 'Cod promoțional', promo_enter: 'Introdu codul', apply: 'Aplică', promo_applied: 'Cod aplicat — 10% reducere', promo_invalid: 'Acest cod nu este valid.', discount_word: 'Reducere', search_lot_ph: 'Caută după compus',
       remove: 'Elimină', qty: 'Cant.', research_only: 'Doar pentru cercetare', free_shipping_over: 'Livrare gratuită peste',
       place_order: 'Plasează comanda', order_placed: 'Comandă plasată ✓', secured_demo: 'La pasul următor primești datele noastre bancare și o referință de plată unică. Nu se stochează date de card.',
       order_summary: 'Sumar comandă', shipping_word: 'Transport', total: 'Total', free_word: 'Gratuit',
@@ -620,9 +628,13 @@
       pay_processing: 'Se procesează plata…',
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
-      ship_24h: 'Livrare în 24h',
-      on_order: 'La comandă · 7–9 zile',
-      lowstock_note: 'Unele articole din comanda ta sunt pe terminate și ar putea necesita reaprovizionare — în acest caz, expedierea durează 7–9 zile lucrătoare.',
+      ship_24h: 'Livrare în 2-3 zile lucrătoare',
+      on_order: 'Se comandă · 10-14 zile',
+      avail_instock: 'În stoc – livrare în 2-3 zile lucrătoare',
+      avail_backorder: 'Se comandă pentru tine – livrare în 10-14 zile',
+      avail_backorder_note: 'Acest lot este comandat abia după plasarea comenzii tale, pentru a garanta prospețime și calitate maximă.',
+      co_backorder_warn: 'Atenție: unul sau mai multe articole din coșul tău nu sunt momentan în stoc. Livrare estimată: 10-14 zile (în cazuri excepționale până la 15 zile). Prin finalizarea comenzii accepți acest termen de livrare.',
+      lowstock_note: 'Unele articole din comanda ta se comandă pentru tine. Livrarea estimată pentru aceste articole este de 10-14 zile.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -814,6 +826,7 @@
       order_no: o.orderNo, currency: o.currency, total: o.total, total_text: o.totalText,
       email: o.email, name: o.name, org: o.org, address: o.address, city: o.city,
       zip: o.zip, country: o.country, lang: o.lang, items: o.items,
+      promo: o.promo || '',
       payment_method: o.paymentMethod || (o.status === 'cod' ? 'cod' : undefined)
     };
   }
@@ -1010,6 +1023,26 @@
     if (p.onSale) return '<span class="corner-badge badge-sale">' + t('sale') + '</span>';
     return '';
   }
+  /* product-level availability: in_stock if ANY buyable size ships now,
+     else backorder if any size is on backorder, else null (fully sold out) */
+  function prodStatus(p) {
+    if (p.type === 'variable') {
+      var any = false, back = false;
+      p.options.forEach(function (o) {
+        var s = T.stockStatus(p.slug, o.label);
+        if (s === 'in_stock') any = true; else if (s === 'backorder') back = true;
+      });
+      return any ? 'in_stock' : (back ? 'backorder' : null);
+    }
+    var s = T.stockStatus(p.slug, null);
+    return s === 'sold_out' ? null : s;
+  }
+  function availBadge(status) {
+    if (!status) return '';
+    var inS = status === 'in_stock';
+    return '<div class="avail-badge avail-' + (inS ? 'in' : 'back') + '">' +
+      t(inS ? 'avail_instock' : 'avail_backorder') + '</div>';
+  }
   function cardHTML(p) {
     var variable = p.type === 'variable';
     var addLabel = variable ? t('select_options') : t('add_to_cart');
@@ -1024,6 +1057,7 @@
           '<a class="c-name" href="/product/?p=' + p.slug + '">' + displayName(p) + '</a>' +
           '<div class="c-size">' + T.sizeLabel(p) + '</div>' +
           '<div class="c-price">' + priceHTML(p) + '</div>' +
+          availBadge(prodStatus(p)) +
           '<button class="card-add" data-add="' + p.slug + '">' + addIcon + '<span>' + addLabel + '</span></button>' +
         '</div>' +
       '</article>';
@@ -1597,20 +1631,8 @@
     var ship = getShipInfo();
 
     var topPrice = isVar ? T.priceLabel(p) : ((p.oldPrice ? '<span class="old">' + money(lvOld(p)) + '</span> ' : '') + '<span class="cur">' + money(lv(p)) + '</span>');
-    // which sizes are actually stocked — named next to "in stock · ships today"
-    var stockedSizes = isVar
-      ? p.options.filter(function (o) { return !T.isPreorder(p.slug, o.label) && !T.isSoldOut(p.slug, o.label); })
-                 .map(function (o) { return o.label; })
-      : [];
-    var anyStock = isVar ? stockedSizes.length > 0 : !T.isPreorder(p.slug, null) && !T.isSoldOut(p.slug, null);
-    // only claim "in stock · ships today" when something really is in stock,
-    // and name exactly what is stocked, e.g. "· GLP-3 RT 10 mg"
-    var stockedWhat = anyStock
-      ? displayName(p) + (stockedSizes.length ? ' ' + stockedSizes.join(', ') : '')
-      : '';
-    var shipStatus = anyStock
-      ? (ship.shipsToday ? t('in_stock_today') : t('ships_next')) + ' · ' + esc(stockedWhat)
-      : '';
+    // availability badge + delivery expectation are rendered dynamically per
+    // selected size by syncAvail() (see #pdAvail / #pdShip below).
 
     root.innerHTML = '' +
       '<div class="pd">' +
@@ -1631,7 +1653,7 @@
                 // label sits ABOVE the bubble, not inside it; only stocked
                 // sizes get a promise, sold-out ones a warning, the rest none
                 var state = so ? '<span class="sw-state sw-out">' + t('sold_out') + '</span>'
-                          : pre ? '<span class="sw-state sw-none"></span>'
+                          : pre ? '<span class="sw-state sw-back">' + t('on_order') + '</span>'
                                 : '<span class="sw-state sw-in">' + t('ship_24h') + '</span>';
                 return '<div class="swatch-wrap">' + state +
                   '<button class="swatch' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
@@ -1641,24 +1663,22 @@
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
           '<div id="pdPreorder"></div>' +
+          '<div id="pdAvail" class="pd-avail"></div>' +
           '<div class="pd-buy-simple">' +
             '<div class="stepper pd-stepper-lg"><button data-pstep="-1" aria-label="-">–</button><span class="qty pd-qty">1</span><button data-pstep="1" aria-label="+">+</button></div>' +
             '<button class="btn btn-block" id="pdAdd">' + t('add_to_cart') + '</button>' +
           '</div>' +
           '<div class="pd-cats">' + t('categories') + ': <a href="/shop/">' + t('cat_' + T.strip(p.category)) + '</a>, <a href="/shop/">' + groupLabel(p) + '</a></div>' +
-          '<div class="pd-ship">' +
-            (shipStatus ? '<div class="ship-line">' + I.clock + '<span>' + shipStatus + '</span></div>' : '') +
-            '<div class="ship-line">' + I.truck + '<span>' + t('two_day') + ' <b>' + fmtDate(ship.deliver) + '</b></span></div>' +
-          '</div>' +
+          '<div class="pd-ship" id="pdShip"></div>' +
           '<div class="spec-grid">' +
             '<div class="cell"><div class="k">' + t('purity') + '</div><div class="v">' + p.purity + '</div></div>' +
             '<div class="cell"><div class="k">' + t('form') + '</div><div class="v">' + (lang === 'en' ? p.form.replace(' powder', '').replace(' blend', '') : formLabel(p)) + '</div></div>' +
-            '<div class="cell"><div class="k">' + t('dispatch') + '</div><div class="v">' + (ship.shipsToday ? t('same_day') : t('next_business_day')) + '</div></div>' +
+            '<div class="cell"><div class="k">' + t('dispatch') + '</div><div class="v" id="pdDispatch">' + (ship.shipsToday ? t('same_day') : t('next_business_day')) + '</div></div>' +
           '</div>' +
           '<ul class="trust-checks">' +
             '<li>' + I.check + t('third_party') + '</li>' +
             '<li>' + I.check + t('coa_per_lot') + '</li>' +
-            '<li>' + I.check + (ship.shipsToday ? t('same_day_dispatch') : t('next_day_dispatch')) + '</li>' +
+            '<li id="pdDispatchCheck">' + I.check + (ship.shipsToday ? t('same_day_dispatch') : t('next_day_dispatch')) + '</li>' +
             '<li>' + I.check + t('free_shipping_over') + ' ' + money(T.freeShip) + '</li>' +
           '</ul>' +
         '</div>' +
@@ -1682,8 +1702,32 @@
         ? '<div class="sold-out-note">' + t('sold_out_note') + '</div>' : '';
     }
 
+    /* availability badge + delivery expectation, following the chosen size:
+       in_stock → green badge + 2-day delivery date; backorder → amber badge +
+       "batch requested after your order" note, and NO near-term delivery date
+       (so we never promise a date we can't hit). */
+    function syncAvail() {
+      var av = $('#pdAvail', root), shipBox = $('#pdShip', root);
+      var dispatch = $('#pdDispatch', root), dispatchChk = $('#pdDispatchCheck', root);
+      var label = isVar ? (selected && selected.label) : null;
+      var status = (isVar && !selected) ? null : T.stockStatus(p.slug, label);
+      if (av) {
+        av.innerHTML = (status === 'in_stock' || status === 'backorder')
+          ? availBadge(status) + (status === 'backorder' ? '<div class="avail-note">' + t('avail_backorder_note') + '</div>' : '')
+          : '';
+      }
+      if (shipBox) {
+        shipBox.innerHTML = (status === 'in_stock')
+          ? '<div class="ship-line">' + I.truck + '<span>' + t('two_day') + ' <b>' + fmtDate(ship.deliver) + '</b></span></div>'
+          : '';
+      }
+      if (dispatch) dispatch.textContent = (status === 'backorder') ? t('on_order') : (ship.shipsToday ? t('same_day') : t('next_business_day'));
+      if (dispatchChk) dispatchChk.innerHTML = I.check + (status === 'backorder' ? t('avail_backorder') : (ship.shipsToday ? t('same_day_dispatch') : t('next_day_dispatch')));
+    }
+
     function syncSel() {
       syncPreorder();
+      syncAvail();
       // a size-less product that is sold out can't be bought either
       if (!isVar) {
         if (T.isSoldOut(p.slug, null)) { addBtn.disabled = true; addBtn.textContent = t('sold_out'); }
@@ -2008,7 +2052,8 @@
       return null;
     }
     if (note) note.textContent = '';
-    var total = sub + ship + ins;
+    var discount = promoDiscount(sub);
+    var total = sub - discount + ship + ins;
     return {
       ref: Orders.uniqueRef(),
       orderNo: 'TP' + String(Date.now()).slice(-8),
@@ -2025,7 +2070,8 @@
       zip: val('coZip'),
       country: country,
       items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i), slug: i.slug, option: i.option || '', inStock: T.inStock(i.slug, i.option) }; }),
-      subtotal: sub, shipping: ship, insurance: ins, total: total,
+      subtotal: sub, shipping: ship, insurance: ins,
+      promo: promoCode, discount: discount, total: total,
       totalText: money(total)
     };
   }
@@ -2042,6 +2088,14 @@
   var stripeJs = null, stripeElements = null, stripeMounted = false;
   var coMethod = 'card'; // 'card' | 'cod' — selected payment method at checkout
 
+  /* ---- promo code ---- : the only live code is STIFI = 10% off the subtotal.
+     The Cloudflare Worker re-validates this server-side and recomputes the
+     charged amount, so a tampered front-end can't invent a discount. */
+  var PROMO_CODES = { 'STIFI': 0.10 };
+  var promoCode = '';        // the accepted code (uppercased), '' if none
+  var promoPct = 0;          // discount fraction, e.g. 0.10
+  function promoDiscount(sub) { return promoPct > 0 ? Math.round(sub * promoPct * 100) / 100 : 0; }
+
   function stripeReady() {
     return !!(window.Stripe && T.stripePublishableKey && T.orderApiUrl);
   }
@@ -2057,7 +2111,7 @@
     var ship = sub >= T.freeShip ? 0 : T.shipCost;
     var insEl = $('#shipInsurance');
     var ins = insEl && insEl.checked ? INS_COST : 0;
-    return Math.round((sub + ship + ins) * 100);
+    return Math.round((sub - promoDiscount(sub) + ship + ins) * 100);
   }
   function mountPaymentElement() {
     if (stripeMounted || !ensureStripe()) return;
@@ -2141,7 +2195,7 @@
         total_text: order.totalText, email: order.email, name: order.name, org: order.org,
         address: order.address, city: order.city, zip: order.zip, country: order.country,
         lang: order.lang, items: order.items,
-        shipping: order.shipping, insurance: order.insurance,
+        shipping: order.shipping, insurance: order.insurance, promo: order.promo || '',
         shipping_label: t('shipping_word'), insurance_label: t('ship_protect')
       };
       return fetch(T.orderApiUrl + '/stripe/payment-intent', {
@@ -2385,18 +2439,20 @@
     var ship = sub >= T.freeShip ? 0 : T.shipCost;
     var insEl = $('#shipInsurance');
     var ins = insEl && insEl.checked ? INS_COST : 0;
-    var hasPreorder = Cart.items.some(function (i) { return T.isPreorder(i.slug, i.option); });
+    var hasBackorder = Cart.items.some(function (i) { return T.stockStatus(i.slug, i.option) === 'backorder'; });
+    var discount = promoDiscount(sub);
     if (os) {
       os.innerHTML = '<h2>' + t('order_summary') + '</h2>' +
-        (hasPreorder ? '<div class="preorder-note">' + t('lowstock_note') + '</div>' : '') +
         (Cart.items.length ? Cart.items.map(function (i) {
           return '<div class="os-line"><div class="thumb">' + pimgLine(i) + '</div><div><div class="os-name">' + lineName(i) + (i.option ? ' · ' + i.option : '') + '</div><div class="os-qty">' + t('qty') + ' ' + i.qty + '</div>' +
             '</div><div class="os-price">' + money(lv(i) * i.qty) + '</div></div>';
         }).join('') : '<p class="text-muted" style="padding:12px 0;">' + t('cart_empty') + '.</p>') +
         '<div class="sum-row" style="margin-top:10px;"><span class="muted">' + t('subtotal') + '</span><span>' + money(sub) + '</span></div>' +
+        (discount ? '<div class="sum-row"><span class="muted">' + t('discount_word') + ' (' + esc(promoCode) + ')</span><span class="os-discount">−' + money(discount) + '</span></div>' : '') +
         '<div class="sum-row"><span class="muted">' + t('shipping_word') + '</span><span id="osShip">' + (ship ? money(ship) : t('free_word')) + '</span></div>' +
         (ins ? '<div class="sum-row"><span class="muted">' + t('ship_protect') + '</span><span>' + money(ins) + '</span></div>' : '') +
-        '<div class="sum-row total"><span>' + t('total') + '</span><span>' + money(sub + ship + ins) + '</span></div>' +
+        '<div class="sum-row total"><span>' + t('total') + '</span><span>' + money(sub - discount + ship + ins) + '</span></div>' +
+        (hasBackorder ? '<div class="co-backorder-warn" role="alert">' + t('co_backorder_warn') + '</div>' : '') +
         '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_card') + '</button>' +
         // stays empty until there's something worth saying (status / error)
         '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;"></p>';
@@ -2455,6 +2511,24 @@
         var blk = $('#promoBlock');
         var open = blk.classList.toggle('open');
         pt.setAttribute('aria-expanded', String(open));
+      });
+    }
+    // promo code apply — validates against PROMO_CODES; the Worker re-checks it
+    var pApply = $('#promoApply'), pInput = $('#promoInput'), pMsg = $('#promoMsg');
+    if (pInput && promoCode) pInput.value = promoCode; // keep across re-renders
+    if (pApply && !pApply.dataset.wired) {
+      pApply.dataset.wired = '1';
+      pApply.addEventListener('click', function () {
+        var code = (pInput && pInput.value || '').trim().toUpperCase();
+        if (PROMO_CODES[code]) {
+          promoCode = code; promoPct = PROMO_CODES[code];
+          if (pMsg) { pMsg.className = 'promo-msg ok'; pMsg.textContent = t('promo_applied'); }
+        } else {
+          promoCode = ''; promoPct = 0;
+          if (pMsg) { pMsg.className = 'promo-msg err'; pMsg.textContent = t('promo_invalid'); }
+        }
+        renderCheckout();                 // reflect the discount in totals + Stripe amount
+        updateStripeAmount();
       });
     }
   }
