@@ -203,6 +203,7 @@
       preorder_note: 'This item is ordered in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
       preorder_order: 'Your order contains items we order in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
       preorder_item: '9–14 working days',
+      sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
       warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
@@ -405,6 +406,7 @@
       preorder_note: 'Dieser Artikel wird für dich bestellt. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
       preorder_order: 'Deine Bestellung enthält Artikel, die für dich bestellt werden. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
       preorder_item: '9–14 Werktage',
+      sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
       warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
@@ -608,6 +610,7 @@
       preorder_note: 'Acest articol este comandat special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
       preorder_order: 'Comanda ta conține articole comandate special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
       preorder_item: '9–14 zile lucrătoare',
+      sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -989,12 +992,20 @@
     $('.st-price', sheet).innerHTML = T.priceLabel(p);
     $('.sheet-hint', sheet).textContent = t('tap_a_size');
     $('.sheet-options', sheet).innerHTML = p.options.map(function (o, i) {
-      var pr = (o.oldPrice ? '<span class="old">' + money(lvOld(o)) + '</span> ' : '') + '<b>' + money(lv(o)) + '</b>';
-      return '<button class="sheet-opt" data-i="' + i + '"><span class="so-label">' + o.label + '</span><span class="so-price">' + pr + '</span><span class="so-add">' + I.plus + '</span></button>';
+      var so = T.isSoldOut(p.slug, o.label);
+      var pr = so
+        ? '<span class="so-soldout">' + t('sold_out') + '</span>'
+        : (o.oldPrice ? '<span class="old">' + money(lvOld(o)) + '</span> ' : '') + '<b>' + money(lv(o)) + '</b>';
+      return '<button class="sheet-opt' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
+        (so ? ' disabled aria-disabled="true"' : '') +
+        '><span class="so-label">' + o.label + '</span><span class="so-price">' + pr + '</span>' +
+        (so ? '' : '<span class="so-add">' + I.plus + '</span>') + '</button>';
     }).join('');
     $$('.sheet-opt', sheet).forEach(function (b) {
       b.addEventListener('click', function () {
-        Cart.add(p, p.options[parseInt(b.dataset.i, 10)], 1);
+        var o = p.options[parseInt(b.dataset.i, 10)];
+        if (T.isSoldOut(p.slug, o.label)) return; // belt and braces
+        Cart.add(p, o, 1);
         closeSizeSheet();
         openDrawer();
       });
@@ -1525,7 +1536,11 @@
     document.title = p.name + ' — TOP Pep';
     var root = $('#productRoot');
     var isVar = p.type === 'variable';
-    var selected = isVar ? p.options[0] : null;
+    // never preselect a sold-out size (bac water 3 ml is options[0])
+    var firstBuyable = isVar
+      ? p.options.findIndex(function (o) { return !T.isSoldOut(p.slug, o.label); })
+      : -1;
+    var selected = (isVar && firstBuyable > -1) ? p.options[firstBuyable] : null;
     var qty = 1;
     var ship = getShipInfo();
 
@@ -1545,7 +1560,12 @@
           (isVar ?
             '<div class="pd-options">' +
               '<div class="pd-select-head"><span class="opt-label">' + t('select_size') + '</span><button class="pd-clear" id="pdClear">' + t('clear') + '</button></div>' +
-              '<div class="swatches">' + p.options.map(function (o, i) { return '<button class="swatch" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + o.label + '</button>'; }).join('') + '</div>' +
+              '<div class="swatches">' + p.options.map(function (o, i) {
+                var so = T.isSoldOut(p.slug, o.label);
+                return '<button class="swatch' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
+                  (so ? ' disabled aria-disabled="true" title="' + t('sold_out') + '"' : '') +
+                  ' aria-pressed="' + (i === firstBuyable && !so) + '">' + o.label + '</button>';
+              }).join('') + '</div>' +
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
           '<div id="pdPreorder"></div>' +
@@ -1582,21 +1602,33 @@
     function syncPreorder() {
       var box = $('#pdPreorder', root);
       if (!box) return;
-      var pre = isVar
-        ? (selected ? T.isPreorder(p.slug, selected.label) : false)
-        : T.isPreorder(p.slug, null);
-      box.innerHTML = pre ? '<div class="preorder-note">' + t('preorder_note') + '</div>' : '';
+      var label = isVar ? (selected && selected.label) : null;
+      var slug = p.slug;
+      if (isVar && !selected) { box.innerHTML = ''; return; }
+      if (T.isSoldOut(slug, label)) {
+        box.innerHTML = '<div class="sold-out-note">' + t('sold_out_note') + '</div>';
+        return;
+      }
+      box.innerHTML = T.isPreorder(slug, label)
+        ? '<div class="preorder-note">' + t('preorder_note') + '</div>' : '';
     }
 
     function syncSel() {
       syncPreorder();
-      if (!isVar) return;
-      if (selected) {
+      // a size-less product that is sold out can't be bought either
+      if (!isVar) {
+        if (T.isSoldOut(p.slug, null)) { addBtn.disabled = true; addBtn.textContent = t('sold_out'); }
+        return;
+      }
+      var soldOut = selected && T.isSoldOut(p.slug, selected.label);
+      if (selected && !soldOut) {
         selPrice.innerHTML = (selected.oldPrice ? '<span class="old" style="font-size:16px;color:var(--text-secondary);text-decoration:line-through;margin-right:8px;">' + money(lvOld(selected)) + '</span>' : '') + money(lv(selected));
         addBtn.disabled = false;
+        addBtn.textContent = t('add_to_cart');
       } else {
         selPrice.textContent = '';
         addBtn.disabled = true;
+        addBtn.textContent = soldOut ? t('sold_out') : t('add_to_cart');
       }
       // swap the main product photo to match the chosen size
       var mainImg = $('.main-img', root);
@@ -2159,11 +2191,19 @@
         var input = $('input', rc); if (input) input.checked = true;
       });
     });
-    // upsell add
+    // upsell add — pick the first size that is actually buyable, so the card
+    // adds what it advertises (bac water: 10 ml, since 3 ml is sold out)
     $$('[data-upsell]').forEach(function (b) {
       b.addEventListener('click', function () {
         var p = T.bySlug(b.dataset.upsell);
-        Cart.add(p, p.type === 'variable' ? p.options[0] : null, 1);
+        var opt = null;
+        if (p.type === 'variable') {
+          var want = b.dataset.upsellOption;
+          opt = want && p.options.filter(function (o) { return o.label === want; })[0];
+          if (!opt) opt = p.options.filter(function (o) { return !T.isSoldOut(p.slug, o.label); })[0];
+          if (!opt || T.isSoldOut(p.slug, opt.label)) return; // sold out → do nothing
+        }
+        Cart.add(p, opt, 1);
         b.textContent = t('co_added');
         renderCheckout();
       });

@@ -51,10 +51,23 @@
     'bacteriostatic-water': ['10 ml']
   };
   function isPreorder(slug, optionLabel) {
+    if (isSoldOut(slug, optionLabel)) return false; // sold out ≠ pre-order
     var e = IN_STOCK[slug];
     if (e === true) return false;      // whole product in stock
     if (!e) return true;               // not listed → pre-order
     return e.indexOf(optionLabel) === -1;
+  }
+
+  /* SOLD OUT — cannot be bought at all (not orderable, unlike pre-order).
+     `true` = whole product, array = those option labels only. */
+  var SOLD_OUT = {
+    'bacteriostatic-water': ['3 ml']
+  };
+  function isSoldOut(slug, optionLabel) {
+    var e = SOLD_OUT[slug];
+    if (!e) return false;
+    if (e === true) return true;
+    return e.indexOf(optionLabel) > -1;
   }
 
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
@@ -338,6 +351,7 @@
     orderApiUrl: ORDER_API_URL,
     stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
     isPreorder: isPreorder,
+    isSoldOut: isSoldOut,
     /* unique payment reference: TOP- + 8 unambiguous chars (no 0/O/1/I) */
     genPaymentRef: function () {
       var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', out = '';
@@ -362,8 +376,11 @@
     },
     priceLabel: function (p) {
       if (p.type === 'variable') {
-        var vs = p.options.map(val);
-        return fmt(Math.min.apply(null, vs)) + ' – ' + fmt(Math.max.apply(null, vs));
+        // never advertise a price the customer can't actually buy
+        var buyable = p.options.filter(function (o) { return !isSoldOut(p.slug, o.label); });
+        var vs = (buyable.length ? buyable : p.options).map(val);
+        var lo = Math.min.apply(null, vs), hi = Math.max.apply(null, vs);
+        return lo === hi ? fmt(lo) : fmt(lo) + ' – ' + fmt(hi);
       }
       return fmt(val(p));
     },
