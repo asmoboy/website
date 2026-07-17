@@ -256,7 +256,7 @@
       im_onrequest: 'Available on request', im_note: 'This legal notice will be completed with the trade-register and VAT numbers before commercial launch.'
     },
     de: {
-      nav_shop: 'Katalog', nav_coa: 'COA', nav_quality: 'Qualität', nav_shipping: 'Versand', nav_wholesale: 'Großhandel', nav_partner: 'Partnerprogramm',
+      nav_shop: 'Katalog', nav_coa: 'Analysezertifikate (COA)', nav_quality: 'Qualität', nav_shipping: 'Versand', nav_wholesale: 'Großhandel', nav_partner: 'Partnerprogramm',
       sign_in: 'Anmelden', about: 'Über uns', faq: 'FAQ',
       add_to_cart: 'In den Warenkorb', select_options: 'Optionen wählen', tap_a_size: 'Tippe auf eine Größe, um sie hinzuzufügen',
       sale: 'Sale', best_seller: 'Bestseller', on_sale: 'Im Sale', clear: 'Auswahl aufheben', checkout: 'Zur Kasse',
@@ -266,7 +266,7 @@
       added_recon: 'Zur Rekonstitution hinzugefügt', ships_taxes: 'Versand &amp; Steuern werden an der Kasse berechnet.',
       in_stock_today: 'Auf Lager · Versand heute', ships_next: 'Auf Lager · Versand am nächsten Werktag',
       two_day: 'Lieferung in 2 Tagen — bei dir bis', select_size: 'Größe wählen', purity: 'Reinheit', form: 'Form', dispatch: 'Versand',
-      same_day: 'Am selben Tag', same_day_dispatch: 'Versand am selben Tag', third_party: 'Drittanbieter-getestet', coa_per_lot: 'COA pro Charge', free_over: 'Gratisversand ab 250 €',
+      same_day: 'Am selben Tag', same_day_dispatch: 'Versand am selben Tag', third_party: 'Drittanbieter-getestet', coa_per_lot: 'Analysezertifikat (COA) pro Charge', free_over: 'Gratisversand ab 250 €',
       categories: 'Kategorien', continue_shopping: 'Weiter einkaufen', search_ph: 'Wirkstoffe suchen…',
       popular: 'Beliebte Produkte', no_results: 'Keine Treffer für', results: 'Treffer',
       coa_verified: 'Verifiziert', coa_in_testing: 'In Prüfung', coa_report_soon: 'wird von Janoshik geprüft — Bericht folgt in Kürze',
@@ -278,7 +278,7 @@
       footer_desc: 'Forschungspeptide von akkreditierten Herstellern, unabhängig geprüft und diskret versendet.',
       f_catalog: 'Katalog', f_company: 'Unternehmen', f_support: 'Support', fl_all: 'Alle Produkte', fl_coa: 'Analysezertifikate (COA)',
       disclaimer: 'Alle Produkte werden ausschließlich für Labor- und In-vitro-Forschungszwecke verkauft. Nichts auf dieser Seite ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts davon ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit der Bestellung bestätigst du, dass du ein qualifizierter Forscher bist.',
-      rights: 'Nur für Forschungszwecke.', reset: 'Zurücksetzen', back_catalog: '← Zurück zum Katalog', description: 'Beschreibung', details: 'Details', specifications: 'Spezifikationen', coa_in_box: 'Gratis chargengenaues COA in jeder Box', results_for: 'Treffer für', product: 'Produkt', price: 'Preis', proceed_checkout: 'Zur Kasse gehen', contact_label: 'Kontakt', shipping_method: 'Versandart', payment: 'Zahlung', cart_empty_sub: 'Durchsuche den Katalog und füge extern getestete Forschungswirkstoffe hinzu — ein chargengenaues COA liegt jeder Bestellung bei.',
+      rights: 'Nur für Forschungszwecke.', reset: 'Zurücksetzen', back_catalog: '← Zurück zum Katalog', description: 'Beschreibung', details: 'Details', specifications: 'Spezifikationen', coa_in_box: 'Gratis chargengenaues Analysezertifikat (COA) in jeder Box', results_for: 'Treffer für', product: 'Produkt', price: 'Preis', proceed_checkout: 'Zur Kasse gehen', contact_label: 'Kontakt', shipping_method: 'Versandart', payment: 'Zahlung', cart_empty_sub: 'Durchsuche den Katalog und füge extern getestete Forschungswirkstoffe hinzu — ein chargengenaues COA liegt jeder Bestellung bei.',
       all: 'Alle', the_catalog: 'Der Katalog', all_research: 'Alle Forschungswirkstoffe', shop_empty: 'In dieser Kategorie ist noch nichts — neue Ware kommt regelmäßig hinzu.',
       hero_eyebrow: 'Drittanbieter-getestet · Nur für Forschungszwecke', hero_h1: 'Jedes Vial kommt mit <span class="outline">Beweis</span>, nicht nur Versprechen.',
       hero_lede: 'TOP Pep bezieht und testet seine Forschungspeptide durch unabhängige Laboranalysen. Ein Analysezertifikat für getestete Chargen ist direkt auf der Produktseite einsehbar — echte Ergebnisse, keine bloßen Behauptungen.',
@@ -431,7 +431,7 @@
       cod_confirm_title: 'Bestellung aufgegeben — Zahlung bei Lieferung', cod_confirm_intro: 'Vielen Dank! Deine Bestellung ist bestätigt. Halte den unten stehenden Betrag bitte bar bereit, um ihn bei Lieferung dem Kurier zu zahlen.',
       cod_amount_due: 'Bei Lieferung zu zahlen', cod_status: 'Nachnahme',
       tab_coa_tested: 'Diese Charge wurde von Janoshik durch einen Drittanbieter getestet (Task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Verifizierten Bericht ansehen</a>.',
-      tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer COA-Bibliothek.',
+      tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer Analysezertifikate-Bibliothek (COA).',
       tab_details_body: 'Wird als versiegeltes {form} in einem manipulationssicheren Vial geliefert. Rekonstituiere nach deinem eigenen Protokoll mit bakteriostatischem Wasser; wir geben keine Dosierungshinweise, da alle Produkte ausschließlich für die Laborforschung verkauft werden.',
       spec_storage: 'Lagerung', spec_storage_val: '–20 °C, vor Licht schützen', spec_use: 'Verwendung', spec_use_val: 'Nur Forschung', spec_coa_testing: 'In Prüfung',
       legal_updated: 'Zuletzt aktualisiert · 01.07.2026', legal_operated: 'TOP Pep wird von ORCA MARKETING AGENCY S.R.L. betrieben.',
@@ -465,7 +465,7 @@
       im_onrequest: 'Auf Anfrage', im_note: 'Dieses Impressum wird vor dem kommerziellen Start um Handelsregister- und USt-IdNr. ergänzt.'
     },
     ro: {
-      nav_shop: 'Catalog', nav_coa: 'COA', nav_quality: 'Calitate', nav_shipping: 'Livrare', nav_wholesale: 'Angro', nav_partner: 'Program parteneri',
+      nav_shop: 'Catalog', nav_coa: 'Certificate de analiză (COA)', nav_quality: 'Calitate', nav_shipping: 'Livrare', nav_wholesale: 'Angro', nav_partner: 'Program parteneri',
       sign_in: 'Autentificare', about: 'Despre', faq: 'Întrebări',
       add_to_cart: 'Adaugă în coș', select_options: 'Alege opțiunile', tap_a_size: 'Atinge o mărime pentru a o adăuga în coș',
       sale: 'Reducere', best_seller: 'Cel mai vândut', on_sale: 'La reducere', clear: 'Resetează', checkout: 'Finalizează comanda',
@@ -475,7 +475,7 @@
       added_recon: 'Adăugat pentru reconstituire', ships_taxes: 'Transportul &amp; taxele se calculează la finalizare.',
       in_stock_today: 'În stoc · se expediază azi', ships_next: 'În stoc · se expediază în următoarea zi lucrătoare',
       two_day: 'Livrare în 2 zile — primești până pe', select_size: 'Alege mărimea', purity: 'Puritate', form: 'Formă', dispatch: 'Expediere',
-      same_day: 'În aceeași zi', same_day_dispatch: 'Expediere în aceeași zi', third_party: 'Testat de terți', coa_per_lot: 'COA pe lot', free_over: 'Livrare gratuită peste 1.230 Lei',
+      same_day: 'În aceeași zi', same_day_dispatch: 'Expediere în aceeași zi', third_party: 'Testat de terți', coa_per_lot: 'Certificate de analiză (COA) pe lot', free_over: 'Livrare gratuită peste 1.230 Lei',
       categories: 'Categorii', continue_shopping: 'Continuă cumpărăturile', search_ph: 'Caută compuși…',
       popular: 'Produse populare', no_results: 'Niciun rezultat pentru', results: 'rezultate',
       coa_verified: 'Verificat', coa_in_testing: 'În testare', coa_report_soon: 'în așteptare la Janoshik — raportul urmează în curând',
@@ -487,7 +487,7 @@
       footer_desc: 'Peptide de cercetare de la producători acreditați, verificate independent și livrate discret.',
       f_catalog: 'Catalog', f_company: 'Companie', f_support: 'Asistență', fl_all: 'Toate produsele', fl_coa: 'Certificate de analiză (COA)',
       disclaimer: 'Toate produsele sunt vândute strict pentru utilizare în cercetare de laborator și in-vitro. Nimic de pe acest site nu este un medicament, aliment, cosmetic sau dispozitiv medical și nimic nu este destinat utilizării, consumului sau administrării umane ori veterinare. Prin plasarea comenzii confirmi că ești cercetător calificat.',
-      rights: 'Doar pentru cercetare.', reset: 'Resetează', back_catalog: '← Înapoi la catalog', description: 'Descriere', details: 'Detalii', specifications: 'Specificații', coa_in_box: 'COA gratuit, per lot, în fiecare cutie', results_for: 'rezultate pentru', product: 'Produs', price: 'Preț', proceed_checkout: 'Continuă spre finalizare', contact_label: 'Contact', shipping_method: 'Metodă de livrare', payment: 'Plată', cart_empty_sub: 'Răsfoiește catalogul pentru a adăuga compuși de cercetare testați independent — fiecare comandă include un COA per lot.',
+      rights: 'Doar pentru cercetare.', reset: 'Resetează', back_catalog: '← Înapoi la catalog', description: 'Descriere', details: 'Detalii', specifications: 'Specificații', coa_in_box: 'Certificate de analiză (COA) gratuit, per lot, în fiecare cutie', results_for: 'rezultate pentru', product: 'Produs', price: 'Preț', proceed_checkout: 'Continuă spre finalizare', contact_label: 'Contact', shipping_method: 'Metodă de livrare', payment: 'Plată', cart_empty_sub: 'Răsfoiește catalogul pentru a adăuga compuși de cercetare testați independent — fiecare comandă include un COA per lot.',
       all: 'Toate', the_catalog: 'Catalogul', all_research: 'Toți compușii de cercetare', shop_empty: 'Încă nimic în această categorie — adăugăm stoc nou regulat.',
       hero_eyebrow: 'Testat de terți · Doar pentru uz de cercetare', hero_h1: 'Fiecare flacon vine cu <span class="outline">dovezi</span>, nu doar promisiuni.',
       hero_lede: 'TOP Pep se aprovizionează și testează peptidele de cercetare prin analize efectuate în laboratoare independente. Un certificat de analiză pentru loturile testate este publicat direct pe pagina produsului — rezultate reale, nu simple afirmații.',
@@ -640,7 +640,7 @@
       cod_confirm_title: 'Comandă plasată — plată ramburs', cod_confirm_intro: 'Mulțumim! Comanda ta este confirmată. Te rugăm să ai la tine suma de mai jos în numerar, pentru a o plăti curierului la livrarea coletului.',
       cod_amount_due: 'De plată la livrare', cod_status: 'Plată ramburs',
       tab_coa_tested: 'Acest lot este testat de terți la Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Vezi raportul verificat</a>.',
-      tab_coa_testing: 'Acest compus este în curs de testare la Janoshik — raportul verificat va fi publicat în biblioteca noastră COA imediat ce este gata.',
+      tab_coa_testing: 'Acest compus este în curs de testare la Janoshik — raportul verificat va fi publicat în biblioteca noastră de certificate de analiză (COA) imediat ce este gata.',
       tab_details_body: 'Livrat ca {form} sigilat într-un flacon cu sigiliu de siguranță. Reconstituie cu apă bacteriostatică conform propriului protocol; nu oferim indicații de dozare, deoarece toate produsele se vând strict pentru cercetare de laborator.',
       spec_storage: 'Depozitare', spec_storage_val: '–20 °C, ferit de lumină', spec_use: 'Utilizare', spec_use_val: 'Doar cercetare', spec_coa_testing: 'În testare',
       legal_updated: 'Ultima actualizare · 01.07.2026', legal_operated: 'TOP Pep este operat de ORCA MARKETING AGENCY S.R.L.',
@@ -1366,7 +1366,19 @@
     checkout: function () {
       var params = new URLSearchParams(location.search);
       var stripe = params.get('stripe');
-      if (stripe === 'success') { showStripePaid(params.get('ref')); return; }
+      if (stripe === 'success') {
+        // redirect methods (Klarna / Revolut Pay) come back with a
+        // redirect_status; only treat succeeded/pending as paid, otherwise the
+        // customer bailed out at the provider — show the cancel note instead.
+        var rs = params.get('redirect_status');
+        if (rs && rs !== 'succeeded' && rs !== 'pending') {
+          renderCheckout();
+          var cn = $('#placeOrderNote');
+          if (cn) { cn.style.color = '#e0533d'; cn.textContent = t('pay_cancel_note'); }
+          return;
+        }
+        showStripePaid(params.get('ref')); return;
+      }
       renderCheckout();
       if (stripe === 'cancel') {
         var note = $('#placeOrderNote');
@@ -2015,19 +2027,25 @@
     stripeElements = stripeJs.elements({
       // Automatic payment methods: the Element and the server-side
       // PaymentIntent must agree. The server uses
-      // automatic_payment_methods:{enabled:true, allow_redirects:'never'},
+      // automatic_payment_methods:{enabled:true, allow_redirects:'always'},
       // so no paymentMethodTypes here (specifying both is what triggered the
       // "collected through automatic payment methods … cannot be confirmed"
-      // error). allow_redirects:'never' on the intent already drops Revolut Pay
-      // / EPS / Satispay / MB WAY; wallets are switched off just below.
+      // error). Wallets (Apple Pay / Google Pay) + redirect methods (Klarna,
+      // Revolut Pay) are enabled below; which ones actually show is governed by
+      // the Stripe Dashboard → Payment methods and device/eligibility.
       mode: 'payment', amount: cents, currency: CUR,
+      // put card LAST so the express options (Klarna, Revolut Pay) sit on top
+      // and plain card entry stays at the bottom, as requested.
+      paymentMethodOrder: ['klarna', 'revolut_pay', 'card'],
       appearance: { theme: 'stripe', variables: { colorPrimary: '#5E17EB', borderRadius: '10px' } }
     });
     stripeElements.create('payment', {
-      layout: 'tabs',
+      // accordion = each method is its own clickable row/button; Apple Pay and
+      // Google Pay render as express buttons above the divider automatically.
+      layout: 'accordion',
       terms: { card: 'never' },
-      // card entry only — no wallets at all
-      wallets: { applePay: 'never', googlePay: 'never', link: 'never' }
+      // Apple Pay + Google Pay as express buttons; Link stays off (not wanted).
+      wallets: { applePay: 'auto', googlePay: 'auto', link: 'never' }
     }).mount('#payment-element');
     stripeMounted = true;
   }

@@ -134,10 +134,12 @@ async function createPaymentIntent(env, db, payload) {
     // Automatic payment methods (MUST match the front-end Payment Element,
     // which no longer passes paymentMethodTypes — mixing the two is what
     // caused the "collected through automatic payment methods … cannot be
-    // confirmed" error). allow_redirects:'never' drops Klarna / Revolut Pay /
-    // EPS / MB WAY / Satispay; Apple Pay + Google Pay + Link are switched off
-    // in the Payment Element options (see app.js `wallets`), leaving card.
-    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    // confirmed" error). allow_redirects:'always' so redirect-based methods
+    // (Klarna, Revolut Pay) work — the front-end confirmPayment passes a
+    // return_url and the checkout page verifies redirect_status on return.
+    // Which methods actually appear (card, Apple Pay, Google Pay, Klarna,
+    // Revolut Pay …) is controlled in the Stripe Dashboard → Payment methods.
+    automatic_payment_methods: { enabled: true, allow_redirects: 'always' },
     metadata: { ref, order_no: base.order_no || '', lang: base.lang || 'en' },
   });
 
