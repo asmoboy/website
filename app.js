@@ -180,7 +180,7 @@
       ab_l1: 'How we test', ab_e2: 'Who it’s for', ab_h2b: 'Made for people who read the COA',
       ab_p3: 'Our customers are labs, students, and independent researchers who care what’s actually in the vial. We build for the person who checks the lot number — because that person is right to.',
       ab_l2: 'Browse the COA library',
-      co_h1: 'Checkout', co_email: 'Email address', co_news: 'Email me new lot &amp; COA releases', ship_addr: 'Shipping address',
+      co_h1: 'Checkout', co_email: 'Email address', co_email_ph: 'you@gmail.com', co_news: 'Email me new lot &amp; COA releases', ship_addr: 'Shipping address',
       co_inst: 'Institution / lab (optional)', co_addr: 'Street', co_city: 'City', co_zip: 'Postal code', co_country: 'Country',
       co_ship1: 'Tracked standard', co_ship1s: 'All EU countries, 24–48h dispatch', co_ship1p: 'Free over €250',
       co_ship2: 'Express', co_ship2s: 'Priority, insulated, 1–2 days', co_ship3: 'United Kingdom', co_ship3s: 'Tracked, 3–5 days',
@@ -202,6 +202,7 @@
       co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
       ship_24h: 'Ships in 24h',
+      on_order: 'On order · 7–9 days',
       lowstock_note: 'Some items in your order are low in stock. They may need to be reordered — if so, shipping takes 7–9 working days.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
@@ -285,13 +286,13 @@
       next_business_day: 'Nächster Werktag', next_day_dispatch: 'Versand am nächsten Werktag',
       ag_eyebrow: 'Nur für Forschungszwecke', ag_h: 'Du musst mindestens 18 Jahre alt sein',
       ag_p: 'TOP Pep liefert Forschungssubstanzen ausschließlich für die In-vitro-Laboranwendung — nicht für den menschlichen oder tierischen Verzehr bestimmt. Indem du fortfährst, bestätigst du, dass du mindestens 18 Jahre alt bist und unseren <a href="/terms/">AGB</a> sowie der <a href="/legal-agreement/">Forschungsnutzungs-Vereinbarung</a> zustimmst.',
-      ag_enter: 'Ja, ich bin 18 oder älter', ag_exit: 'Verlassen', ag_foot: 'HPLC + MS getestet · COA verfügbar · Diskreter Versand',
+      ag_enter: 'Ja, ich bin 18 oder älter', ag_exit: 'Verlassen', ag_foot: 'HPLC + MS getestet · Analysezertifikat (COA) verfügbar · Diskreter Versand',
       bac_water: 'Bakteriostatisches Wasser 10 ml',
       hero_cta1: 'Katalog ansehen', hero_cta2: 'Analysezertifikate ansehen (COA)', stat_purity: 'Dokumentierte Reinheit', stat_compounds: 'Wirkstoffe auf Lager', stat_free: 'Gratisversand ab',
       sec_best: 'Der Katalog', sec_featured: 'Peptide', shop_all: 'Alle ansehen', browse_word: 'Ansehen',
       sec_glp_eyebrow: 'GLP-1 &amp; Stoffwechsel', sec_glp_h: 'Metabolische Forschung', sec_gh_eyebrow: 'Sekretagoga', sec_gh_h: 'Wachstumshormon-Peptide', sec_rec_eyebrow: 'Regeneration', sec_rec_h: 'Regeneration &amp; Heilung',
       promise1_h: 'Getestet, bevor es gelistet wird', promise1_p: 'Jede Charge wird unabhängig auf Identität und Reinheit geprüft, <em>bevor</em> sie in den Verkauf geht — nie erst nach einer Reklamation.',
-      promise2_h: 'COA in jeder Box', promise2_p: 'Das Zertifikat zu deiner exakten Chargennummer liegt der Bestellung bei und bleibt öffentlich in unserer Bibliothek einsehbar.',
+      promise2_h: 'Analysezertifikat (COA) in jeder Box', promise2_p: 'Das Zertifikat zu deiner exakten Chargennummer liegt der Bestellung bei und bleibt öffentlich in unserer Bibliothek einsehbar.',
       promise3_h: 'Diskret &amp; mit Sendungsverfolgung', promise3_p: 'Neutrale, unbedruckte Verpackung mit Sendungsverfolgung — Versand innerhalb von 24–48 Stunden, Lieferung in die gesamte EU und nach Großbritannien.',
       faqt_eyebrow: 'Fragen', faqt_h: 'Bevor du bestellst', faqt_p: 'Reinheit, Verpackung, Lagerung — und was „nur für Forschungszwecke“ wirklich bedeutet. Die Kurzfassung.', faqt_all: 'Alle FAQs',
       faqt_q1: 'Liegt ein Analysenzertifikat (COA) bei?', faqt_a1: 'Ja. Jede Charge wird von einem Drittanbieter getestet; das chargengenaue COA liegt der Box bei und wird veröffentlicht, damit du es mit deinem Vial abgleichen kannst.',
@@ -310,7 +311,7 @@
       wh_p1: 'Kliniken, Wiederverkäufer und Forschungsgruppen erhalten feste Konten mit fixen Volumenpreisen, vollständiger COA-Dokumentation zu jeder Charge und Versandpriorität vor Einzelbestellungen. Nenn uns dein monatliches Volumen und wir stellen dir ein Programm zusammen.',
       wh_s1: 'Einheiten pro Bestellung', wh_s2: 'Geprüfte Konten', wh_s3: 'Ø Versandzeit', wh_cta: 'Großhandelspreise anfragen',
       wh_eb2: 'So funktioniert’s', wh_h2: 'Skaliert nach deiner Bestellmenge',
-      wh_c1: '<b>Staffelpreise</b> ab 15 Einheiten', wh_c2: '<b>Direkter Ansprechpartner</b> für die Abwicklung', wh_c3: '<b>Chargen-COAs</b> bei jeder Lieferung inklusive', wh_c4: '<b>Flexible Zahlungsziele</b> für verifizierte Partner', wh_c5: '<b>Feste Lieferslots</b> für Stammkunden',
+      wh_c1: '<b>Staffelpreise</b> ab 15 Einheiten', wh_c2: '<b>Direkter Ansprechpartner</b> für die Abwicklung', wh_c3: '<b>Chargen-Analysezertifikate (COA)</b> bei jeder Lieferung inklusive', wh_c4: '<b>Flexible Zahlungsziele</b> für verifizierte Partner', wh_c5: '<b>Feste Lieferslots</b> für Stammkunden',
       wh_feb: 'Kontakt aufnehmen', wh_fh: 'Richte dein Konto ein', wh_fp: 'Teile uns mit, welche Produkte dich interessieren, dein erwartetes Monatsvolumen und die Bestellfrequenz — Konten werden manuell geprüft, bevor Preise freigegeben werden.',
       wh_ph_msg: 'Interessante Produkte, geschätztes Volumen, Bestellfrequenz', wh_send: 'Anfrage senden',
       q_eb: 'Qualität &amp; Tests', q_h1: 'Geprüft, bevor es gelistet wird — nicht erst nach einer Reklamation.',
@@ -332,7 +333,7 @@
       q_ceb: 'Auf dem Zertifikat', q_ch: 'Nachweis statt Versprechen',
       q_cp: 'Ein Zertifikat zählt nur, wenn es einer Überprüfung standhält. Jedes TOP-Pep-COA führt zu einer Charge zurück, die du selbst prüfen kannst — nichts hier musst du uns einfach glauben.',
       q_cc1: 'HPLC-Reinheit, gemessen an Referenzstandards', q_cc2: 'Identität bestätigt per Massenspektrometrie &amp; Molekulargewicht', q_cc3: 'Unabhängig von Janoshik getestet — wir korrigieren unsere Hausaufgaben nicht selbst',
-      q_cbtn: 'Zur COA-Suche &rarr;',
+      q_cbtn: 'Zur Analysezertifikat-Suche (COA) &rarr;',
       sp_eb: 'Diskreter &amp; zuverlässiger Versand', sp_h: 'Sicher verpackt,<br>diskret geliefert.',
       sp_p: 'Jede Bestellung wird mit derselben Sorgfalt behandelt wie der Wirkstoff selbst — versiegelt, transportsicher verpackt und ohne jede Kennzeichnung verschickt, die verrät, was drin ist.',
       sp_s2: 'Versandkostenfrei', sp_s3v: 'Neutral', sp_s3: 'Unauffällige Verpackung',
@@ -387,8 +388,8 @@
       ab_p2: 'Jeder kann ein Vial „hochrein“ nennen. Wir veröffentlichen die Zahl, verknüpfen sie mit deiner Charge und lassen das Zertifikat sprechen. Besteht eine Charge nicht, wird sie nicht verschickt — Marketing überholt bei uns nie die Daten.',
       ab_l1: 'So testen wir', ab_e2: 'Für wen wir das machen', ab_h2b: 'Gemacht für Leute, die das COA wirklich lesen',
       ab_p3: 'Unsere Kunden sind Labore, Studierende und unabhängige Forschende, denen wichtig ist, was wirklich im Vial steckt. Wir bauen für die Person, die die Chargennummer nachschlägt — denn sie hat recht damit.',
-      ab_l2: 'Zur COA-Bibliothek',
-      co_h1: 'Kasse', co_email: 'E-Mail-Adresse', co_news: 'Per E-Mail über neue Chargen &amp; COAs informieren', ship_addr: 'Lieferadresse',
+      ab_l2: 'Zur Analysezertifikate-Bibliothek (COA)',
+      co_h1: 'Kasse', co_email: 'E-Mail-Adresse', co_email_ph: 'du@gmail.com', co_news: 'Per E-Mail über neue Chargen &amp; Analysezertifikate (COA) informieren', ship_addr: 'Lieferadresse',
       co_inst: 'Institution / Labor (optional)', co_addr: 'Straße', co_city: 'Stadt', co_zip: 'Postleitzahl', co_country: 'Land',
       co_ship1: 'Standard mit Tracking', co_ship1s: 'Alle EU-Länder, Versand in 24–48 h', co_ship1p: 'Gratis ab 250 €',
       co_ship2: 'Express', co_ship2s: 'Priorität, isoliert, 1–2 Tage', co_ship3: 'Vereinigtes Königreich', co_ship3s: 'Mit Tracking, 3–5 Tage',
@@ -410,6 +411,7 @@
       co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
       ship_24h: 'Versand in 24h',
+      on_order: 'Auf Bestellung · 7–9 Tage',
       lowstock_note: 'Einige Artikel in deiner Bestellung sind knapp auf Lager. Es kann sein, dass wir sie nachbestellen müssen — dann dauert der Versand 7–9 Werktage.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
@@ -494,13 +496,13 @@
       next_business_day: 'Următoarea zi lucrătoare', next_day_dispatch: 'Expediere în următoarea zi lucrătoare',
       ag_eyebrow: 'Doar pentru uz de cercetare', ag_h: 'Trebuie să ai cel puțin 18 ani pentru a intra',
       ag_p: 'TOP Pep furnizează compuși de cercetare strict pentru uz de laborator in-vitro — nu sunt destinați consumului uman sau veterinar. Continuând, confirmi că ai cel puțin 18 ani și ești de acord cu <a href="/terms/">Termenii &amp; Condițiile</a> și <a href="/legal-agreement/">Acordul de utilizare în cercetare</a>.',
-      ag_enter: 'Da, am 18 ani sau mai mult', ag_exit: 'Ieși', ag_foot: 'Testat HPLC + MS · COA disponibil · Livrare discretă',
+      ag_enter: 'Da, am 18 ani sau mai mult', ag_exit: 'Ieși', ag_foot: 'Testat HPLC + MS · Certificat de analiză (COA) disponibil · Livrare discretă',
       bac_water: 'Apă bacteriostatică 10 ml',
       hero_cta1: 'Vezi catalogul', hero_cta2: 'Vezi certificatele de analiză (COA)', stat_purity: 'Puritate documentată', stat_compounds: 'Compuși în stoc', stat_free: 'Livrare gratuită peste',
       sec_best: 'Catalogul', sec_featured: 'Peptide', shop_all: 'Vezi toate', browse_word: 'Explorează',
       sec_glp_eyebrow: 'GLP-1 &amp; metabolism', sec_glp_h: 'Cercetare metabolică', sec_gh_eyebrow: 'Secretagogi', sec_gh_h: 'Peptide pentru hormonul de creștere', sec_rec_eyebrow: 'Reparare', sec_rec_h: 'Recuperare &amp; vindecare',
       promise1_h: 'Testat înainte de listare', promise1_p: 'Fiecare lot este verificat de terți pentru identitate și puritate <em>înainte</em> de a fi pus în vânzare — niciodată după o reclamație.',
-      promise2_h: 'COA în fiecare cutie', promise2_p: 'Certificatul aferent lotului tău exact vine odată cu comanda și rămâne public în biblioteca noastră.',
+      promise2_h: 'Certificate de analiză (COA) în fiecare cutie', promise2_p: 'Certificatul aferent lotului tău exact vine odată cu comanda și rămâne public în biblioteca noastră.',
       promise3_h: 'Discret &amp; cu urmărire', promise3_p: 'Ambalaj neutru, fără branding, cu urmărire — expediat în 24–48 de ore și livrat în toată UE și în Regatul Unit.',
       faqt_eyebrow: 'Întrebări', faqt_h: 'Înainte să comanzi', faqt_p: 'Puritate, ambalare, depozitare — și ce înseamnă de fapt „doar pentru cercetare”. Pe scurt.', faqt_all: 'Toate întrebările',
       faqt_q1: 'Este inclus un Certificat de Analiză (COA)?', faqt_a1: 'Da. Fiecare lot este testat de terți, iar COA-ul aferent lotului vine în cutie și este publicat, ca să îl poți verifica cu flaconul tău.',
@@ -519,7 +521,7 @@
       wh_p1: 'Clinicile, revânzătorii și grupurile de cercetare primesc conturi permanente cu prețuri fixe de volum, documentație COA completă pentru fiecare lot și prioritate la expediere înaintea comenzilor individuale. Spune-ne volumul tău lunar și îți pregătim un program.',
       wh_s1: 'Unități per comandă', wh_s2: 'Conturi aprobate', wh_s3: 'Timp mediu de expediere', wh_cta: 'Cere prețuri en-gros',
       wh_eb2: 'Cum funcționează', wh_h2: 'Scalat după cât comanzi',
-      wh_c1: '<b>Prețuri pe niveluri</b> începând de la 15 unități', wh_c2: '<b>Persoană de contact directă</b> pentru comenzi', wh_c3: '<b>COA-uri per lot</b> incluse la fiecare livrare', wh_c4: '<b>Termene de plată flexibile</b> pentru parteneri verificați', wh_c5: '<b>Sloturi de livrare recurente</b> pentru clienți fideli',
+      wh_c1: '<b>Prețuri pe niveluri</b> începând de la 15 unități', wh_c2: '<b>Persoană de contact directă</b> pentru comenzi', wh_c3: '<b>Certificate de analiză (COA) per lot</b> incluse la fiecare livrare', wh_c4: '<b>Termene de plată flexibile</b> pentru parteneri verificați', wh_c5: '<b>Sloturi de livrare recurente</b> pentru clienți fideli',
       wh_feb: 'Ia legătura cu noi', wh_fh: 'Configurează-ți contul', wh_fp: 'Spune-ne ce produse te interesează, volumul lunar estimat și frecvența comenzilor — conturile sunt verificate manual înainte de a debloca prețurile.',
       wh_ph_msg: 'Produse de interes, volum estimat, frecvența comenzilor', wh_send: 'Trimite cererea',
       q_eb: 'Calitate &amp; testare', q_h1: 'Verificat înainte de listare, nu după o reclamație.',
@@ -541,7 +543,7 @@
       q_ceb: 'Pe certificat', q_ch: 'Dovezi, nu promisiuni',
       q_cp: 'Un certificat contează doar dacă rezistă la verificare. Fiecare COA TOP Pep duce înapoi la un lot pe care îl poți verifica singur — nimic de aici nu trebuie luat pe cuvânt.',
       q_cc1: 'Puritate HPLC, raportată la standarde de referință', q_cc2: 'Identitate confirmată prin spectrometrie de masă &amp; greutate moleculară', q_cc3: 'Testat independent de Janoshik — nu ne corectăm singuri temele',
-      q_cbtn: 'Deschide căutarea COA &rarr;',
+      q_cbtn: 'Deschide căutarea de certificate de analiză (COA) &rarr;',
       sp_eb: 'Livrare discretă &amp; sigură', sp_h: 'Împachetat bine,<br>livrat discret.',
       sp_p: 'Fiecare comandă este tratată cu aceeași grijă ca și compusul — sigilată, împachetată să reziste transportului și trimisă fără niciun însemn care să arate ce e înăuntru.',
       sp_s2: 'Transport gratuit', sp_s3v: 'Neutru', sp_s3: 'Ambalaj fără însemne',
@@ -596,8 +598,8 @@
       ab_p2: 'Oricine poate numi un flacon „de puritate înaltă”. Noi publicăm cifra, o legăm de lotul tău și lăsăm certificatul să vorbească. Dacă un lot nu trece, nu se livrează — la noi marketingul nu întrece niciodată datele.',
       ab_l1: 'Cum testăm', ab_e2: 'Pentru cine e', ab_h2b: 'Făcut pentru cei care chiar citesc COA-ul',
       ab_p3: 'Clienții noștri sunt laboratoare, studenți și cercetători independenți cărora le pasă ce e de fapt în flacon. Construim pentru omul care verifică numărul de lot — pentru că are dreptate să o facă.',
-      ab_l2: 'Vezi biblioteca COA',
-      co_h1: 'Finalizare comandă', co_email: 'Adresă de e-mail', co_news: 'Vreau să primesc pe e-mail noutăți despre loturi și COA-uri', ship_addr: 'Adresă de livrare',
+      ab_l2: 'Vezi biblioteca de certificate de analiză (COA)',
+      co_h1: 'Finalizare comandă', co_email: 'Adresă de e-mail', co_email_ph: 'tu@gmail.com', co_news: 'Vreau să primesc pe e-mail noutăți despre loturi și certificate de analiză (COA)', ship_addr: 'Adresă de livrare',
       co_inst: 'Instituție / laborator (opțional)', co_addr: 'Stradă', co_city: 'Oraș', co_zip: 'Cod poștal', co_country: 'Țară',
       co_ship1: 'Standard cu tracking', co_ship1s: 'Toate țările UE, expediere în 24–48h', co_ship1p: 'Gratuit peste 250 €',
       co_ship2: 'Express', co_ship2s: 'Prioritar, izolat, 1–2 zile', co_ship3: 'Regatul Unit', co_ship3s: 'Cu tracking, 3–5 zile',
@@ -619,6 +621,7 @@
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
       ship_24h: 'Livrare în 24h',
+      on_order: 'La comandă · 7–9 zile',
       lowstock_note: 'Unele articole din comanda ta sunt pe terminate și ar putea necesita reaprovizionare — în acest caz, expedierea durează 7–9 zile lucrătoare.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
@@ -679,12 +682,43 @@
     de: { Austria:'Österreich', Belgium:'Belgien', Bulgaria:'Bulgarien', Croatia:'Kroatien', Cyprus:'Zypern', Czechia:'Tschechien', Denmark:'Dänemark', Estonia:'Estland', Finland:'Finnland', France:'Frankreich', Germany:'Deutschland', Greece:'Griechenland', Hungary:'Ungarn', Ireland:'Irland', Italy:'Italien', Latvia:'Lettland', Lithuania:'Litauen', Luxembourg:'Luxemburg', Malta:'Malta', Netherlands:'Niederlande', Poland:'Polen', Portugal:'Portugal', Romania:'Rumänien', Slovakia:'Slowakei', Slovenia:'Slowenien', Spain:'Spanien', Sweden:'Schweden', 'United Kingdom':'Vereinigtes Königreich' },
     ro: { Austria:'Austria', Belgium:'Belgia', Bulgaria:'Bulgaria', Croatia:'Croația', Cyprus:'Cipru', Czechia:'Cehia', Denmark:'Danemarca', Estonia:'Estonia', Finland:'Finlanda', France:'Franța', Germany:'Germania', Greece:'Grecia', Hungary:'Ungaria', Ireland:'Irlanda', Italy:'Italia', Latvia:'Letonia', Lithuania:'Lituania', Luxembourg:'Luxemburg', Malta:'Malta', Netherlands:'Țările de Jos', Poland:'Polonia', Portugal:'Portugalia', Romania:'România', Slovakia:'Slovacia', Slovenia:'Slovenia', Spain:'Spania', Sweden:'Suedia', 'United Kingdom':'Regatul Unit' }
   };
+  /* international dialling codes — drives the phone-field placeholder, keyed to
+     the delivery country selected in checkout. */
+  var DIAL_CODES = {
+    Austria:'+43', Belgium:'+32', Bulgaria:'+359', Croatia:'+385', Cyprus:'+357',
+    Czechia:'+420', Denmark:'+45', Estonia:'+372', Finland:'+358', France:'+33',
+    Germany:'+49', Greece:'+30', Hungary:'+36', Ireland:'+353', Italy:'+39',
+    Latvia:'+371', Lithuania:'+370', Luxembourg:'+352', Malta:'+356', Netherlands:'+31',
+    Poland:'+48', Portugal:'+351', Romania:'+40', Slovakia:'+421', Slovenia:'+386',
+    Spain:'+34', Sweden:'+46', 'United Kingdom':'+44'
+  };
+  /* IANA time-zone → country: a client-side, language-independent guess at the
+     visitor's location, used only to pre-select the checkout country (the
+     customer can always change it). Covers the countries we ship to. */
+  var TZ_COUNTRY = {
+    'Europe/Vienna':'Austria', 'Europe/Brussels':'Belgium', 'Europe/Sofia':'Bulgaria',
+    'Europe/Zagreb':'Croatia', 'Asia/Nicosia':'Cyprus', 'Europe/Nicosia':'Cyprus',
+    'Europe/Prague':'Czechia', 'Europe/Copenhagen':'Denmark', 'Europe/Tallinn':'Estonia',
+    'Europe/Helsinki':'Finland', 'Europe/Paris':'France', 'Europe/Berlin':'Germany',
+    'Europe/Busingen':'Germany', 'Europe/Athens':'Greece', 'Europe/Budapest':'Hungary',
+    'Europe/Dublin':'Ireland', 'Europe/Rome':'Italy', 'Europe/Riga':'Latvia',
+    'Europe/Vilnius':'Lithuania', 'Europe/Luxembourg':'Luxembourg', 'Europe/Malta':'Malta',
+    'Europe/Amsterdam':'Netherlands', 'Europe/Warsaw':'Poland', 'Europe/Lisbon':'Portugal',
+    'Europe/Bucharest':'Romania', 'Europe/Bratislava':'Slovakia', 'Europe/Ljubljana':'Slovenia',
+    'Europe/Madrid':'Spain', 'Europe/Stockholm':'Sweden', 'Europe/London':'United Kingdom'
+  };
+  function geoCountry() {
+    try {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return TZ_COUNTRY[tz] || null;
+    } catch (e) { return null; }
+  }
   var SKIP = { en: 'Skip to content', de: 'Zum Inhalt springen', ro: 'Sari la conținut' };
   /* per-page <title> (— TOP Pep is appended) + meta description */
   var PAGE_META = {
     home:     { t: { en: 'Research peptides, verified before they ship', de: 'Forschungspeptide, geprüft bevor sie versendet werden', ro: 'Peptide de cercetare, verificate înainte de expediere' }, d: { en: 'Third-party tested research peptides with a Certificate of Analysis on the product page. Discreet, tracked EU & UK shipping.', de: 'Drittanbieter-getestete Forschungspeptide mit Analysenzertifikat auf der Produktseite. Diskreter Versand mit Sendungsverfolgung in EU & UK.', ro: 'Peptide de cercetare testate de terți, cu certificat de analiză pe pagina produsului. Livrare discretă și urmărită în UE & Regatul Unit.' } },
     shop:     { t: { en: 'Catalog', de: 'Katalog', ro: 'Catalog' }, d: { en: 'Browse the full TOP Pep catalog of third-party tested research peptides, blends and lab supplies.', de: 'Durchstöbere den gesamten TOP-Pep-Katalog an drittanbieter-getesteten Forschungspeptiden, Mischungen und Laborbedarf.', ro: 'Răsfoiește întregul catalog TOP Pep de peptide de cercetare testate de terți, amestecuri și consumabile de laborator.' } },
-    coa:      { t: { en: 'COA library', de: 'COA-Bibliothek', ro: 'Bibliotecă COA' }, d: { en: 'Public library of Janoshik Certificates of Analysis. Verify your vial against its lot number.', de: 'Öffentliche Bibliothek der Janoshik-Analysenzertifikate. Prüfe dein Vial anhand der Chargennummer.', ro: 'Bibliotecă publică de certificate de analiză Janoshik. Verifică-ți flaconul după numărul de lot.' } },
+    coa:      { t: { en: 'COA library', de: 'Analysezertifikate (COA)', ro: 'Certificate de analiză (COA)' }, d: { en: 'Public library of Janoshik Certificates of Analysis. Verify your vial against its lot number.', de: 'Öffentliche Bibliothek der Janoshik-Analysenzertifikate. Prüfe dein Vial anhand der Chargennummer.', ro: 'Bibliotecă publică de certificate de analiză Janoshik. Verifică-ți flaconul după numărul de lot.' } },
     quality:  { t: { en: 'Quality & testing', de: 'Qualität & Tests', ro: 'Calitate & testare' }, d: { en: 'Every TOP Pep batch is independently tested by Janoshik — HPLC purity, mass-spec identity, and a certificate you can verify.', de: 'Jede TOP-Pep-Charge wird von Janoshik unabhängig getestet — HPLC-Reinheit, MS-Identität und ein verifizierbares Zertifikat.', ro: 'Fiecare lot TOP Pep este testat independent de Janoshik — puritate HPLC, identitate prin spectrometrie de masă și un certificat verificabil.' } },
     shipping: { t: { en: 'Shipping', de: 'Versand', ro: 'Livrare' }, d: { en: 'Freeze-dried, sealed and shipped discreetly with tracking. Free over €250, delivery across the EU and UK.', de: 'Gefriergetrocknet, versiegelt und diskret mit Sendungsverfolgung versendet. Gratis ab 250 €, Lieferung in EU und UK.', ro: 'Liofilizat, sigilat și expediat discret cu urmărire. Gratuit peste 250 €, livrare în UE și Regatul Unit.' } },
     wholesale:{ t: { en: 'Wholesale', de: 'Großhandel', ro: 'Angro' }, d: { en: 'Standing wholesale accounts with fixed volume pricing, batch-level COAs and dispatch priority.', de: 'Feste Großhandelskonten mit fixen Volumenpreisen, Chargen-COAs und Versandpriorität.', ro: 'Conturi en-gros permanente cu prețuri fixe de volum, COA-uri per lot și prioritate la expediere.' } },
@@ -1016,12 +1050,18 @@
     $('.sheet-hint', sheet).textContent = t('tap_a_size');
     $('.sheet-options', sheet).innerHTML = p.options.map(function (o, i) {
       var so = T.isSoldOut(p.slug, o.label);
+      var pre = T.isPreorder(p.slug, o.label);
+      // stock line under the size: sold out / on order (7–9 days) / ships in 24h
+      var state = so ? '<span class="so-state so-out">' + t('sold_out') + '</span>'
+                : pre ? '<span class="so-state so-pre">' + t('on_order') + '</span>'
+                      : '<span class="so-state so-in">' + t('ship_24h') + '</span>';
       var pr = so
         ? '<span class="so-soldout">' + t('sold_out') + '</span>'
         : (o.oldPrice ? '<span class="old">' + money(lvOld(o)) + '</span> ' : '') + '<b>' + money(lv(o)) + '</b>';
       return '<button class="sheet-opt' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
         (so ? ' disabled aria-disabled="true"' : '') +
-        '><span class="so-label">' + o.label + '</span><span class="so-price">' + pr + '</span>' +
+        '><span class="so-labelwrap"><span class="so-label">' + o.label + '</span>' + state + '</span>' +
+        '<span class="so-price">' + pr + '</span>' +
         (so ? '' : '<span class="so-add">' + I.plus + '</span>') + '</button>';
     }).join('');
     $$('.sheet-opt', sheet).forEach(function (b) {
@@ -2308,7 +2348,38 @@
     var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
   }
 
+  /* localise the checkout inputs: geo-preselect the country, translate the
+     email example, and set the phone placeholder to the country's dial code. */
+  function setupCheckoutLocale() {
+    var sel = $('#coCountry');
+    var email = $('#coEmail');
+    var phone = $('#coPhone');
+    if (email) email.setAttribute('placeholder', t('co_email_ph'));
+    // pre-select the visitor's country from their time zone — once, so a manual
+    // pick afterwards is never overwritten by a re-render
+    if (sel && !sel.dataset.geoSet) {
+      sel.dataset.geoSet = '1';
+      var geo = geoCountry();
+      if (geo) {
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].getAttribute('data-country') === geo) { sel.selectedIndex = i; break; }
+        }
+      }
+    }
+    function syncPhone() {
+      if (!phone) return;
+      var dc = DIAL_CODES[selectedCountry()] || '';
+      phone.setAttribute('placeholder', dc ? dc + ' …' : '');
+    }
+    syncPhone();
+    if (sel && !sel.dataset.phoneWired) {
+      sel.dataset.phoneWired = '1';
+      sel.addEventListener('change', syncPhone);
+    }
+  }
+
   function renderCheckout() {
+    setupCheckoutLocale();
     var sub = Cart.subtotal();
     var os = $('#orderSummary');
     var ship = sub >= T.freeShip ? 0 : T.shipCost;
