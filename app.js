@@ -203,6 +203,7 @@
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
       ship_24h: 'Ships in 24h',
       on_order: 'On order · 10–14 days',
+      on_order_short: '10–14 days',
       co_backorder_warn: 'Please note: one or more items in your cart are currently not in stock. Estimated delivery for those items is 10–14 days. By completing your purchase you accept this delivery time.',
       lowstock_note: 'Some items in your order are ordered in for you. Estimated delivery for those items is 10–14 days.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
@@ -413,6 +414,7 @@
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
       ship_24h: 'Versand in 24h',
       on_order: 'Auf Bestellung · 10-14 Tage',
+      on_order_short: '10-14 Tage',
       co_backorder_warn: 'Achtung: Ein oder mehrere Artikel in deinem Warenkorb sind aktuell nicht auf Lager. Die geschätzte Lieferzeit für diese Artikel beträgt 10-14 Tage. Mit dem Kauf akzeptierst du diese Lieferzeit.',
       lowstock_note: 'Einige Artikel in deiner Bestellung werden für dich bestellt. Die geschätzte Lieferzeit für diese Artikel beträgt 10-14 Tage.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
@@ -624,6 +626,7 @@
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
       ship_24h: 'Livrare în 24h',
       on_order: 'La comandă · 10-14 zile',
+      on_order_short: '10-14 zile',
       co_backorder_warn: 'Atenție: unul sau mai multe articole din coșul tău nu sunt momentan în stoc. Livrarea estimată pentru aceste articole este de 10-14 zile. Prin finalizarea comenzii accepți acest termen de livrare.',
       lowstock_note: 'Unele articole din comanda ta se comandă pentru tine. Livrarea estimată pentru aceste articole este de 10-14 zile.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
@@ -1077,7 +1080,7 @@
       var pre = T.isPreorder(p.slug, o.label);
       // stock line under the size: sold out / on order (7–9 days) / ships in 24h
       var state = so ? '<span class="so-state so-out">' + t('sold_out') + '</span>'
-                : pre ? '<span class="so-state so-pre">' + t('on_order') + '</span>'
+                : pre ? '<span class="so-state so-pre">' + t('on_order_short') + '</span>'
                       : '<span class="so-state so-in">' + t('ship_24h') + '</span>';
       var pr = so
         ? '<span class="so-soldout">' + t('sold_out') + '</span>'
@@ -1643,7 +1646,7 @@
                 // label sits ABOVE the bubble, not inside it; only stocked
                 // sizes get a promise, sold-out ones a warning, the rest none
                 var state = so ? '<span class="sw-state sw-out">' + t('sold_out') + '</span>'
-                          : pre ? '<span class="sw-state sw-back">' + t('on_order') + '</span>'
+                          : pre ? '<span class="sw-state sw-back">' + t('on_order_short') + '</span>'
                                 : '<span class="sw-state sw-in">' + t('ship_24h') + '</span>';
                 return '<div class="swatch-wrap">' + state +
                   '<button class="swatch' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
