@@ -69,6 +69,12 @@
     if (e === true) return true;
     return e.indexOf(optionLabel) > -1;
   }
+  /* inStock = ships in 24h: not pre-order and not sold out. This is the flag
+     the cash-on-delivery (ramburs) rule checks. Manage it in the IN_STOCK map
+     above (per product; `true` = all sizes, or list the buyable size labels). */
+  function inStock(slug, optionLabel) {
+    return !isPreorder(slug, optionLabel) && !isSoldOut(slug, optionLabel);
+  }
 
   function enc(path) { return path.split('/').map(encodeURIComponent).join('/'); }
   var IMG = '/Produktbilder/', COA = '/Janotest/';
@@ -345,13 +351,13 @@
     currency: CUR,
     freeShip: CUR === 'ron' ? 1230 : 250,
     shipCost: CUR === 'ron' ? 35 : 15.90,
-    telegram: '@TOP_Pep',
     bank: PAYMENT_BANK_DETAILS,
     orderInbox: ORDER_INBOX,
     orderApiUrl: ORDER_API_URL,
     stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
     isPreorder: isPreorder,
     isSoldOut: isSoldOut,
+    inStock: inStock,
     /* unique payment reference: TOP- + 8 unambiguous chars (no 0/O/1/I) */
     genPaymentRef: function () {
       var alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ', out = '';

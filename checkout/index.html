@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=26">
+<link rel="stylesheet" href="/styles.css?v=27">
 </head>
 <body data-page="checkout">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -78,10 +78,15 @@
               <div class="promo-inline"><input type="text" placeholder="Enter code" data-i18n-ph="promo_enter" aria-label="Promo code"><button class="btn" data-i18n="apply">Apply</button></div>
             </div>
           </div>
-          <!-- Card is the only payment method: the Stripe Payment Element is
-               shown straight away, no accordion to click open. -->
-          <div id="payment-element"><!-- Stripe Payment Element mounts here --></div>
-          <div id="card-errors" class="pay-card-err" role="alert" aria-live="polite"></div>
+          <!-- Payment-method chooser (rendered by app.js). Card is always
+               available; cash-on-delivery (ramburs) is added only for Romania
+               and only when every item ships in 24h. -->
+          <div id="payMethods" class="pay-methods"></div>
+          <!-- Card pane: Stripe Payment Element (raw card data never touches us). -->
+          <div id="cardPane">
+            <div id="payment-element"><!-- Stripe Payment Element mounts here --></div>
+            <div id="card-errors" class="pay-card-err" role="alert" aria-live="polite"></div>
+          </div>
         </div>
 
       </form>
@@ -91,7 +96,7 @@
   </div>
 </main>
 <script src="https://js.stripe.com/v3/"></script>
-<script src="/data.js?v=26"></script>
-<script src="/app.js?v=26"></script>
+<script src="/data.js?v=27"></script>
+<script src="/app.js?v=27"></script>
 </body>
 </html>

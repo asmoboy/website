@@ -96,7 +96,7 @@
       form_ok_contact: 'Thanks — your message is on its way. We usually reply within a few hours on business days.',
       nav_contact: 'Contact',
       ct_h1: 'Contact us', ct_lede: 'Question about an order, a COA, or reconstitution? Send us a message — we usually reply within a few hours on business days.',
-      ct_order: 'Order number (optional)', ct_msg: 'Your message', ct_send: 'Send message', ct_name: 'Name', ct_tg: 'Prefer chat? Message us on Telegram',
+      ct_order: 'Order number (optional)', ct_msg: 'Your message', ct_send: 'Send message', ct_name: 'Name',
       ph_first: 'First name', ph_last: 'Last name', ph_email: 'Email', ph_company: 'Company (optional)', ph_phone: 'Phone',
       wh_eb1: 'Wholesale &amp; volume', wh_h1: 'Ordering<br>in volume?',
       wh_p1: 'Clinics, resellers, and research groups get standing accounts with fixed volume pricing, full COA documentation on every batch, and dispatch priority ahead of retail orders. Send us your monthly volume and we’ll put together a program.',
@@ -185,7 +185,7 @@
       co_ship1: 'Tracked standard', co_ship1s: 'All EU countries, 24–48h dispatch', co_ship1p: 'Free over €250',
       co_ship2: 'Express', co_ship2s: 'Priority, insulated, 1–2 days', co_ship3: 'United Kingdom', co_ship3s: 'Tracked, 3–5 days',
       co_addons: 'Add to your order', co_add: 'Add', co_card: 'Card',
-      coa_subtitle: 'Janoshik Test Results',
+      coa_subtitle: 'Janoshik Test Results', coa_page_h1: 'COAs',
       sort_recommended: 'Recommended', sort_az: 'A → Z', sort_price_asc: 'Price ↑', sort_price_desc: 'Price ↓',
       acc_welcome: 'Welcome back', acc_create_title: 'Create your account', acc_signin: 'Sign in', acc_create: 'Create account',
       acc_google: 'Continue with Google', acc_or_email: 'or with email', acc_name: 'Full name', acc_pass: 'Password',
@@ -215,6 +215,12 @@
       pay_card_error: 'Sorry, we couldn’t start the card payment. Please try again or use bank transfer.',
       pay_paid_title: 'Payment received', pay_paid_intro: 'Thank you — your card payment went through. We’re preparing your parcel now and it ships within 1 business day; you’ll get a tracking link by email.',
       pay_cancel_note: 'Payment cancelled — nothing was charged. You can try again or choose bank transfer.',
+      pay_choose: 'Payment method', pay_card_label: 'Card', pay_card_sub: 'Pay securely by card now.',
+      pay_cod: 'Cash on delivery', pay_cod_sub: 'Pay in cash to the courier when your parcel arrives.',
+      pay_cod_hint: 'Cash on delivery is only available for orders where every item ships within 24 hours.',
+      place_order_cod: 'Place order — pay on delivery',
+      cod_confirm_title: 'Order placed — pay on delivery', cod_confirm_intro: 'Thank you! Your order is confirmed. Please have the amount below ready in cash to pay the courier when your parcel arrives.',
+      cod_amount_due: 'Amount to pay on delivery', cod_status: 'Cash on delivery',
       tab_coa_tested: 'This lot is third-party tested by Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">View the verified report</a>.',
       tab_coa_testing: 'This compound is currently in testing at Janoshik — the verified report will be published in our COA library as soon as it lands.',
       tab_details_body: 'Supplied as a sealed {form} in a tamper-evident vial. Reconstitute with bacteriostatic water according to your own protocol; we provide no dosing guidance, as all products are sold strictly for laboratory research use.',
@@ -270,7 +276,7 @@
       order_summary: 'Bestellübersicht', shipping_word: 'Versand', total: 'Gesamt', free_word: 'Gratis',
       join: 'Abonnieren', nl_title: 'Labor-Updates, kein Spam.', nl_sub: 'Neue Chargen und COA-Berichte ein- bis zweimal im Monat. Kein Spam, jederzeit abbestellbar.', nl_done: 'Abonniert — bitte bestätige in deinem Postfach.',
       footer_desc: 'Forschungspeptide von akkreditierten Herstellern, unabhängig geprüft und diskret versendet.',
-      f_catalog: 'Katalog', f_company: 'Unternehmen', f_support: 'Support', fl_all: 'Alle Produkte', fl_coa: 'COA-Bibliothek',
+      f_catalog: 'Katalog', f_company: 'Unternehmen', f_support: 'Support', fl_all: 'Alle Produkte', fl_coa: 'Analysezertifikate (COA)',
       disclaimer: 'Alle Produkte werden ausschließlich für Labor- und In-vitro-Forschungszwecke verkauft. Nichts auf dieser Seite ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts davon ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit der Bestellung bestätigst du, dass du ein qualifizierter Forscher bist.',
       rights: 'Nur für Forschungszwecke.', reset: 'Zurücksetzen', back_catalog: '← Zurück zum Katalog', description: 'Beschreibung', details: 'Details', specifications: 'Spezifikationen', coa_in_box: 'Gratis chargengenaues COA in jeder Box', results_for: 'Treffer für', product: 'Produkt', price: 'Preis', proceed_checkout: 'Zur Kasse gehen', contact_label: 'Kontakt', shipping_method: 'Versandart', payment: 'Zahlung', cart_empty_sub: 'Durchsuche den Katalog und füge extern getestete Forschungswirkstoffe hinzu — ein chargengenaues COA liegt jeder Bestellung bei.',
       all: 'Alle', the_catalog: 'Der Katalog', all_research: 'Alle Forschungswirkstoffe', shop_empty: 'In dieser Kategorie ist noch nichts — neue Ware kommt regelmäßig hinzu.',
@@ -281,7 +287,7 @@
       ag_p: 'TOP Pep liefert Forschungssubstanzen ausschließlich für die In-vitro-Laboranwendung — nicht für den menschlichen oder tierischen Verzehr bestimmt. Indem du fortfährst, bestätigst du, dass du mindestens 18 Jahre alt bist und unseren <a href="/terms/">AGB</a> sowie der <a href="/legal-agreement/">Forschungsnutzungs-Vereinbarung</a> zustimmst.',
       ag_enter: 'Ja, ich bin 18 oder älter', ag_exit: 'Verlassen', ag_foot: 'HPLC + MS getestet · COA verfügbar · Diskreter Versand',
       bac_water: 'Bakteriostatisches Wasser 10 ml',
-      hero_cta1: 'Katalog ansehen', hero_cta2: 'COA-Bibliothek ansehen', stat_purity: 'Dokumentierte Reinheit', stat_compounds: 'Wirkstoffe auf Lager', stat_free: 'Gratisversand ab',
+      hero_cta1: 'Katalog ansehen', hero_cta2: 'Analysezertifikate ansehen (COA)', stat_purity: 'Dokumentierte Reinheit', stat_compounds: 'Wirkstoffe auf Lager', stat_free: 'Gratisversand ab',
       sec_best: 'Der Katalog', sec_featured: 'Peptide', shop_all: 'Alle ansehen', browse_word: 'Ansehen',
       sec_glp_eyebrow: 'GLP-1 &amp; Stoffwechsel', sec_glp_h: 'Metabolische Forschung', sec_gh_eyebrow: 'Sekretagoga', sec_gh_h: 'Wachstumshormon-Peptide', sec_rec_eyebrow: 'Regeneration', sec_rec_h: 'Regeneration &amp; Heilung',
       promise1_h: 'Getestet, bevor es gelistet wird', promise1_p: 'Jede Charge wird unabhängig auf Identität und Reinheit geprüft, <em>bevor</em> sie in den Verkauf geht — nie erst nach einer Reklamation.',
@@ -298,7 +304,7 @@
       form_ok_contact: 'Danke — deine Nachricht ist unterwegs. An Werktagen antworten wir meist innerhalb weniger Stunden.',
       nav_contact: 'Kontakt',
       ct_h1: 'Kontaktiere uns', ct_lede: 'Frage zu einer Bestellung, einem COA oder zur Rekonstitution? Schreib uns — an Werktagen antworten wir meist innerhalb weniger Stunden.',
-      ct_order: 'Bestellnummer (optional)', ct_msg: 'Deine Nachricht', ct_send: 'Nachricht senden', ct_name: 'Name', ct_tg: 'Lieber per Chat? Schreib uns auf Telegram',
+      ct_order: 'Bestellnummer (optional)', ct_msg: 'Deine Nachricht', ct_send: 'Nachricht senden', ct_name: 'Name',
       ph_first: 'Vorname', ph_last: 'Nachname', ph_email: 'E-Mail', ph_company: 'Firma (optional)', ph_phone: 'Telefon',
       wh_eb1: 'Großhandel &amp; Volumen', wh_h1: 'Bestellst du<br>in großen Mengen?',
       wh_p1: 'Kliniken, Wiederverkäufer und Forschungsgruppen erhalten feste Konten mit fixen Volumenpreisen, vollständiger COA-Dokumentation zu jeder Charge und Versandpriorität vor Einzelbestellungen. Nenn uns dein monatliches Volumen und wir stellen dir ein Programm zusammen.',
@@ -387,7 +393,7 @@
       co_ship1: 'Standard mit Tracking', co_ship1s: 'Alle EU-Länder, Versand in 24–48 h', co_ship1p: 'Gratis ab 250 €',
       co_ship2: 'Express', co_ship2s: 'Priorität, isoliert, 1–2 Tage', co_ship3: 'Vereinigtes Königreich', co_ship3s: 'Mit Tracking, 3–5 Tage',
       co_addons: 'Zur Bestellung hinzufügen', co_add: 'Hinzufügen', co_card: 'Karte',
-      coa_subtitle: 'Janoshik-Testergebnisse',
+      coa_subtitle: 'Janoshik-Testergebnisse', coa_page_h1: 'Analysezertifikate (COA)',
       sort_recommended: 'Empfohlen', sort_az: 'A → Z', sort_price_asc: 'Preis ↑', sort_price_desc: 'Preis ↓',
       acc_welcome: 'Willkommen zurück', acc_create_title: 'Konto erstellen', acc_signin: 'Anmelden', acc_create: 'Konto erstellen',
       acc_google: 'Mit Google fortfahren', acc_or_email: 'oder mit E-Mail', acc_name: 'Vollständiger Name', acc_pass: 'Passwort',
@@ -418,6 +424,12 @@
       pay_card_error: 'Die Kartenzahlung konnte leider nicht gestartet werden. Bitte versuche es erneut oder nutze die Banküberweisung.',
       pay_paid_title: 'Zahlung erhalten', pay_paid_intro: 'Vielen Dank — deine Kartenzahlung war erfolgreich. Wir bereiten dein Paket vor; Versand innerhalb von 1 Werktag, den Tracking-Link bekommst du per E-Mail.',
       pay_cancel_note: 'Zahlung abgebrochen — es wurde nichts belastet. Du kannst es erneut versuchen oder die Banküberweisung wählen.',
+      pay_choose: 'Zahlungsart', pay_card_label: 'Karte', pay_card_sub: 'Jetzt sicher per Karte bezahlen.',
+      pay_cod: 'Nachnahme', pay_cod_sub: 'Zahle bei Lieferung bar beim Kurier.',
+      pay_cod_hint: 'Nachnahme ist nur für Bestellungen möglich, deren Artikel alle innerhalb von 24 Stunden versandfertig sind.',
+      place_order_cod: 'Bestellen — Zahlung bei Lieferung',
+      cod_confirm_title: 'Bestellung aufgegeben — Zahlung bei Lieferung', cod_confirm_intro: 'Vielen Dank! Deine Bestellung ist bestätigt. Halte den unten stehenden Betrag bitte bar bereit, um ihn bei Lieferung dem Kurier zu zahlen.',
+      cod_amount_due: 'Bei Lieferung zu zahlen', cod_status: 'Nachnahme',
       tab_coa_tested: 'Diese Charge wurde von Janoshik durch einen Drittanbieter getestet (Task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Verifizierten Bericht ansehen</a>.',
       tab_coa_testing: 'Dieser Wirkstoff wird derzeit bei Janoshik getestet — der verifizierte Bericht wird veröffentlicht, sobald er vorliegt, in unserer COA-Bibliothek.',
       tab_details_body: 'Wird als versiegeltes {form} in einem manipulationssicheren Vial geliefert. Rekonstituiere nach deinem eigenen Protokoll mit bakteriostatischem Wasser; wir geben keine Dosierungshinweise, da alle Produkte ausschließlich für die Laborforschung verkauft werden.',
@@ -473,7 +485,7 @@
       order_summary: 'Sumar comandă', shipping_word: 'Transport', total: 'Total', free_word: 'Gratuit',
       join: 'Abonează-te', nl_title: 'Noutăți de laborator, fără spam.', nl_sub: 'Loturi noi și rapoarte COA o dată sau de două ori pe lună. Fără spam, te dezabonezi oricând.', nl_done: 'Te-ai abonat — verifică e-mailul pentru confirmare.',
       footer_desc: 'Peptide de cercetare de la producători acreditați, verificate independent și livrate discret.',
-      f_catalog: 'Catalog', f_company: 'Companie', f_support: 'Asistență', fl_all: 'Toate produsele', fl_coa: 'Bibliotecă COA',
+      f_catalog: 'Catalog', f_company: 'Companie', f_support: 'Asistență', fl_all: 'Toate produsele', fl_coa: 'Certificate de analiză (COA)',
       disclaimer: 'Toate produsele sunt vândute strict pentru utilizare în cercetare de laborator și in-vitro. Nimic de pe acest site nu este un medicament, aliment, cosmetic sau dispozitiv medical și nimic nu este destinat utilizării, consumului sau administrării umane ori veterinare. Prin plasarea comenzii confirmi că ești cercetător calificat.',
       rights: 'Doar pentru cercetare.', reset: 'Resetează', back_catalog: '← Înapoi la catalog', description: 'Descriere', details: 'Detalii', specifications: 'Specificații', coa_in_box: 'COA gratuit, per lot, în fiecare cutie', results_for: 'rezultate pentru', product: 'Produs', price: 'Preț', proceed_checkout: 'Continuă spre finalizare', contact_label: 'Contact', shipping_method: 'Metodă de livrare', payment: 'Plată', cart_empty_sub: 'Răsfoiește catalogul pentru a adăuga compuși de cercetare testați independent — fiecare comandă include un COA per lot.',
       all: 'Toate', the_catalog: 'Catalogul', all_research: 'Toți compușii de cercetare', shop_empty: 'Încă nimic în această categorie — adăugăm stoc nou regulat.',
@@ -484,7 +496,7 @@
       ag_p: 'TOP Pep furnizează compuși de cercetare strict pentru uz de laborator in-vitro — nu sunt destinați consumului uman sau veterinar. Continuând, confirmi că ai cel puțin 18 ani și ești de acord cu <a href="/terms/">Termenii &amp; Condițiile</a> și <a href="/legal-agreement/">Acordul de utilizare în cercetare</a>.',
       ag_enter: 'Da, am 18 ani sau mai mult', ag_exit: 'Ieși', ag_foot: 'Testat HPLC + MS · COA disponibil · Livrare discretă',
       bac_water: 'Apă bacteriostatică 10 ml',
-      hero_cta1: 'Vezi catalogul', hero_cta2: 'Vezi biblioteca COA', stat_purity: 'Puritate documentată', stat_compounds: 'Compuși în stoc', stat_free: 'Livrare gratuită peste',
+      hero_cta1: 'Vezi catalogul', hero_cta2: 'Vezi certificatele de analiză (COA)', stat_purity: 'Puritate documentată', stat_compounds: 'Compuși în stoc', stat_free: 'Livrare gratuită peste',
       sec_best: 'Catalogul', sec_featured: 'Peptide', shop_all: 'Vezi toate', browse_word: 'Explorează',
       sec_glp_eyebrow: 'GLP-1 &amp; metabolism', sec_glp_h: 'Cercetare metabolică', sec_gh_eyebrow: 'Secretagogi', sec_gh_h: 'Peptide pentru hormonul de creștere', sec_rec_eyebrow: 'Reparare', sec_rec_h: 'Recuperare &amp; vindecare',
       promise1_h: 'Testat înainte de listare', promise1_p: 'Fiecare lot este verificat de terți pentru identitate și puritate <em>înainte</em> de a fi pus în vânzare — niciodată după o reclamație.',
@@ -501,7 +513,7 @@
       form_ok_contact: 'Mulțumim — mesajul tău e pe drum. În zilele lucrătoare răspundem de obicei în câteva ore.',
       nav_contact: 'Contact',
       ct_h1: 'Contactează-ne', ct_lede: 'Ai o întrebare despre o comandă, un COA sau reconstituire? Scrie-ne — în zilele lucrătoare răspundem de obicei în câteva ore.',
-      ct_order: 'Număr comandă (opțional)', ct_msg: 'Mesajul tău', ct_send: 'Trimite mesajul', ct_name: 'Nume', ct_tg: 'Preferi chatul? Scrie-ne pe Telegram',
+      ct_order: 'Număr comandă (opțional)', ct_msg: 'Mesajul tău', ct_send: 'Trimite mesajul', ct_name: 'Nume',
       ph_first: 'Prenume', ph_last: 'Nume', ph_email: 'E-mail', ph_company: 'Companie (opțional)', ph_phone: 'Telefon',
       wh_eb1: 'Angro &amp; volum', wh_h1: 'Comanzi<br>în volum?',
       wh_p1: 'Clinicile, revânzătorii și grupurile de cercetare primesc conturi permanente cu prețuri fixe de volum, documentație COA completă pentru fiecare lot și prioritate la expediere înaintea comenzilor individuale. Spune-ne volumul tău lunar și îți pregătim un program.',
@@ -590,7 +602,7 @@
       co_ship1: 'Standard cu tracking', co_ship1s: 'Toate țările UE, expediere în 24–48h', co_ship1p: 'Gratuit peste 250 €',
       co_ship2: 'Express', co_ship2s: 'Prioritar, izolat, 1–2 zile', co_ship3: 'Regatul Unit', co_ship3s: 'Cu tracking, 3–5 zile',
       co_addons: 'Adaugă la comandă', co_add: 'Adaugă', co_card: 'Card',
-      coa_subtitle: 'Rezultatele testelor Janoshik',
+      coa_subtitle: 'Rezultatele testelor Janoshik', coa_page_h1: 'Certificate de analiză (COA)',
       sort_recommended: 'Recomandate', sort_az: 'A → Z', sort_price_asc: 'Preț ↑', sort_price_desc: 'Preț ↓',
       acc_welcome: 'Bine ai revenit', acc_create_title: 'Creează-ți contul', acc_signin: 'Autentificare', acc_create: 'Creează cont',
       acc_google: 'Continuă cu Google', acc_or_email: 'sau cu e-mail', acc_name: 'Nume complet', acc_pass: 'Parolă',
@@ -607,7 +619,7 @@
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
       ship_24h: 'Livrare în 24h',
-      lowstock_note: 'Unele articole din comanda ta sunt pe terminate. S-ar putea să fie nevoie să le recomandăm — în acest caz expedierea durează 7–9 zile lucrătoare.',
+      lowstock_note: 'Unele articole din comanda ta sunt pe terminate și ar putea necesita reaprovizionare — în acest caz, expedierea durează 7–9 zile lucrătoare.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -619,8 +631,14 @@
       err_phone: 'Introdu un număr de telefon valid sau lasă câmpul gol.',
       place_order_card: 'Plătește cu cardul', pay_redirecting: 'Redirecționare către plata securizată…',
       pay_card_error: 'Ne pare rău, nu am putut începe plata cu cardul. Încearcă din nou sau folosește transferul bancar.',
-      pay_paid_title: 'Plată primită', pay_paid_intro: 'Mulțumim — plata cu cardul a reușit. Pregătim coletul acum; se expediază în 1 zi lucrătoare și vei primi linkul de urmărire pe e-mail.',
+      pay_paid_title: 'Plată primită', pay_paid_intro: 'Mulțumim — plata cu cardul a reușit. Pregătim coletul acum; se expediază într-o zi lucrătoare și vei primi linkul de urmărire pe e-mail.',
       pay_cancel_note: 'Plată anulată — nu a fost debitat nimic. Poți încerca din nou sau alege transferul bancar.',
+      pay_choose: 'Metodă de plată', pay_card_label: 'Card', pay_card_sub: 'Plătește acum securizat cu cardul.',
+      pay_cod: 'Plată ramburs', pay_cod_sub: 'Plătești cash curierului la livrare.',
+      pay_cod_hint: 'Plata ramburs este disponibilă doar pentru comenzile cu produse care pot fi expediate în 24 de ore.',
+      place_order_cod: 'Plasează comanda — plată ramburs',
+      cod_confirm_title: 'Comandă plasată — plată ramburs', cod_confirm_intro: 'Mulțumim! Comanda ta este confirmată. Te rugăm să ai la tine suma de mai jos în numerar, pentru a o plăti curierului la livrarea coletului.',
+      cod_amount_due: 'De plată la livrare', cod_status: 'Plată ramburs',
       tab_coa_tested: 'Acest lot este testat de terți la Janoshik (task #{task}). <a href="{url}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline;">Vezi raportul verificat</a>.',
       tab_coa_testing: 'Acest compus este în curs de testare la Janoshik — raportul verificat va fi publicat în biblioteca noastră COA imediat ce este gata.',
       tab_details_body: 'Livrat ca {form} sigilat într-un flacon cu sigiliu de siguranță. Reconstituie cu apă bacteriostatică conform propriului protocol; nu oferim indicații de dozare, deoarece toate produsele se vând strict pentru cercetare de laborator.',
@@ -756,6 +774,15 @@
      real unique constraint and status. Payment refs are additionally
      de-duplicated locally against already-stored orders.
   ================================================================= */
+  /* map a camelCase order to the snake_case body the Worker expects */
+  function orderApiPayload(o) {
+    return {
+      order_no: o.orderNo, currency: o.currency, total: o.total, total_text: o.totalText,
+      email: o.email, name: o.name, org: o.org, address: o.address, city: o.city,
+      zip: o.zip, country: o.country, lang: o.lang, items: o.items,
+      payment_method: o.paymentMethod || (o.status === 'cod' ? 'cod' : undefined)
+    };
+  }
   var Orders = {
     KEY: 'toppep_orders',
     all: function () { try { return JSON.parse(localStorage.getItem(this.KEY) || '[]'); } catch (e) { return []; } },
@@ -766,17 +793,16 @@
       do { ref = T.genPaymentRef(); guard++; } while (this.byRef(ref) && guard < 50);
       return ref;
     },
+    store: function (order) { var list = this.all(); list.unshift(order); this.save(list); return order; },
     add: function (order) {
-      var list = this.all();
-      list.unshift(order);
-      this.save(list);
+      this.store(order);
       // Phase 2: hand the order to the backend if configured.
       if (T.orderApiUrl) {
         try {
           fetch(T.orderApiUrl + '/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(order)
+            body: JSON.stringify(orderApiPayload(order))
           }).catch(function () {});
         } catch (e) {}
       }
@@ -1946,11 +1972,15 @@
       city: val('coCity'),
       zip: val('coZip'),
       country: country,
-      items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i) }; }),
+      items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i), slug: i.slug, option: i.option || '', inStock: T.inStock(i.slug, i.option) }; }),
       subtotal: sub, shipping: ship, insurance: ins, total: total,
       totalText: money(total)
     };
   }
+  /* cash-on-delivery is offered only to Romania and only when the whole basket
+     ships in 24h — checked here at checkout, and again server-side. */
+  function cartAllInStock() { return Cart.items.length > 0 && Cart.items.every(function (i) { return T.inStock(i.slug, i.option); }); }
+  function isRomania() { return selectedCountry() === 'Romania'; }
 
   /* =================================================================
      STRIPE — embedded card payment (Payment Element, no redirect).
@@ -1958,12 +1988,15 @@
      raw card data goes straight to Stripe and never touches our code.
   ================================================================= */
   var stripeJs = null, stripeElements = null, stripeMounted = false;
+  var coMethod = 'card'; // 'card' | 'cod' — selected payment method at checkout
 
   function stripeReady() {
     return !!(window.Stripe && T.stripePublishableKey && T.orderApiUrl);
   }
   function ensureStripe() {
-    if (!stripeJs && stripeReady()) stripeJs = Stripe(T.stripePublishableKey);
+    // locale drives the Payment Element UI *and* Stripe's own error messages
+    // (card declined, incorrect CVC, …) — shown in the customer's language.
+    if (!stripeJs && stripeReady()) stripeJs = Stripe(T.stripePublishableKey, { locale: lang });
     return stripeJs;
   }
   /* current order total in the smallest currency unit (cents / bani) */
@@ -1980,12 +2013,14 @@
     var cents = checkoutCents();
     if (cents < 1) return; // nothing to charge yet
     stripeElements = stripeJs.elements({
+      // Automatic payment methods: the Element and the server-side
+      // PaymentIntent must agree. The server uses
+      // automatic_payment_methods:{enabled:true, allow_redirects:'never'},
+      // so no paymentMethodTypes here (specifying both is what triggered the
+      // "collected through automatic payment methods … cannot be confirmed"
+      // error). allow_redirects:'never' on the intent already drops Revolut Pay
+      // / EPS / Satispay / MB WAY; wallets are switched off just below.
       mode: 'payment', amount: cents, currency: CUR,
-      // In deferred mode the Element does NOT see the PaymentIntent's
-      // payment_method_types — it renders whatever the dashboard allows unless
-      // restricted here too. Without this, Revolut Pay / EPS / Satispay /
-      // MB WAY still show up even though the server only accepts 'card'.
-      paymentMethodTypes: ['card'],
       appearance: { theme: 'stripe', variables: { colorPrimary: '#5E17EB', borderRadius: '10px' } }
     });
     stripeElements.create('payment', {
@@ -2135,6 +2170,126 @@
     var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
   }
 
+  /* ---- payment-method chooser (card / cash-on-delivery) ---- */
+  function renderPaymentMethods(sub, ship, ins) {
+    var host = $('#payMethods');
+    if (!host) return;
+    var ro = isRomania();
+    var codOk = ro && cartAllInStock();
+    // COD is not shown at all outside Romania; inside Romania it always shows
+    // but is disabled (with a hint) when the basket isn't all in stock.
+    if (!ro && coMethod === 'cod') coMethod = 'card';
+    if (ro && coMethod === 'cod' && !codOk) coMethod = 'card';
+
+    var cardCard =
+      '<label class="pay-opt' + (coMethod === 'card' ? ' selected' : '') + '" data-method="card">' +
+        '<input type="radio" name="payMethod" ' + (coMethod === 'card' ? 'checked' : '') + '>' +
+        '<div class="pay-opt-body"><div class="pay-opt-title">' + t('pay_card_label') + '</div><div class="pay-opt-sub">' + t('pay_card_sub') + '</div></div>' +
+      '</label>';
+    var codCard = ro ?
+      '<label class="pay-opt' + (coMethod === 'cod' ? ' selected' : '') + (codOk ? '' : ' disabled') + '" data-method="cod"' + (codOk ? '' : ' aria-disabled="true"') + '>' +
+        '<input type="radio" name="payMethod" ' + (coMethod === 'cod' ? 'checked' : '') + (codOk ? '' : ' disabled') + '>' +
+        '<div class="pay-opt-body"><div class="pay-opt-title">' + t('pay_cod') + '</div><div class="pay-opt-sub">' + t('pay_cod_sub') + '</div>' +
+          (codOk ? '' : '<div class="pay-opt-hint">' + t('pay_cod_hint') + '</div>') +
+        '</div></label>' : '';
+
+    host.innerHTML = '<div class="pay-choose-label">' + t('pay_choose') + '</div>' + cardCard + codCard;
+    $$('.pay-opt', host).forEach(function (opt) {
+      if (opt.classList.contains('disabled')) return;
+      opt.addEventListener('click', function () {
+        coMethod = opt.getAttribute('data-method');
+        renderPaymentMethods(sub, ship, ins);
+        applyPayMethod(sub, ship, ins);
+      });
+    });
+    applyPayMethod(sub, ship, ins);
+  }
+  function applyPayMethod(sub, ship, ins) {
+    var pane = $('#cardPane');
+    var btn = $('#placeOrder');
+    if (coMethod === 'cod') {
+      if (pane) pane.style.display = 'none';
+      if (btn) { btn.textContent = t('place_order_cod'); btn.onclick = function () { placeCodOrder(sub, ship, ins); }; }
+    } else {
+      if (pane) pane.style.display = '';
+      if (stripeReady()) { mountPaymentElement(); updateStripeAmount(); }
+      if (btn) { btn.textContent = t('place_order_card'); btn.onclick = function () { placeCardOrder(sub, ship, ins); }; }
+    }
+  }
+
+  /* ---- place a cash-on-delivery order (Romania, all in stock) ---- */
+  function placeCodOrder(sub, ship, ins) {
+    // re-check the rules here (belt) — the server checks again (braces)
+    if (!isRomania() || !cartAllInStock()) {
+      var note = $('#placeOrderNote');
+      if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_cod_hint'); }
+      coMethod = 'card'; renderPaymentMethods(sub, ship, ins);
+      return;
+    }
+    var order = buildCheckoutOrder(sub, ship, ins);
+    if (!order) return; // required-field / format checks block here
+    order.paymentMethod = 'cod';
+    order.status = 'cod';
+
+    var note = $('#placeOrderNote');
+    var btn = $('#placeOrder');
+    function finish() {
+      Orders.store(order); // already POSTed below, so store locally only
+      emailOrderToInbox(order, { status: 'CASH ON DELIVERY — collect ' + order.totalText + ' from courier', subjectTag: 'COD' });
+      Cart.clear();
+      showCodConfirmation(order);
+    }
+    // Ask the server to authorise the COD order. A 400 is a hard veto (wrong
+    // country / an item not in stock) — we surface it and stop. Any other
+    // outcome (server up + ok, or unreachable) falls back to the email record,
+    // since the front-end already enforced the same rules.
+    if (T.orderApiUrl) {
+      if (btn) btn.disabled = true;
+      if (note) { note.style.color = ''; note.textContent = t('pay_processing'); }
+      fetch(T.orderApiUrl + '/orders', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(orderApiPayload(order))
+      }).then(function (r) {
+        if (r.status === 400) { return r.json().then(function (j) { throw { veto: true, msg: (j && j.error) || t('pay_cod_hint') }; }); }
+        return null; // ok or non-veto error → proceed
+      }).then(function () {
+        if (btn) btn.disabled = false;
+        if (note) note.textContent = '';
+        finish();
+      }).catch(function (e) {
+        if (btn) btn.disabled = false;
+        if (e && e.veto) {
+          if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_cod_hint'); }
+          coMethod = 'card'; renderPaymentMethods(sub, ship, ins);
+        } else {
+          if (note) note.textContent = '';
+          finish(); // network error → don't block a valid order
+        }
+      });
+    } else {
+      finish();
+    }
+  }
+
+  /* ---- "pay on delivery" confirmation view ---- */
+  function showCodConfirmation(order) {
+    var main = $('#main');
+    if (!main) return;
+    document.title = t('cod_confirm_title') + ' — TOP Pep';
+    main.innerHTML = '<div class="wrap"><div class="pay-confirm">' +
+      '<span class="pay-eyebrow">' + t('cod_status') + '</span>' +
+      '<h1>' + t('cod_confirm_title') + '</h1>' +
+      '<p class="pay-intro">' + t('cod_confirm_intro') + '</p>' +
+      '<div class="pay-card">' +
+        '<div class="pay-row"><div class="pay-row-label">' + t('cod_amount_due') + '</div><div class="pay-row-val"><span class="pay-val">' + esc(order.totalText) + '</span></div></div>' +
+        '<div class="pay-row"><div class="pay-row-label">' + t('pay_order_no') + '</div><div class="pay-row-val"><span class="pay-val">' + esc(order.orderNo) + '</span></div></div>' +
+      '</div>' +
+      '<div class="pay-actions"><a class="btn" href="/">' + t('pay_back_home') + '</a><a class="btn btn-outline" href="/faq/">' + t('pay_view_faq') + '</a></div>' +
+    '</div></div>';
+    window.scrollTo(0, 0);
+    var ss = $('#stickySearch'); if (ss) ss.style.display = 'none';
+  }
+
   function renderCheckout() {
     var sub = Cart.subtotal();
     var os = $('#orderSummary');
@@ -2156,14 +2311,16 @@
         '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_card') + '</button>' +
         // stays empty until there's something worth saying (status / error)
         '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;"></p>';
-      var po = $('#placeOrder');
-      if (po) po.addEventListener('click', function () { placeCardOrder(sub, ship, ins); });
     }
     wireAddressValidation();
-    // card is the only method: show the Stripe fields straight away
-    if (stripeReady()) {
-      mountPaymentElement();
-      updateStripeAmount(); // keep the charge in sync with shipping/insurance
+    // render the payment-method chooser; it owns the button handler and mounts
+    // the Stripe fields when card is selected
+    renderPaymentMethods(sub, ship, ins);
+    // re-evaluate cash-on-delivery whenever the delivery country changes
+    var coCountry = $('#coCountry');
+    if (coCountry && !coCountry.dataset.codWired) {
+      coCountry.dataset.codWired = '1';
+      coCountry.addEventListener('change', function () { renderPaymentMethods(Cart.subtotal(), Cart.subtotal() >= T.freeShip ? 0 : T.shipCost, ($('#shipInsurance') && $('#shipInsurance').checked) ? INS_COST : 0); });
     }
     var insPrice = $('#insPrice');
     if (insPrice) insPrice.textContent = money(INS_COST);

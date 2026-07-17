@@ -131,10 +131,13 @@ async function createPaymentIntent(env, db, payload) {
     // dashboard shows the bare order reference only (e.g. TOP-R28VXUQB)
     description: ref,
     receipt_email: base.email,
-    // card only — no Klarna / Revolut Pay / EPS / MB WAY / Satispay / Link.
-    // (Apple Pay + Google Pay ride on 'card'; they are switched off in the
-    // Payment Element options, see app.js `wallets`.)
-    payment_method_types: ['card'],
+    // Automatic payment methods (MUST match the front-end Payment Element,
+    // which no longer passes paymentMethodTypes — mixing the two is what
+    // caused the "collected through automatic payment methods … cannot be
+    // confirmed" error). allow_redirects:'never' drops Klarna / Revolut Pay /
+    // EPS / MB WAY / Satispay; Apple Pay + Google Pay + Link are switched off
+    // in the Payment Element options (see app.js `wallets`), leaving card.
+    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
     metadata: { ref, order_no: base.order_no || '', lang: base.lang || 'en' },
   });
 
@@ -196,7 +199,7 @@ function isUniqueViolation(e) {
 // ---- allow-listed columns we accept from the client payload ----
 const ORDER_FIELDS = [
   'order_no', 'currency', 'total', 'total_text', 'email', 'name', 'org',
-  'address', 'city', 'zip', 'country', 'lang', 'items',
+  'address', 'city', 'zip', 'country', 'lang', 'items', 'payment_method',
 ];
 
 function pickOrderFields(payload) {
@@ -234,21 +237,65 @@ function validateAddress(payload) {
   return null;
 }
 
+// ---- stock (mirror of IN_STOCK / SOLD_OUT in data.js) ----
+// The server is authoritative for the cash-on-delivery rule and must NOT trust
+// a client-supplied `inStock` flag. Keep these two maps in sync with data.js.
+const IN_STOCK = {
+  'retatrutide': ['10 mg'],
+  'ghk-cu': ['50 mg'],
+  'ghk-cu-serum': true,
+  'tirzepatide': ['20 mg'],
+  'bacteriostatic-water': ['10 ml'],
+};
+const SOLD_OUT = { 'bacteriostatic-water': ['3 ml'] };
+function serverInStock(slug, option) {
+  const so = SOLD_OUT[slug];
+  if (so === true || (Array.isArray(so) && so.indexOf(option) > -1)) return false;
+  const e = IN_STOCK[slug];
+  if (e === true) return true;
+  if (!e) return false;
+  return e.indexOf(option) > -1;
+}
+
+// ---- cash-on-delivery rule (Romania only, whole basket ships in 24h) ----
+// Returns an error string when the order must be rejected, else null.
+function validateCod(payload) {
+  if (String(payload.payment_method || '') !== 'cod') return null;
+  if (String(payload.country || '').trim() !== 'Romania') {
+    return 'cash on delivery is only available for delivery to Romania';
+  }
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  if (!items.length) return 'no items';
+  for (const i of items) {
+    if (!serverInStock(i.slug, i.option || '')) {
+      return 'cash on delivery is only available when every item ships within 24 hours';
+    }
+  }
+  return null;
+}
+
 // ---- POST /orders ----
 async function createOrder(db, payload) {
   const base = pickOrderFields(payload);
+  // items carry slug/option for the COD stock check — keep them on the record
+  if (payload.items !== undefined) base.items = payload.items;
   if (!base.email || !base.name || !base.order_no || base.total === undefined) {
     return { error: 'missing required fields', status: 400 };
   }
   const addrError = validateAddress(base);
   if (addrError) return { error: addrError, status: 400 };
+  // cash-on-delivery guard — server is authoritative (frontend checks aren't enough)
+  const codError = validateCod(payload);
+  if (codError) return { error: codError, status: 400 };
 
+  const isCod = String(payload.payment_method || '') === 'cod';
+  const startStatus = isCod ? 'cod' : 'pending';
   // Retry on the (astronomically unlikely) unique-constraint clash.
   for (let attempt = 0; attempt < 5; attempt++) {
     const ref = genRef();
     const { data, error } = await db
       .from('orders')
-      .insert({ ...base, ref, status: 'pending' })
+      .insert({ ...base, ref, status: startStatus })
       .select()
       .single();
 
@@ -371,15 +418,26 @@ export default {
       if (!/^\/orders(\/|$)/.test(url.pathname)) {
         return jsonResponse({ error: 'not found' }, { status: 404 }, env);
       }
-      if (!db) {
-        return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
-      }
 
       if (request.method === 'POST' && url.pathname === '/orders') {
         const body = await request.json();
+        // Validate the cash-on-delivery rule (and address) BEFORE touching the
+        // DB, so a hand-crafted COD request is rejected with 400 even if the
+        // DB is unavailable — the server veto never depends on Supabase.
+        const codError = validateCod(body);
+        if (codError) return jsonResponse({ error: codError }, { status: 400 }, env);
+        const addrError = validateAddress(pickOrderFields(body));
+        if (addrError) return jsonResponse({ error: addrError }, { status: 400 }, env);
+        if (!db) {
+          return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        }
         const res = await createOrder(db, body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, { status: 201 }, env);
+      }
+
+      if (!db) {
+        return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
       }
 
       const paidMatch = url.pathname.match(/^\/orders\/([^/]+)\/paid$/);

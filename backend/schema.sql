@@ -5,7 +5,8 @@ create table if not exists orders (
   id            bigint generated always as identity primary key,
   ref           text        not null unique,          -- payment reference TOP-XXXXXXXX (never repeats)
   order_no      text        not null,
-  status        text        not null default 'pending' check (status in ('pending','paid','shipped','cancelled')),
+  status        text        not null default 'pending' check (status in ('pending','paid','cod','shipped','cancelled')),
+  payment_method text       not null default 'card' check (payment_method in ('card','bank','cod')),
   currency      text        not null default 'eur',
   total         numeric(10,2) not null,
   total_text    text        not null,
