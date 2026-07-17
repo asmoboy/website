@@ -453,7 +453,7 @@
       im_onrequest: 'Auf Anfrage', im_note: 'Dieses Impressum wird vor dem kommerziellen Start um Handelsregister- und USt-IdNr. ergänzt.'
     },
     ro: {
-      nav_shop: 'Catalog', nav_coa: 'COA', nav_quality: 'Calitate', nav_shipping: 'Livrare', nav_wholesale: 'En-gros', nav_partner: 'Program parteneri',
+      nav_shop: 'Catalog', nav_coa: 'COA', nav_quality: 'Calitate', nav_shipping: 'Livrare', nav_wholesale: 'Angro', nav_partner: 'Program parteneri',
       sign_in: 'Autentificare', about: 'Despre', faq: 'Întrebări',
       add_to_cart: 'Adaugă în coș', select_options: 'Alege opțiunile', tap_a_size: 'Atinge o mărime pentru a o adăuga în coș',
       sale: 'Reducere', best_seller: 'Cel mai vândut', on_sale: 'La reducere', clear: 'Resetează', checkout: 'Finalizează comanda',
@@ -503,7 +503,7 @@
       ct_h1: 'Contactează-ne', ct_lede: 'Ai o întrebare despre o comandă, un COA sau reconstituire? Scrie-ne — în zilele lucrătoare răspundem de obicei în câteva ore.',
       ct_order: 'Număr comandă (opțional)', ct_msg: 'Mesajul tău', ct_send: 'Trimite mesajul', ct_name: 'Nume', ct_tg: 'Preferi chatul? Scrie-ne pe Telegram',
       ph_first: 'Prenume', ph_last: 'Nume', ph_email: 'E-mail', ph_company: 'Companie (opțional)', ph_phone: 'Telefon',
-      wh_eb1: 'En-gros &amp; volum', wh_h1: 'Comanzi<br>în volum?',
+      wh_eb1: 'Angro &amp; volum', wh_h1: 'Comanzi<br>în volum?',
       wh_p1: 'Clinicile, revânzătorii și grupurile de cercetare primesc conturi permanente cu prețuri fixe de volum, documentație COA completă pentru fiecare lot și prioritate la expediere înaintea comenzilor individuale. Spune-ne volumul tău lunar și îți pregătim un program.',
       wh_s1: 'Unități per comandă', wh_s2: 'Conturi aprobate', wh_s3: 'Timp mediu de expediere', wh_cta: 'Cere prețuri en-gros',
       wh_eb2: 'Cum funcționează', wh_h2: 'Scalat după cât comanzi',
@@ -606,7 +606,7 @@
       pay_processing: 'Se procesează plata…',
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
-      ship_24h: 'Expediere în 24h',
+      ship_24h: 'Livrare în 24h',
       lowstock_note: 'Unele articole din comanda ta sunt pe terminate. S-ar putea să fie nevoie să le recomandăm — în acest caz expedierea durează 7–9 zile lucrătoare.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
@@ -669,7 +669,7 @@
     coa:      { t: { en: 'COA library', de: 'COA-Bibliothek', ro: 'Bibliotecă COA' }, d: { en: 'Public library of Janoshik Certificates of Analysis. Verify your vial against its lot number.', de: 'Öffentliche Bibliothek der Janoshik-Analysenzertifikate. Prüfe dein Vial anhand der Chargennummer.', ro: 'Bibliotecă publică de certificate de analiză Janoshik. Verifică-ți flaconul după numărul de lot.' } },
     quality:  { t: { en: 'Quality & testing', de: 'Qualität & Tests', ro: 'Calitate & testare' }, d: { en: 'Every TOP Pep batch is independently tested by Janoshik — HPLC purity, mass-spec identity, and a certificate you can verify.', de: 'Jede TOP-Pep-Charge wird von Janoshik unabhängig getestet — HPLC-Reinheit, MS-Identität und ein verifizierbares Zertifikat.', ro: 'Fiecare lot TOP Pep este testat independent de Janoshik — puritate HPLC, identitate prin spectrometrie de masă și un certificat verificabil.' } },
     shipping: { t: { en: 'Shipping', de: 'Versand', ro: 'Livrare' }, d: { en: 'Freeze-dried, sealed and shipped discreetly with tracking. Free over €250, delivery across the EU and UK.', de: 'Gefriergetrocknet, versiegelt und diskret mit Sendungsverfolgung versendet. Gratis ab 250 €, Lieferung in EU und UK.', ro: 'Liofilizat, sigilat și expediat discret cu urmărire. Gratuit peste 250 €, livrare în UE și Regatul Unit.' } },
-    wholesale:{ t: { en: 'Wholesale', de: 'Großhandel', ro: 'En-gros' }, d: { en: 'Standing wholesale accounts with fixed volume pricing, batch-level COAs and dispatch priority.', de: 'Feste Großhandelskonten mit fixen Volumenpreisen, Chargen-COAs und Versandpriorität.', ro: 'Conturi en-gros permanente cu prețuri fixe de volum, COA-uri per lot și prioritate la expediere.' } },
+    wholesale:{ t: { en: 'Wholesale', de: 'Großhandel', ro: 'Angro' }, d: { en: 'Standing wholesale accounts with fixed volume pricing, batch-level COAs and dispatch priority.', de: 'Feste Großhandelskonten mit fixen Volumenpreisen, Chargen-COAs und Versandpriorität.', ro: 'Conturi en-gros permanente cu prețuri fixe de volum, COA-uri per lot și prioritate la expediere.' } },
     partner:  { t: { en: 'Partner Program', de: 'Partnerprogramm', ro: 'Program parteneri' }, d: { en: 'Earn 20–40% tiered commission promoting third-party tested research peptides. Monthly PayPal payouts.', de: 'Verdiene 20–40 % gestaffelte Provision mit drittanbieter-getesteten Forschungspeptiden. Monatliche PayPal-Auszahlungen.', ro: 'Câștigă un comision de 20–40% promovând peptide de cercetare testate de terți. Plăți lunare prin PayPal.' } },
     contact:  { t: { en: 'Contact', de: 'Kontakt', ro: 'Contact' }, d: { en: 'Question about an order, a COA, or reconstitution? Contact the TOP Pep support team.', de: 'Frage zu einer Bestellung, einem COA oder zur Rekonstitution? Kontaktiere das TOP-Pep-Support-Team.', ro: 'Ai o întrebare despre o comandă, un COA sau reconstituire? Contactează echipa de asistență TOP Pep.' } },
     faq:      { t: { en: 'FAQ', de: 'FAQ', ro: 'Întrebări frecvente' }, d: { en: 'Answers on testing, COAs, storage, shipping, wholesale and support.', de: 'Antworten zu Tests, COAs, Lagerung, Versand, Großhandel und Support.', ro: 'Răspunsuri despre testare, COA-uri, depozitare, livrare, en-gros și asistență.' } },
@@ -1525,9 +1525,13 @@
                  .map(function (o) { return o.label; })
       : [];
     var anyStock = isVar ? stockedSizes.length > 0 : !T.isPreorder(p.slug, null) && !T.isSoldOut(p.slug, null);
-    // only claim "in stock · ships today" when something really is in stock
+    // only claim "in stock · ships today" when something really is in stock,
+    // and name exactly what is stocked, e.g. "· GLP-3 RT 10 mg"
+    var stockedWhat = anyStock
+      ? displayName(p) + (stockedSizes.length ? ' ' + stockedSizes.join(', ') : '')
+      : '';
     var shipStatus = anyStock
-      ? (ship.shipsToday ? t('in_stock_today') : t('ships_next')) + (stockedSizes.length ? ' · ' + stockedSizes.join(', ') : '')
+      ? (ship.shipsToday ? t('in_stock_today') : t('ships_next')) + ' · ' + esc(stockedWhat)
       : '';
 
     root.innerHTML = '' +
