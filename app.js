@@ -201,12 +201,9 @@
       place_order_card: 'Pay by card', pay_redirecting: 'Redirecting to secure payment…', pay_processing: 'Processing your payment…',
       co_phone: 'Phone (optional)', co_house: 'House no.', accepted_cards: 'Accepted cards',
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
-      ship_24h: 'Ships in 2–3 business days',
-      on_order: 'Ordered in · 10–14 days',
-      avail_instock: 'In stock – ships in 2–3 business days',
-      avail_backorder: 'Ordered in for you – 10–14 day delivery',
-      avail_backorder_note: 'This batch is requested only after you order, to guarantee maximum freshness and quality.',
-      co_backorder_warn: 'Please note: one or more items in your cart are currently not in stock. Estimated delivery: 10–14 days (in exceptional cases up to 15 days). By completing your purchase you accept this delivery time.',
+      ship_24h: 'Ships in 24h',
+      on_order: 'On order · 10–14 days',
+      co_backorder_warn: 'Please note: one or more items in your cart are currently not in stock. Estimated delivery for those items is 10–14 days. By completing your purchase you accept this delivery time.',
       lowstock_note: 'Some items in your order are ordered in for you. Estimated delivery for those items is 10–14 days.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
@@ -414,12 +411,9 @@
       pay_processing: 'Zahlung wird verarbeitet…',
       co_phone: 'Telefon (optional)', co_house: 'Hausnummer', accepted_cards: 'Akzeptierte Karten',
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
-      ship_24h: 'Versand in 2-3 Werktagen',
-      on_order: 'Wird bestellt · 10-14 Tage',
-      avail_instock: 'Auf Lager – Versand in 2-3 Werktagen',
-      avail_backorder: 'Wird für dich bestellt – Lieferzeit 10-14 Tage',
-      avail_backorder_note: 'Diese Charge wird erst nach deiner Bestellung angefordert, um maximale Frische/Qualität zu garantieren.',
-      co_backorder_warn: 'Achtung: Ein oder mehrere Artikel in deinem Warenkorb sind aktuell nicht auf Lager. Geschätzte Lieferzeit: 10-14 Tage (in Ausnahmefällen bis zu 15 Tage). Mit dem Kauf akzeptierst du diese Lieferzeit.',
+      ship_24h: 'Versand in 24h',
+      on_order: 'Auf Bestellung · 10-14 Tage',
+      co_backorder_warn: 'Achtung: Ein oder mehrere Artikel in deinem Warenkorb sind aktuell nicht auf Lager. Die geschätzte Lieferzeit für diese Artikel beträgt 10-14 Tage. Mit dem Kauf akzeptierst du diese Lieferzeit.',
       lowstock_note: 'Einige Artikel in deiner Bestellung werden für dich bestellt. Die geschätzte Lieferzeit für diese Artikel beträgt 10-14 Tage.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
@@ -628,12 +622,9 @@
       pay_processing: 'Se procesează plata…',
       co_phone: 'Telefon (opțional)', co_house: 'Număr casă', accepted_cards: 'Carduri acceptate',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
-      ship_24h: 'Livrare în 2-3 zile lucrătoare',
-      on_order: 'Se comandă · 10-14 zile',
-      avail_instock: 'În stoc – livrare în 2-3 zile lucrătoare',
-      avail_backorder: 'Se comandă pentru tine – livrare în 10-14 zile',
-      avail_backorder_note: 'Acest lot este comandat abia după plasarea comenzii tale, pentru a garanta prospețime și calitate maximă.',
-      co_backorder_warn: 'Atenție: unul sau mai multe articole din coșul tău nu sunt momentan în stoc. Livrare estimată: 10-14 zile (în cazuri excepționale până la 15 zile). Prin finalizarea comenzii accepți acest termen de livrare.',
+      ship_24h: 'Livrare în 24h',
+      on_order: 'La comandă · 10-14 zile',
+      co_backorder_warn: 'Atenție: unul sau mai multe articole din coșul tău nu sunt momentan în stoc. Livrarea estimată pentru aceste articole este de 10-14 zile. Prin finalizarea comenzii accepți acest termen de livrare.',
       lowstock_note: 'Unele articole din comanda ta se comandă pentru tine. Livrarea estimată pentru aceste articole este de 10-14 zile.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
@@ -1057,7 +1048,6 @@
           '<a class="c-name" href="/product/?p=' + p.slug + '">' + displayName(p) + '</a>' +
           '<div class="c-size">' + T.sizeLabel(p) + '</div>' +
           '<div class="c-price">' + priceHTML(p) + '</div>' +
-          availBadge(prodStatus(p)) +
           '<button class="card-add" data-add="' + p.slug + '">' + addIcon + '<span>' + addLabel + '</span></button>' +
         '</div>' +
       '</article>';
@@ -1663,7 +1653,6 @@
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
           '<div id="pdPreorder"></div>' +
-          '<div id="pdAvail" class="pd-avail"></div>' +
           '<div class="pd-buy-simple">' +
             '<div class="stepper pd-stepper-lg"><button data-pstep="-1" aria-label="-">–</button><span class="qty pd-qty">1</span><button data-pstep="1" aria-label="+">+</button></div>' +
             '<button class="btn btn-block" id="pdAdd">' + t('add_to_cart') + '</button>' +
@@ -1702,27 +1691,21 @@
         ? '<div class="sold-out-note">' + t('sold_out_note') + '</div>' : '';
     }
 
-    /* availability badge + delivery expectation, following the chosen size:
-       in_stock → green badge + 2-day delivery date; backorder → amber badge +
-       "batch requested after your order" note, and NO near-term delivery date
-       (so we never promise a date we can't hit). */
+    /* delivery expectation follows the chosen size: in-stock keeps the old
+       "24h dispatch + 2-day delivery date" line; a backorder size shows the
+       real 10–14 day wait instead of a near-term date we can't hit. */
     function syncAvail() {
-      var av = $('#pdAvail', root), shipBox = $('#pdShip', root);
+      var shipBox = $('#pdShip', root);
       var dispatch = $('#pdDispatch', root), dispatchChk = $('#pdDispatchCheck', root);
       var label = isVar ? (selected && selected.label) : null;
       var status = (isVar && !selected) ? null : T.stockStatus(p.slug, label);
-      if (av) {
-        av.innerHTML = (status === 'in_stock' || status === 'backorder')
-          ? availBadge(status) + (status === 'backorder' ? '<div class="avail-note">' + t('avail_backorder_note') + '</div>' : '')
-          : '';
-      }
       if (shipBox) {
         shipBox.innerHTML = (status === 'in_stock')
           ? '<div class="ship-line">' + I.truck + '<span>' + t('two_day') + ' <b>' + fmtDate(ship.deliver) + '</b></span></div>'
-          : '';
+          : (status === 'backorder' ? '<div class="ship-line">' + I.truck + '<span>' + t('on_order') + '</span></div>' : '');
       }
       if (dispatch) dispatch.textContent = (status === 'backorder') ? t('on_order') : (ship.shipsToday ? t('same_day') : t('next_business_day'));
-      if (dispatchChk) dispatchChk.innerHTML = I.check + (status === 'backorder' ? t('avail_backorder') : (ship.shipsToday ? t('same_day_dispatch') : t('next_day_dispatch')));
+      if (dispatchChk) dispatchChk.innerHTML = I.check + (status === 'backorder' ? t('on_order') : (ship.shipsToday ? t('same_day_dispatch') : t('next_day_dispatch')));
     }
 
     function syncSel() {
