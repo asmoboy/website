@@ -35,7 +35,7 @@
      The SECRET key (sk_...) must NEVER live here; it goes in the Worker only
      via `wrangler secret put STRIPE_SECRET_KEY`. Card payment appears at
      checkout once BOTH this and ORDER_API_URL are set. */
-  var STRIPE_PUBLISHABLE_KEY = 'pk_test_51Tg51f1UsXHHcaKWEXsoqHe685rARobHkjmoFr2CqL7oOR8sj9d4bbL251BIUSyiXt6GpDQaJFOGnvbTD9MvBYmX00MJReT8Sp';
+  var STRIPE_PUBLISHABLE_KEY = 'pk_live_51Tg51UP45TQiZZmgZs5PmOjkkbxZNHZxKEZzF0WH4tZu8qjSz2K3XRFs9gmkqOQ05QFuqnJ1IlwfWl4JkVuGwg4E00GidZ9LOe';
 
   /* =================================================================
      STOCK — everything is pre-order EXCEPT the SKUs listed here.
