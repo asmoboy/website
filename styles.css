@@ -1032,3 +1032,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .sold-out-note { border: 1px solid var(--line-strong, #d8d8de); background: rgba(0,0,0,.03);
   border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; }
 .so-soldout { color: #6b7280; font-size: 12px; margin-left: 6px; }
+
+/* ---- in-stock notice (third state next to pre-order / sold out) ---- */
+.instock-note { border: 1px solid #16a34a; background: rgba(22,163,74,.07);
+  border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; line-height: 1.5; }

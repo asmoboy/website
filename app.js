@@ -204,6 +204,7 @@
       preorder_order: 'Your order contains items we order in for you. Processing takes <b>9–14 working days</b> — not immediate shipping. Thank you for your patience.',
       preorder_item: '9–14 working days',
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
+      in_stock_note: 'In stock — available in a warehouse near you.',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
       warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
@@ -407,6 +408,7 @@
       preorder_order: 'Deine Bestellung enthält Artikel, die für dich bestellt werden. Die Bearbeitung dauert <b>9–14 Werktage</b> — kein Sofortversand. Danke für deine Geduld.',
       preorder_item: '9–14 Werktage',
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
+      in_stock_note: 'Auf Lager — verfügbar in einem Lager in deiner Nähe.',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
       warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
@@ -611,6 +613,7 @@
       preorder_order: 'Comanda ta conține articole comandate special pentru tine. Procesarea durează <b>9–14 zile lucrătoare</b> — nu se expediază imediat. Îți mulțumim pentru răbdare.',
       preorder_item: '9–14 zile lucrătoare',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
+      in_stock_note: 'În stoc — disponibil într-un depozit din apropierea ta.',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -1607,10 +1610,11 @@
       if (isVar && !selected) { box.innerHTML = ''; return; }
       if (T.isSoldOut(slug, label)) {
         box.innerHTML = '<div class="sold-out-note">' + t('sold_out_note') + '</div>';
-        return;
+      } else if (T.isPreorder(slug, label)) {
+        box.innerHTML = '<div class="preorder-note">' + t('preorder_note') + '</div>';
+      } else {
+        box.innerHTML = '<div class="instock-note">' + t('in_stock_note') + '</div>';
       }
-      box.innerHTML = T.isPreorder(slug, label)
-        ? '<div class="preorder-note">' + t('preorder_note') + '</div>' : '';
     }
 
     function syncSel() {
