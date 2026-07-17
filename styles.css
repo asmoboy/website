@@ -1001,11 +1001,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 @media (max-width: 1080px) { .wrap.section { padding-left: 28px; padding-right: 28px; } }
 @media (max-width: 640px) { .wrap.section { padding-left: 18px; padding-right: 18px; } }
 
-/* ---- accepted card brands (above the add-to-cart button) ---- */
-.pay-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0 0 12px; }
-.pay-badge { display: inline-flex; line-height: 0; }
-.pay-badge svg { display: block; border-radius: 4px; }
-
 /* ---- checkout: street + house number, card errors ---- */
 .field-row:has(.field-house) { grid-template-columns: 3fr 1fr; }
 .pay-card-err:empty { display: none; }
@@ -1036,3 +1031,15 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* ---- in-stock notice (third state next to pre-order / sold out) ---- */
 .instock-note { border: 1px solid #16a34a; background: rgba(22,163,74,.07);
   border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; font-size: 14.5px; line-height: 1.5; }
+
+/* ---- availability shown above each size option ---- */
+.swatch { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1.2; }
+.sw-state { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; font-weight: 700; }
+.sw-label { font-size: 12px; }
+.sw-in { color: #16a34a; }
+.sw-pre { color: #b45309; }
+.sw-out { color: #9ca3af; }
+/* on the selected (brand-coloured) swatch the state must stay readable */
+.swatch[aria-pressed="true"] .sw-state { color: rgba(255,255,255,.85); }
+.swatch.is-sold-out { text-decoration: none; }
+.swatch.is-sold-out .sw-label { text-decoration: line-through; }

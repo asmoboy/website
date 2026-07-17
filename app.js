@@ -205,6 +205,7 @@
       preorder_item: '9–14 working days',
       sold_out: 'Sold out', sold_out_note: 'This size is sold out at the moment.',
       in_stock_note: 'In stock — available in a warehouse near you.',
+      in_stock_short: 'Near you',
       err_zip: 'That postal code doesn’t match the selected country. Please check it.',
       err_zip_fmt: 'Postal code for {country} must be {n} digits.',
       warn_zip_city: 'Postal code {zip} belongs to {city} — please check.',
@@ -409,6 +410,7 @@
       preorder_item: '9–14 Werktage',
       sold_out: 'Ausverkauft', sold_out_note: 'Diese Größe ist derzeit ausverkauft.',
       in_stock_note: 'Auf Lager — verfügbar in einem Lager in deiner Nähe.',
+      in_stock_short: 'In deiner Nähe',
       err_zip: 'Diese Postleitzahl passt nicht zum gewählten Land. Bitte prüfe sie.',
       err_zip_fmt: 'Die Postleitzahl für {country} muss {n} Ziffern haben.',
       warn_zip_city: 'PLZ {zip} gehört zu {city} — bitte prüfen.',
@@ -614,6 +616,7 @@
       preorder_item: '9–14 zile lucrătoare',
       sold_out: 'Epuizat', sold_out_note: 'Această mărime este epuizată momentan.',
       in_stock_note: 'În stoc — disponibil într-un depozit din apropierea ta.',
+      in_stock_short: 'Lângă tine',
       err_zip: 'Acest cod poștal nu corespunde țării selectate. Te rugăm să îl verifici.',
       err_zip_fmt: 'Codul poștal pentru {country} trebuie să aibă {n} cifre.',
       warn_zip_city: 'Codul poștal {zip} aparține de {city} — te rugăm să verifici.',
@@ -1512,29 +1515,6 @@
     catch (e) { return d.toDateString(); }
   }
 
-  /* ---- accepted card brands, shown above the add-to-cart button ---- */
-  function payBadges() {
-    function badge(inner, label) {
-      return '<span class="pay-badge" role="img" aria-label="' + label + '">' +
-        '<svg viewBox="0 0 38 24" width="38" height="24" aria-hidden="true" focusable="false">' +
-          '<rect x=".5" y=".5" width="37" height="23" rx="3.5" fill="#fff" stroke="#e3e3e8"/>' + inner +
-        '</svg></span>';
-    }
-    var F = 'Arial,Helvetica,sans-serif';
-    return '<div class="pay-badges" aria-label="' + t('accepted_cards') + '">' +
-      badge('<text x="19" y="16" text-anchor="middle" font-family="' + F + '" font-size="9" font-weight="bold" font-style="italic" fill="#1A1F71">VISA</text>', 'Visa') +
-      badge('<circle cx="15" cy="12" r="6" fill="#EB001B"/><circle cx="23" cy="12" r="6" fill="#F79E1B"/>' +
-            '<path d="M19 7.53a6 6 0 000 8.94 6 6 0 000-8.94z" fill="#FF5F00"/>', 'Mastercard') +
-      badge('<rect x="2" y="2" width="34" height="20" rx="2" fill="#006FCF"/>' +
-            '<text x="19" y="15.5" text-anchor="middle" font-family="' + F + '" font-size="7" font-weight="bold" fill="#fff">AMEX</text>', 'American Express') +
-      badge('<circle cx="15" cy="12" r="6" fill="#ED0006"/><circle cx="23" cy="12" r="6" fill="#0099DF"/>' +
-            '<path d="M19 7.53a6 6 0 000 8.94 6 6 0 000-8.94z" fill="#6C6BBD"/>', 'Maestro') +
-      badge('<rect x="4.5" y="4" width="9" height="16" rx="2" fill="#0E4C96"/>' +
-            '<rect x="14.5" y="4" width="9" height="16" rx="2" fill="#D0021B"/>' +
-            '<rect x="24.5" y="4" width="9" height="16" rx="2" fill="#009944"/>', 'JCB') +
-    '</div>';
-  }
-
   function renderProduct(p) {
     document.title = p.name + ' — TOP Pep';
     var root = $('#productRoot');
@@ -1565,14 +1545,20 @@
               '<div class="pd-select-head"><span class="opt-label">' + t('select_size') + '</span><button class="pd-clear" id="pdClear">' + t('clear') + '</button></div>' +
               '<div class="swatches">' + p.options.map(function (o, i) {
                 var so = T.isSoldOut(p.slug, o.label);
+                var pre = T.isPreorder(p.slug, o.label);
+                // state sits above the size, so you can see at a glance which
+                // one is actually in stock nearby
+                var state = so ? '<span class="sw-state sw-out">' + t('sold_out') + '</span>'
+                          : pre ? '<span class="sw-state sw-pre">' + t('preorder_item') + '</span>'
+                                : '<span class="sw-state sw-in">' + t('in_stock_short') + '</span>';
                 return '<button class="swatch' + (so ? ' is-sold-out' : '') + '" data-i="' + i + '"' +
-                  (so ? ' disabled aria-disabled="true" title="' + t('sold_out') + '"' : '') +
-                  ' aria-pressed="' + (i === firstBuyable && !so) + '">' + o.label + '</button>';
+                  (so ? ' disabled aria-disabled="true"' : '') +
+                  ' aria-pressed="' + (i === firstBuyable && !so) + '">' +
+                  state + '<span class="sw-label">' + o.label + '</span></button>';
               }).join('') + '</div>' +
             '</div>' +
             '<div class="pd-sel-price" id="pdSelPrice"></div>' : '') +
           '<div id="pdPreorder"></div>' +
-          payBadges() +
           '<div class="pd-buy-simple">' +
             '<div class="stepper pd-stepper-lg"><button data-pstep="-1" aria-label="-">–</button><span class="qty pd-qty">1</span><button data-pstep="1" aria-label="+">+</button></div>' +
             '<button class="btn btn-block" id="pdAdd">' + t('add_to_cart') + '</button>' +
@@ -1613,7 +1599,9 @@
       } else if (T.isPreorder(slug, label)) {
         box.innerHTML = '<div class="preorder-note">' + t('preorder_note') + '</div>';
       } else {
-        box.innerHTML = '<div class="instock-note">' + t('in_stock_note') + '</div>';
+        // sized products already show "in deiner Nähe" above each size —
+        // only the size-less ones still need the box
+        box.innerHTML = isVar ? '' : '<div class="instock-note">' + t('in_stock_note') + '</div>';
       }
     }
 
@@ -1994,15 +1982,18 @@
     if (cents < 1) return; // nothing to charge yet
     stripeElements = stripeJs.elements({
       mode: 'payment', amount: cents, currency: CUR,
+      // In deferred mode the Element does NOT see the PaymentIntent's
+      // payment_method_types — it renders whatever the dashboard allows unless
+      // restricted here too. Without this, Revolut Pay / EPS / Satispay /
+      // MB WAY still show up even though the server only accepts 'card'.
+      paymentMethodTypes: ['card'],
       appearance: { theme: 'stripe', variables: { colorPrimary: '#5E17EB', borderRadius: '10px' } }
     });
     stripeElements.create('payment', {
       layout: 'tabs',
-      // Link stays on (kept deliberately — its inline sign-up block and consent
-      // text come with it; Stripe offers no way to keep Link but hide them).
       terms: { card: 'never' },
-      // tab order left→right; everything else lands in the overflow menu
-      paymentMethodOrder: ['card', 'apple_pay', 'google_pay', 'revolut_pay']
+      // card entry only — no wallets at all
+      wallets: { applePay: 'never', googlePay: 'never', link: 'never' }
     }).mount('#payment-element');
     stripeMounted = true;
   }

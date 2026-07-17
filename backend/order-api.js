@@ -131,8 +131,10 @@ async function createPaymentIntent(env, db, payload) {
     // dashboard shows the bare order reference only (e.g. TOP-R28VXUQB)
     description: ref,
     receipt_email: base.email,
-    // allow_redirects:'never' keeps it inline (cards only, no redirect methods)
-    automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
+    // card only — no Klarna / Revolut Pay / EPS / MB WAY / Satispay / Link.
+    // (Apple Pay + Google Pay ride on 'card'; they are switched off in the
+    // Payment Element options, see app.js `wallets`.)
+    payment_method_types: ['card'],
     metadata: { ref, order_no: base.order_no || '', lang: base.lang || 'en' },
   });
 
