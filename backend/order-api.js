@@ -94,7 +94,7 @@ function toMinorUnits(amount) { return Math.round(Number(amount) * 100); }
    contents. Stripe sees an amount + our order reference, nothing more. */
 // promo codes are validated HERE, server-side — the front-end only requests a
 // code; this is the authority on whether/how much it discounts.
-const PROMO_CODES = { STIFI: 0.10 };
+const PROMO_CODES = { STIFI: 0.20 };
 function promoRate(code) {
   const key = String(code || '').trim().toUpperCase();
   return PROMO_CODES[key] || 0;
