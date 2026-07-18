@@ -446,6 +446,61 @@ async function markPayout(db, id) {
   return { ok: true, sale: data };
 }
 
+// ---- POST /affiliate/create — create an affiliate (+ optional login) ----
+// This is the single control point for onboarding an influencer: it can create
+// the Supabase Auth login (service_role admin API) AND the affiliates row that
+// ties their name/email to a referral code + commission rate, in one step.
+async function createAffiliate(db, body) {
+  const name = String(body.name || '').trim();
+  const email = String(body.email || '').trim().toLowerCase();
+  const code = String(body.referral_code || '').trim();
+  const pct = Number(body.commission_pct);
+  const password = String(body.password || '');
+  if (!name || !email || !code || !(pct >= 0 && pct <= 100)) {
+    return { error: 'name, email, referral_code and a commission_pct (0–100) are required', status: 400 };
+  }
+  let userId = null;
+  if (password) {
+    // create the dashboard login; email_confirm so they can sign in immediately
+    const { data: created, error: uerr } = await db.auth.admin.createUser({ email, password, email_confirm: true });
+    if (uerr) return { error: 'login: ' + uerr.message, status: 400 };
+    userId = created.user.id;
+  }
+  const { data, error } = await db.from('affiliates').insert({
+    user_id: userId, name, email, referral_code: code, commission_pct: pct,
+    payout_method: body.payout_method || null, payout_details: body.payout_details || null,
+  }).select().single();
+  if (error) return { error: error.message, status: isUniqueViolation(error) ? 409 : 500 };
+  return { ok: true, affiliate: data };
+}
+
+// ---- GET /affiliate/list — all affiliates + their aggregate stats ----
+async function listAffiliates(db) {
+  const { data: affs, error } = await db.from('affiliates').select('*').order('created_at', { ascending: true });
+  if (error) return { error: error.message, status: 500 };
+  const { data: clicks } = await db.from('clicks').select('affiliate_id');
+  const { data: sales } = await db.from('sales').select('affiliate_id, status, commission, self_referral');
+  const clickCount = {};
+  (clicks || []).forEach(function (c) { if (c.affiliate_id) clickCount[c.affiliate_id] = (clickCount[c.affiliate_id] || 0) + 1; });
+  const stat = {};
+  (sales || []).forEach(function (s) {
+    if (s.self_referral || !s.affiliate_id) return;
+    const g = (stat[s.affiliate_id] = stat[s.affiliate_id] || { confirmed: 0, confirmed_sum: 0, pending_sum: 0 });
+    if (s.status === 'confirmed') { g.confirmed++; g.confirmed_sum += Number(s.commission || 0); }
+    else if (s.status === 'pending') { g.pending_sum += Number(s.commission || 0); }
+  });
+  const out = (affs || []).map(function (a) {
+    const g = stat[a.id] || { confirmed: 0, confirmed_sum: 0, pending_sum: 0 };
+    return Object.assign({}, a, {
+      clicks: clickCount[a.id] || 0,
+      confirmed_sales: g.confirmed,
+      confirmed_commission: round2(g.confirmed_sum),
+      pending_commission: round2(g.pending_sum),
+    });
+  });
+  return { ok: true, affiliates: out };
+}
+
 // ---- thank-you email (localised) ----
 function thankYouTemplate(o) {
   const items = (o.items || []).map((i) => `  ${i.qty}× ${i.name}`).join('\n');
@@ -532,6 +587,27 @@ export default {
           await recordClick(db, body, ip).catch(() => {});
         }
         return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which codes exist
+      }
+
+      // ---- affiliate: admin management (ADMIN_TOKEN) ----
+      if (request.method === 'POST' && url.pathname === '/affiliate/create') {
+        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        const body = await request.json().catch(() => ({}));
+        const res = await createAffiliate(db, body);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, { status: 201 }, env);
+      }
+      if (request.method === 'GET' && url.pathname === '/affiliate/list') {
+        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        const res = await listAffiliates(db);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
       }
 
       // ---- affiliate: admin payout views (ADMIN_TOKEN) ----
