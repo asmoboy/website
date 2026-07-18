@@ -313,7 +313,12 @@ async function createOrder(db, payload) {
       .select()
       .single();
 
-    if (!error) return { ok: true, order: data };
+    if (!error) {
+      // attribute the sale to an affiliate if the order carried a ref code —
+      // never let a tracking failure break the order itself
+      await createSale(db, data, payload).catch(() => {});
+      return { ok: true, order: data };
+    }
     if (isUniqueViolation(error)) continue; // clash on ref → retry with a new one
     return { error: error.message, status: 500 };
   }
@@ -330,6 +335,9 @@ async function markPaid(db, ref, env) {
     .single();
 
   if (error) return { error: error.message, status: error.code === 'PGRST116' ? 404 : 500 };
+
+  // card/prepaid is final once paid (no returns) → release the commission
+  await confirmSale(db, ref).catch(() => {});
 
   try {
     await sendThankYouEmail(order, env);
@@ -348,6 +356,94 @@ async function listOrders(db, status) {
   const { data, error } = await q;
   if (error) return { error: error.message, status: 500 };
   return { ok: true, orders: data };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AFFILIATE TRACKING
+//   Commission is always computed HERE (server-side) from the item subtotal
+//   after any promo discount — the front-end only sends the referral code, so a
+//   tampered client can never inflate a payout. Card/prepaid sales confirm on
+//   payment; COD sales stay 'pending' until the parcel is marked delivered.
+// ═══════════════════════════════════════════════════════════════
+function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+function itemsSubtotal(payload) {
+  return (payload.items || []).reduce(function (n, i) {
+    return n + (Number(i.price) || 0) * Math.max(1, parseInt(i.qty, 10) || 1);
+  }, 0);
+}
+
+// record a referred click (only for codes that belong to a real affiliate)
+async function recordClick(db, payload, ip) {
+  const code = String(payload.ref || '').trim();
+  if (!code) return;
+  const { data: aff } = await db.from('affiliates').select('id, active').eq('referral_code', code).maybeSingle();
+  if (!aff || aff.active === false) return;
+  await db.from('clicks').insert({
+    referral_code: code,
+    affiliate_id: aff.id,
+    referrer: (payload.referrer || '').slice(0, 500) || null,
+    ip: ip || null,
+    user_agent: (payload.user_agent || '').slice(0, 500) || null,
+  });
+}
+
+// create the sale row for a freshly-inserted order (if it carried a ref code)
+async function createSale(db, order, payload) {
+  const code = String(payload.ref_code || '').trim();
+  if (!code) return;
+  const { data: aff } = await db.from('affiliates')
+    .select('id, email, commission_pct, active').eq('referral_code', code).maybeSingle();
+  if (!aff || aff.active === false) return;           // unknown/inactive code → no attribution
+  const base = round2(itemsSubtotal(payload) * (1 - promoRate(payload.promo)));
+  const pct = Number(aff.commission_pct);
+  const commission = round2(base * pct / 100);
+  const selfRef = String(order.email || '').trim().toLowerCase() === String(aff.email || '').trim().toLowerCase();
+  await db.from('sales').insert({
+    order_ref: order.ref, order_no: order.order_no, referral_code: code,
+    affiliate_id: aff.id, order_total: base, commission_pct: pct, commission,
+    self_referral: selfRef,
+    // self-referrals are recorded for transparency but excluded (never payable)
+    status: selfRef ? 'cancelled' : 'pending',
+  });
+}
+
+// confirm a pending sale (card paid, or COD delivered) → becomes payable
+async function confirmSale(db, ref) {
+  await db.from('sales')
+    .update({ status: 'confirmed', confirmed_at: new Date().toISOString() })
+    .eq('order_ref', ref).eq('status', 'pending');
+}
+// exclude a pending sale (order cancelled / COD refused)
+async function cancelSale(db, ref) {
+  await db.from('sales').update({ status: 'cancelled' }).eq('order_ref', ref).eq('status', 'pending');
+}
+
+// ---- PATCH /orders/:ref/delivered — COD confirmation trigger ----
+async function markDelivered(db, ref) {
+  const { data: order, error } = await db.from('orders')
+    .update({ status: 'delivered', delivered_at: new Date().toISOString() })
+    .eq('ref', ref).select().single();
+  if (error) return { error: error.message, status: error.code === 'PGRST116' ? 404 : 500 };
+  await confirmSale(db, ref).catch(() => {});          // release the COD commission
+  return { ok: true, order };
+}
+
+// ---- GET /affiliate/payouts — confirmed, unpaid, non-self commissions ----
+async function listPayouts(db) {
+  const { data, error } = await db.from('sales')
+    .select('id, order_ref, order_no, referral_code, commission, created_at, affiliate_id, affiliates(name,email,payout_method,payout_details)')
+    .eq('status', 'confirmed').eq('payout_status', 'unpaid').eq('self_referral', false)
+    .order('created_at', { ascending: true });
+  if (error) return { error: error.message, status: 500 };
+  return { ok: true, sales: data };
+}
+// ---- PATCH /affiliate/sales/:id/payout — mark a confirmed sale paid out ----
+async function markPayout(db, id) {
+  const { data, error } = await db.from('sales')
+    .update({ payout_status: 'paid', paid_out_at: new Date().toISOString() })
+    .eq('id', id).eq('status', 'confirmed').select().single();
+  if (error) return { error: error.message, status: error.code === 'PGRST116' ? 404 : 500 };
+  return { ok: true, sale: data };
 }
 
 // ---- thank-you email (localised) ----
@@ -428,6 +524,37 @@ export default {
         return jsonResponse(res, {}, env);
       }
 
+      // ---- affiliate: record a referred click (public) ----
+      if (request.method === 'POST' && url.pathname === '/affiliate/click') {
+        if (db) {
+          const body = await request.json().catch(() => ({}));
+          const ip = request.headers.get('CF-Connecting-IP') || null;
+          await recordClick(db, body, ip).catch(() => {});
+        }
+        return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which codes exist
+      }
+
+      // ---- affiliate: admin payout views (ADMIN_TOKEN) ----
+      if (request.method === 'GET' && url.pathname === '/affiliate/payouts') {
+        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        const res = await listPayouts(db);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+      const payoutMatch = url.pathname.match(/^\/affiliate\/sales\/(\d+)\/payout$/);
+      if (request.method === 'PATCH' && payoutMatch) {
+        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        const res = await markPayout(db, payoutMatch[1]);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+
       // ---- order records (these, and only these, require Supabase) ----
       if (!/^\/orders(\/|$)/.test(url.pathname)) {
         return jsonResponse({ error: 'not found' }, { status: 404 }, env);
@@ -460,6 +587,16 @@ export default {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await markPaid(db, paidMatch[1], env);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+
+      const deliveredMatch = url.pathname.match(/^\/orders\/([^/]+)\/delivered$/);
+      if (request.method === 'PATCH' && deliveredMatch) {
+        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        const res = await markDelivered(db, deliveredMatch[1]);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
       }

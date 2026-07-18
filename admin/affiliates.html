@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Affiliate payouts — TOP Pep</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=35">
+<style>
+  .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 90px; }
+  .admin-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .admin-head img { height: 40px; width: auto; }
+  .admin-sub { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+  .tokrow { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .tokrow input { flex: 1; min-width: 240px; padding: 11px 14px; border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; }
+  h2.sec { font-size: 1.1rem; margin: 30px 0 12px; }
+  .aff-group { border: 1px solid var(--line-strong); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+  .aff-group .top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+  .aff-group .who { font-weight: 600; }
+  .aff-group .pay { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .aff-group .tot { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--brand); }
+  table.t { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
+  table.t th, table.t td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+  table.t th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
+  .msg.err { color: #e0533d; } .msg.ok { color: #1a7f37; }
+  .empty { color: var(--muted); padding: 24px 0; }
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-head"><img src="/logo.png" alt="TOP Pep"><h1 style="font-size:1.4rem;">Affiliate payouts</h1></div>
+  <p class="admin-sub">Open (confirmed, unpaid) commissions per affiliate, plus cash-on-delivery orders awaiting a delivery confirmation.</p>
+
+  <div class="tokrow">
+    <input id="token" type="password" placeholder="Admin token (ADMIN_TOKEN)" aria-label="Admin token">
+    <button class="btn" id="loadBtn">Load</button>
+  </div>
+  <p class="msg" id="msg"></p>
+
+  <h2 class="sec">Open payouts</h2>
+  <div id="payouts"><p class="empty">Enter the admin token and press Load.</p></div>
+
+  <h2 class="sec">Cash-on-delivery — awaiting delivery</h2>
+  <p class="admin-sub" style="margin-bottom:12px;">Mark a COD order delivered once the parcel is handed over and paid — this releases the affiliate commission. If it was refused / undeliverable, leave it (or cancel the order).</p>
+  <div id="cods"><p class="empty">—</p></div>
+</div>
+
+<script src="/data.js?v=35"></script>
+<script>
+(function () {
+  var T = window.TOPPEP;
+  var $ = function (id) { return document.getElementById(id); };
+  var api = T.orderApiUrl;
+  var money = function (n) { return (Number(n) || 0).toFixed(2) + '€'; };
+  var TKEY = 'toppep_admin_token';
+
+  $('token').value = localStorage.getItem(TKEY) || '';
+
+  function headers() { return { 'Authorization': 'Bearer ' + $('token').value.trim(), 'Content-Type': 'application/json' }; }
+  function setMsg(text, cls) { var m = $('msg'); m.className = 'msg ' + (cls || ''); m.textContent = text || ''; }
+
+  async function loadPayouts() {
+    var res = await fetch(api + '/affiliate/payouts', { headers: headers() });
+    if (!res.ok) { throw new Error(res.status === 403 ? 'Wrong admin token' : ('Payouts error ' + res.status)); }
+    var data = await res.json();
+    var sales = data.sales || [];
+    // group by affiliate
+    var groups = {};
+    sales.forEach(function (s) {
+      var k = s.affiliate_id || 'unknown';
+      (groups[k] = groups[k] || { aff: s.affiliates || {}, rows: [], total: 0 });
+      groups[k].rows.push(s); groups[k].total += Number(s.commission || 0);
+    });
+    var keys = Object.keys(groups);
+    $('payouts').innerHTML = keys.length ? keys.map(function (k) {
+      var g = groups[k];
+      return '<div class="aff-group"><div class="top"><div><div class="who">' + (g.aff.name || '—') + ' · <span class="text-muted">' + (g.aff.email || '') + '</span></div>' +
+        '<div class="pay">' + (g.aff.payout_method || 'no payout method') + (g.aff.payout_details ? ' · ' + g.aff.payout_details : '') + '</div></div>' +
+        '<div class="tot">' + money(g.total) + '</div></div>' +
+        '<table class="t"><thead><tr><th>Order</th><th>Commission</th><th>Date</th><th></th></tr></thead><tbody>' +
+        g.rows.map(function (s) {
+          return '<tr><td>' + (s.order_no || s.order_ref) + '</td><td><b>' + money(s.commission) + '</b></td>' +
+            '<td class="text-muted">' + new Date(s.created_at).toLocaleDateString() + '</td>' +
+            '<td><button class="btn btn-sm btn-outline" data-payout="' + s.id + '">Mark paid</button></td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }).join('') : '<p class="empty">No open payouts.</p>';
+
+    document.querySelectorAll('[data-payout]').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        b.disabled = true; b.textContent = '…';
+        var r = await fetch(api + '/affiliate/sales/' + b.dataset.payout + '/payout', { method: 'PATCH', headers: headers() });
+        if (r.ok) { setMsg('Marked paid.', 'ok'); loadPayouts(); } else { b.disabled = false; b.textContent = 'Mark paid'; setMsg('Payout failed (' + r.status + ')', 'err'); }
+      });
+    });
+  }
+
+  async function loadCods() {
+    var res = await fetch(api + '/orders?status=cod', { headers: headers() });
+    if (!res.ok) { $('cods').innerHTML = '<p class="empty">—</p>'; return; }
+    var data = await res.json();
+    var orders = data.orders || [];
+    $('cods').innerHTML = orders.length ? ('<table class="t"><thead><tr><th>Ref</th><th>Order</th><th>Customer</th><th>Total</th><th></th></tr></thead><tbody>' +
+      orders.map(function (o) {
+        return '<tr><td>' + o.ref + '</td><td>' + o.order_no + '</td><td>' + o.name + '</td><td>' + o.total_text + '</td>' +
+          '<td><button class="btn btn-sm" data-deliver="' + o.ref + '">Mark delivered</button></td></tr>';
+      }).join('') + '</tbody></table>') : '<p class="empty">No COD orders awaiting delivery.</p>';
+
+    document.querySelectorAll('[data-deliver]').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        b.disabled = true; b.textContent = '…';
+        var r = await fetch(api + '/orders/' + encodeURIComponent(b.dataset.deliver) + '/delivered', { method: 'PATCH', headers: headers() });
+        if (r.ok) { setMsg('Delivered — commission released.', 'ok'); loadCods(); loadPayouts(); } else { b.disabled = false; b.textContent = 'Mark delivered'; setMsg('Failed (' + r.status + ')', 'err'); }
+      });
+    });
+  }
+
+  $('loadBtn').addEventListener('click', async function () {
+    localStorage.setItem(TKEY, $('token').value.trim());
+    setMsg('Loading…');
+    try { await loadPayouts(); await loadCods(); setMsg(''); }
+    catch (e) { setMsg(e.message, 'err'); }
+  });
+})();
+</script>
+</body>
+</html>

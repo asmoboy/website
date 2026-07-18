@@ -826,7 +826,7 @@
       order_no: o.orderNo, currency: o.currency, total: o.total, total_text: o.totalText,
       email: o.email, name: o.name, org: o.org, address: o.address, city: o.city,
       zip: o.zip, country: o.country, lang: o.lang, items: o.items,
-      promo: o.promo || '',
+      promo: o.promo || '', ref_code: Affiliate.code(),
       payment_method: o.paymentMethod || (o.status === 'cod' ? 'cod' : undefined)
     };
   }
@@ -2214,6 +2214,7 @@
         address: order.address, city: order.city, zip: order.zip, country: order.country,
         lang: order.lang, items: order.items,
         shipping: order.shipping, insurance: order.insurance, promo: order.promo || '',
+        ref_code: Affiliate.code(),
         shipping_label: t('shipping_word'), insurance_label: t('ship_protect')
       };
       return fetch(T.orderApiUrl + '/stripe/payment-intent', {
@@ -2573,10 +2574,38 @@
     });
   }
 
+  /* ---- affiliate referral tracking ----
+     Capture ?ref=CODE into a 30-day first-party cookie and ping the Worker so
+     the click is recorded. The code rides along with every order so the Worker
+     attributes the sale + computes the commission server-side. */
+  var Affiliate = {
+    code: function () {
+      var m = document.cookie.match(/(?:^|;\s*)toppep_ref=([^;]+)/);
+      return m ? decodeURIComponent(m[1]) : '';
+    },
+    setCookie: function (code) {
+      var d = new Date(); d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
+      document.cookie = 'toppep_ref=' + encodeURIComponent(code) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+    },
+    init: function () {
+      var ref = (new URLSearchParams(location.search).get('ref') || '').trim();
+      if (!ref) return;
+      this.setCookie(ref);                              // (re)start the 30-day window
+      if (!T.orderApiUrl) return;
+      try {
+        fetch(T.orderApiUrl + '/affiliate/click', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ref: ref, referrer: document.referrer || '', user_agent: navigator.userAgent || '' })
+        }).catch(function () {});
+      } catch (e) { /* tracking must never break the page */ }
+    }
+  };
+
   /* =================================================================
      BOOT
   ================================================================= */
   Cart.load();
+  Affiliate.init();
   buildChrome();
   if (Pages[page]) Pages[page]();
 })();

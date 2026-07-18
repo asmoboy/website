@@ -37,6 +37,13 @@
      checkout once BOTH this and ORDER_API_URL are set. */
   var STRIPE_PUBLISHABLE_KEY = 'pk_live_51Tg51UP45TQiZZmgZs5PmOjkkbxZNHZxKEZzF0WH4tZu8qjSz2K3XRFs9gmkqOQ05QFuqnJ1IlwfWl4JkVuGwg4E00GidZ9LOe';
 
+  /* Supabase — used ONLY by the affiliate dashboard (/affiliate/) to read an
+     affiliate's own clicks/sales via Row-Level-Security. The anon key is public
+     and safe in the browser; the service_role key must NEVER live here (Worker
+     only). Fill both in to switch the dashboard on. */
+  var SUPABASE_URL = '';        // e.g. https://xxxxxxxx.supabase.co
+  var SUPABASE_ANON_KEY = '';   // the "anon public" key from Supabase → Project settings → API
+
   /* =================================================================
      STOCK — everything is pre-order EXCEPT the SKUs listed here.
      Value `true` = the whole product ships now; an array = only those
@@ -365,6 +372,8 @@
     orderInbox: ORDER_INBOX,
     orderApiUrl: ORDER_API_URL,
     stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
+    supabaseUrl: SUPABASE_URL,
+    supabaseAnonKey: SUPABASE_ANON_KEY,
     isPreorder: isPreorder,
     isSoldOut: isSoldOut,
     inStock: inStock,
