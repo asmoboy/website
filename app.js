@@ -78,6 +78,8 @@
       ag_eyebrow: 'Research use only', ag_h: 'You must be 18 or older to enter',
       ag_p: 'TOP Pep supplies research compounds strictly for in-vitro laboratory use — not intended for human or veterinary consumption. By continuing, you confirm you are at least 18 years old and agree to our <a href="/terms/">Terms &amp; Conditions</a> and <a href="/legal-agreement/">Research Use Agreement</a>.',
       ag_enter: 'I\'m 18 or older — Enter', ag_exit: 'Exit', ag_foot: 'HPLC + MS tested · COA available · Discreet shipping',
+      cookie_text: 'We use cookies to keep the site working and to remember your choices. See our <a href="/privacy/">Privacy policy</a>.',
+      cookie_accept: 'Accept all', cookie_decline: 'Only necessary',
       bac_water: 'Bacteriostatic Water 10 ml',
       hero_cta1: 'Browse the catalog', hero_cta2: 'View the COA library', stat_purity: 'Documented purity', stat_compounds: 'Compounds in stock', stat_free: 'Free-shipping threshold',
       sec_best: 'The catalog', sec_featured: 'Peptides', shop_all: 'Shop all', browse_word: 'Browse',
@@ -289,6 +291,8 @@
       ag_eyebrow: 'Nur für Forschungszwecke', ag_h: 'Du musst mindestens 18 Jahre alt sein',
       ag_p: 'TOP Pep liefert Forschungssubstanzen ausschließlich für die In-vitro-Laboranwendung — nicht für den menschlichen oder tierischen Verzehr bestimmt. Indem du fortfährst, bestätigst du, dass du mindestens 18 Jahre alt bist und unseren <a href="/terms/">AGB</a> sowie der <a href="/legal-agreement/">Forschungsnutzungs-Vereinbarung</a> zustimmst.',
       ag_enter: 'Ja, ich bin 18 oder älter', ag_exit: 'Verlassen', ag_foot: 'HPLC + MS getestet · Analysezertifikat (COA) verfügbar · Diskreter Versand',
+      cookie_text: 'Wir verwenden Cookies, damit die Website funktioniert und deine Einstellungen gespeichert werden. Siehe unsere <a href="/privacy/">Datenschutzerklärung</a>.',
+      cookie_accept: 'Alle akzeptieren', cookie_decline: 'Nur notwendige',
       bac_water: 'Bakteriostatisches Wasser 10 ml',
       hero_cta1: 'Katalog ansehen', hero_cta2: 'Analysezertifikate ansehen (COA)', stat_purity: 'Dokumentierte Reinheit', stat_compounds: 'Wirkstoffe auf Lager', stat_free: 'Gratisversand ab',
       sec_best: 'Der Katalog', sec_featured: 'Peptide', shop_all: 'Alle ansehen', browse_word: 'Ansehen',
@@ -501,6 +505,8 @@
       ag_eyebrow: 'Doar pentru uz de cercetare', ag_h: 'Trebuie să ai cel puțin 18 ani pentru a intra',
       ag_p: 'TOP Pep furnizează compuși de cercetare strict pentru uz de laborator in-vitro — nu sunt destinați consumului uman sau veterinar. Continuând, confirmi că ai cel puțin 18 ani și ești de acord cu <a href="/terms/">Termenii &amp; Condițiile</a> și <a href="/legal-agreement/">Acordul de utilizare în cercetare</a>.',
       ag_enter: 'Da, am 18 ani sau mai mult', ag_exit: 'Ieși', ag_foot: 'Testat HPLC + MS · Certificat de analiză (COA) disponibil · Livrare discretă',
+      cookie_text: 'Folosim cookie-uri pentru ca site-ul să funcționeze și pentru a reține preferințele tale. Vezi <a href="/privacy/">Politica de confidențialitate</a>.',
+      cookie_accept: 'Acceptă toate', cookie_decline: 'Doar necesare',
       bac_water: 'Apă bacteriostatică 10 ml',
       hero_cta1: 'Vezi catalogul', hero_cta2: 'Vezi certificatele de analiză (COA)', stat_purity: 'Puritate documentată', stat_compounds: 'Compuși în stoc', stat_free: 'Livrare gratuită peste',
       sec_best: 'Catalogul', sec_featured: 'Peptide', shop_all: 'Vezi toate', browse_word: 'Explorează',
@@ -1131,6 +1137,29 @@
       '</div>';
   }
 
+  /* ---- cookie consent banner (bottom bar, first visit until a choice is made) ---- */
+  function cookieBannerHTML() {
+    return '' +
+      '<div class="cookie-bar" id="cookieBar" role="dialog" aria-live="polite" aria-label="Cookies">' +
+        '<p class="cookie-text">' + t('cookie_text') + '</p>' +
+        '<div class="cookie-actions">' +
+          '<button class="btn btn-outline btn-sm" id="cookieDecline">' + t('cookie_decline') + '</button>' +
+          '<button class="btn btn-sm" id="cookieAccept">' + t('cookie_accept') + '</button>' +
+        '</div>' +
+      '</div>';
+  }
+  function initCookieBanner() {
+    if (localStorage.getItem('toppep_cookie_consent')) return; // already chosen
+    document.body.insertAdjacentHTML('beforeend', cookieBannerHTML());
+    function close(choice) {
+      localStorage.setItem('toppep_cookie_consent', choice);
+      var bar = $('#cookieBar'); if (bar) bar.remove();
+    }
+    var a = $('#cookieAccept'), d = $('#cookieDecline');
+    if (a) a.addEventListener('click', function () { close('all'); });
+    if (d) d.addEventListener('click', function () { close('necessary'); });
+  }
+
   function buildChrome() {
     document.body.insertAdjacentHTML('afterbegin', tickerHTML() + headerHTML() + searchModalHTML() + drawerHTML() + sizeSheetHTML() + coaLightboxHTML());
     document.body.insertAdjacentHTML('beforeend', footerHTML());
@@ -1158,6 +1187,9 @@
       });
       $('#ageExit').addEventListener('click', function () { location.href = 'https://www.google.com'; });
     }
+
+    // cookie consent banner (sits below the age gate; visible once it's gone)
+    initCookieBanner();
 
     // language switcher
     var langBtn = $('#langBtn'), langMenu = $('#langMenu');
@@ -2114,15 +2146,15 @@
       // Revolut Pay) are enabled below; which ones actually show is governed by
       // the Stripe Dashboard → Payment methods and device/eligibility.
       mode: 'payment', amount: cents, currency: CUR,
-      // put card LAST so the express options (Klarna, Revolut Pay) sit on top
-      // and plain card entry stays at the bottom, as requested.
-      paymentMethodOrder: ['klarna', 'revolut_pay', 'card'],
+      // card FIRST and the other methods (Klarna, Revolut Pay) below it.
+      paymentMethodOrder: ['card', 'klarna', 'revolut_pay'],
       appearance: { theme: 'stripe', variables: { colorPrimary: '#5E17EB', borderRadius: '10px' } }
     });
     stripeElements.create('payment', {
-      // accordion = each method is its own clickable row/button; Apple Pay and
-      // Google Pay render as express buttons above the divider automatically.
-      layout: 'accordion',
+      // accordion, but card is expanded by default (defaultCollapsed:false) so
+      // the customer can type the number straight away — Stripe reveals expiry
+      // and CVC automatically once the card number is entered.
+      layout: { type: 'accordion', defaultCollapsed: false, radios: true, spacedAccordionItems: false },
       terms: { card: 'never' },
       // Apple Pay + Google Pay as express buttons; Link stays off (not wanted).
       wallets: { applePay: 'auto', googlePay: 'auto', link: 'never' }
