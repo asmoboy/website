@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=38">
+<link rel="stylesheet" href="/styles.css?v=39">
 <style>
   .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 90px; }
   .admin-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
@@ -93,7 +93,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/data.js?v=38"></script>
+<script src="/data.js?v=39"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
@@ -184,27 +184,73 @@
     return r;
   }
 
+  var editingId = null; // id of the affiliate currently shown as an editable row, or null
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function inp(id, val, ph, extra) { return '<input id="' + id + '" value="' + esc(val) + '" placeholder="' + esc(ph || '') + '" style="width:100%;padding:6px 8px;border:1px solid var(--line-strong);border-radius:6px;font:inherit;font-size:13px;" ' + (extra || '') + '>'; }
+
   async function loadAffiliates() {
     var res = await apiFetch('/affiliate/list');
     if (!res.ok) throw new Error('List error ' + res.status);
     var data = await res.json();
     var affs = data.affiliates || [];
     $('affList').innerHTML = affs.length ? ('<div style="overflow-x:auto;"><table class="t"><thead><tr>' +
-      '<th>Influencer</th><th>Code</th><th>Referral link</th><th>Commission %</th><th>Discount %</th><th>Clicks</th><th>Sales</th><th>Earned</th><th>Pending</th></tr></thead><tbody>' +
+      '<th>Influencer</th><th>Code</th><th>Referral link</th><th>Commission %</th><th>Discount %</th><th>Clicks</th><th>Sales</th><th>Earned</th><th>Pending</th><th>Actions</th></tr></thead><tbody>' +
       affs.map(function (a) {
         var link = location.origin + '/?ref=' + a.referral_code;
-        return '<tr><td><b>' + a.name + '</b><br><span class="text-muted" style="font-size:12px;">' + a.email + '</span></td>' +
-          '<td><code style="font-family:var(--font-mono);">' + a.referral_code + '</code></td>' +
+        if (a.id === editingId) {
+          return '<tr>' +
+            '<td>' + inp('eName_' + a.id, a.name, 'Name') + '<div style="margin-top:6px;">' + inp('eEmail_' + a.id, a.email, 'Email') + '</div></td>' +
+            '<td>' + inp('eCode_' + a.id, a.referral_code, 'Code') + '</td>' +
+            '<td class="text-muted" style="font-size:12px;">' + esc(link) + '</td>' +
+            '<td>' + inp('ePct_' + a.id, a.commission_pct, 'Commission %') + '</td>' +
+            '<td>' + inp('eDiscount_' + a.id, a.discount_pct, 'Discount %') + '</td>' +
+            '<td class="text-muted">' + a.clicks + '</td><td class="text-muted">' + a.confirmed_sales + '</td>' +
+            '<td class="text-muted">' + money(a.confirmed_commission) + '</td><td class="text-muted">' + money(a.pending_commission) + '</td>' +
+            '<td><div style="display:flex;flex-direction:column;gap:6px;min-width:130px;">' +
+              inp('ePayMethod_' + a.id, a.payout_method || '', 'paypal / bank') +
+              inp('ePayDetails_' + a.id, a.payout_details || '', 'Payout details') +
+              '<label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="checkbox" id="eActive_' + a.id + '" ' + (a.active !== false ? 'checked' : '') + '> Active</label>' +
+              '<div style="display:flex;gap:6px;"><button class="btn btn-sm" data-save="' + a.id + '">Save</button><button class="btn btn-sm btn-outline" data-cancel="1">Cancel</button></div>' +
+            '</div></td></tr>';
+        }
+        return '<tr' + (a.active === false ? ' style="opacity:.55;"' : '') + '><td><b>' + esc(a.name) + '</b><br><span class="text-muted" style="font-size:12px;">' + esc(a.email) + '</span></td>' +
+          '<td><code style="font-family:var(--font-mono);">' + esc(a.referral_code) + '</code></td>' +
           '<td><button class="btn btn-sm btn-outline" data-copy="' + encodeURIComponent(link) + '">Copy link</button></td>' +
           '<td>' + a.commission_pct + '%</td><td>' + (Number(a.discount_pct) > 0 ? a.discount_pct + '%' : '<span class="text-muted">—</span>') + '</td>' +
           '<td>' + a.clicks + '</td><td>' + a.confirmed_sales + '</td>' +
-          '<td><b>' + money(a.confirmed_commission) + '</b></td><td class="text-muted">' + money(a.pending_commission) + '</td></tr>';
+          '<td><b>' + money(a.confirmed_commission) + '</b></td><td class="text-muted">' + money(a.pending_commission) + '</td>' +
+          '<td><button class="btn btn-sm btn-outline" data-edit="' + a.id + '">Edit</button></td></tr>';
       }).join('') + '</tbody></table></div>') : '<p class="empty">No affiliates yet — add one above.</p>';
 
     document.querySelectorAll('[data-copy]').forEach(function (b) {
       b.addEventListener('click', function () {
         navigator.clipboard && navigator.clipboard.writeText(decodeURIComponent(b.dataset.copy));
         b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy link'; }, 1500);
+      });
+    });
+    document.querySelectorAll('[data-edit]').forEach(function (b) {
+      b.addEventListener('click', function () { editingId = b.dataset.edit; loadAffiliates(); });
+    });
+    document.querySelectorAll('[data-cancel]').forEach(function (b) {
+      b.addEventListener('click', function () { editingId = null; loadAffiliates(); });
+    });
+    document.querySelectorAll('[data-save]').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        var id = b.dataset.save;
+        b.disabled = true; b.textContent = '…';
+        var payload = {
+          name: $('eName_' + id).value.trim(), email: $('eEmail_' + id).value.trim(),
+          referral_code: $('eCode_' + id).value.trim(), commission_pct: Number($('ePct_' + id).value),
+          discount_pct: Number($('eDiscount_' + id).value || 0),
+          payout_method: $('ePayMethod_' + id).value.trim(), payout_details: $('ePayDetails_' + id).value.trim(),
+          active: $('eActive_' + id).checked
+        };
+        var r = await apiFetch('/affiliate/' + id, { method: 'PATCH', body: JSON.stringify(payload) }).catch(function (e) { setMsg(e.message, 'err'); return null; });
+        if (!r) { b.disabled = false; b.textContent = 'Save'; return; }
+        var data = await r.json().catch(function () { return {}; });
+        if (!r.ok) { setMsg(data.error || ('Failed (' + r.status + ')'), 'err'); b.disabled = false; b.textContent = 'Save'; return; }
+        editingId = null; setMsg('Saved.', 'ok'); loadAffiliates();
       });
     });
   }

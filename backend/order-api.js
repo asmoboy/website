@@ -103,7 +103,7 @@ function toMinorUnits(amount) { return Math.round(Number(amount) * 100); }
    contents. Stripe sees an amount + our order reference, nothing more. */
 // promo codes are validated HERE, server-side — the front-end only requests a
 // code; this is the authority on whether/how much it discounts.
-const PROMO_CODES = { STIFI: 0.20 };
+const PROMO_CODES = { STIFI: 0.20, SANDY: 0.20 };
 function promoRate(code) {
   const key = String(code || '').trim().toUpperCase();
   return PROMO_CODES[key] || 0;
@@ -513,6 +513,37 @@ async function createAffiliate(db, body) {
   return { ok: true, affiliate: data };
 }
 
+// ---- PATCH /affiliate/:id — edit an existing affiliate ----
+// Only touches fields actually present in the body, so the admin panel can
+// send just the changed ones. Does NOT touch the Supabase Auth login/password
+// — that stays a separate concern (reset it directly in Supabase if needed).
+async function updateAffiliate(db, id, body) {
+  const fields = {};
+  if (body.name !== undefined) fields.name = String(body.name).trim();
+  if (body.email !== undefined) fields.email = String(body.email).trim().toLowerCase();
+  if (body.referral_code !== undefined) fields.referral_code = String(body.referral_code).trim();
+  if (body.commission_pct !== undefined) fields.commission_pct = Number(body.commission_pct);
+  if (body.discount_pct !== undefined) fields.discount_pct = Number(body.discount_pct);
+  if (body.payout_method !== undefined) fields.payout_method = body.payout_method || null;
+  if (body.payout_details !== undefined) fields.payout_details = body.payout_details || null;
+  if (body.active !== undefined) fields.active = !!body.active;
+
+  if (!Object.keys(fields).length) return { error: 'nothing to update', status: 400 };
+  if (fields.name !== undefined && !fields.name) return { error: 'name cannot be empty', status: 400 };
+  if (fields.email !== undefined && !fields.email) return { error: 'email cannot be empty', status: 400 };
+  if (fields.referral_code !== undefined && !fields.referral_code) return { error: 'referral_code cannot be empty', status: 400 };
+  if (fields.commission_pct !== undefined && !(fields.commission_pct >= 0 && fields.commission_pct <= 100)) {
+    return { error: 'commission_pct must be between 0 and 100', status: 400 };
+  }
+  if (fields.discount_pct !== undefined && !(fields.discount_pct >= 0 && fields.discount_pct <= 100)) {
+    return { error: 'discount_pct must be between 0 and 100', status: 400 };
+  }
+
+  const { data, error } = await db.from('affiliates').update(fields).eq('id', id).select().single();
+  if (error) return { error: error.message, status: isUniqueViolation(error) ? 409 : (error.code === 'PGRST116' ? 404 : 500) };
+  return { ok: true, affiliate: data };
+}
+
 // ---- GET /affiliate/list — all affiliates + their aggregate stats ----
 async function listAffiliates(db) {
   const { data: affs, error } = await db.from('affiliates').select('*').order('created_at', { ascending: true });
@@ -787,6 +818,17 @@ export default {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await listAffiliates(db);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+      const affUpdateMatch = url.pathname.match(/^\/affiliate\/([0-9a-fA-F-]{36})$/);
+      if (request.method === 'PATCH' && affUpdateMatch) {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        if (!(await requireAdminSession(db, request))) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        const body = await request.json().catch(() => ({}));
+        const res = await updateAffiliate(db, affUpdateMatch[1], body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
       }
