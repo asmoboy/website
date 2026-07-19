@@ -41,8 +41,8 @@
      affiliate's own clicks/sales via Row-Level-Security. The anon key is public
      and safe in the browser; the service_role key must NEVER live here (Worker
      only). Fill both in to switch the dashboard on. */
-  var SUPABASE_URL = '';        // e.g. https://xxxxxxxx.supabase.co
-  var SUPABASE_ANON_KEY = '';   // the "anon public" key from Supabase → Project settings → API
+  var SUPABASE_URL = 'https://dwozxkyoqwioqggspztr.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3b3p4a3lvcXdpb3FnZ3NwenRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNjQ2NTgsImV4cCI6MjA5OTY0MDY1OH0.ZbYPTMB-mOZyIcTQZAUraiDVfsANiQt5_33yQ5zdAI0';   // the "anon public" key from Supabase → Project settings → API
 
   /* =================================================================
      STOCK — everything is pre-order EXCEPT the SKUs listed here.
