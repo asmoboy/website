@@ -9,62 +9,100 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=39">
+<link rel="stylesheet" href="/styles.css?v=40">
 <style>
-  .aff-wrap { max-width: 920px; margin: 0 auto; padding: 40px 24px 90px; }
-  .aff-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
-  .aff-head img { height: 40px; width: auto; }
-  .aff-sub { color: var(--muted); font-size: 14px; margin-bottom: 26px; }
-  .aff-card { border: 1px solid var(--line-strong); border-radius: 14px; padding: 22px; margin-bottom: 18px; background: var(--white); }
-  .aff-login { max-width: 380px; }
-  .aff-login .field { margin-bottom: 14px; }
-  .aff-login label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
-  .aff-login input { width: 100%; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; font-size: 15px; }
-  .aff-msg { font-size: 13px; margin: 10px 0 0; min-height: 16px; }
-  .aff-msg.err { color: #e0533d; } .aff-msg.ok { color: #1a7f37; }
-  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
-  .stat { border: 1px solid var(--line-strong); border-radius: 14px; padding: 18px; }
-  .stat .v { font-family: var(--font-display); font-weight: 700; font-size: 26px; }
-  .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }
-  .stat.hl .v { color: var(--brand); }
-  .ref-link { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .ref-link code { flex: 1; min-width: 240px; background: #f4f4f6; border-radius: 8px; padding: 12px 14px; font-family: var(--font-mono); font-size: 13px; overflow-x: auto; white-space: nowrap; }
+  body { background: var(--bg-light); }
+  .af-top { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 20px 24px; background: var(--white); border-bottom: 1px solid var(--line); }
+  .af-top .brand { display: flex; align-items: center; gap: 10px; }
+  .af-top .brand img { height: 34px; width: auto; }
+  .af-top .brand span { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+  .af-wrap { max-width: 960px; margin: 0 auto; padding: 56px 24px 100px; }
+  .af-eyebrow { display: inline-block; border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 7px 16px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent-primary); margin-bottom: 20px; }
+  .af-h1 { font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.05; margin: 0 0 14px; }
+  .af-h1 .accent { color: var(--accent-primary); }
+  .af-lede { color: var(--muted); font-size: 16px; max-width: 480px; margin: 0 0 34px; }
+  .card { background: var(--white); border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(10,10,10,0.07); padding: 26px; margin-bottom: 20px; }
+
+  /* login */
+  .login-hero { display: grid; grid-template-columns: 1fr; gap: 8px; max-width: 440px; margin: 0 auto; text-align: center; }
+  .login-hero .af-eyebrow, .login-hero .af-lede { margin-left: auto; margin-right: auto; }
+  .login-card { text-align: left; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 7px; }
+  .field input { width: 100%; padding: 13px 15px; border: 1px solid var(--line-strong); border-radius: 12px; font: inherit; font-size: 15px; box-sizing: border-box; }
+  .field input:focus { outline: none; border-color: var(--accent-primary); }
+  .msg { font-size: 13px; margin: 12px 0 0; min-height: 16px; }
+  .msg.err { color: #e0533d; } .msg.ok { color: #1a7f37; }
+
+  /* dashboard */
+  .welcome { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
+  .ref-box { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .ref-box code { flex: 1; min-width: 240px; background: var(--bg-light); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; font-family: var(--font-mono); font-size: 14px; overflow-x: auto; white-space: nowrap; }
+  .code-chip { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 14px; color: var(--muted); }
+  .code-chip b { font-family: var(--font-mono); color: var(--accent-primary); background: rgba(94,23,235,.08);
+    padding: 4px 10px; border-radius: 8px; letter-spacing: .04em; }
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .stat { background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 22px; }
+  .stat .v { font-family: var(--font-display); font-weight: 700; font-size: 32px; line-height: 1; }
+  .stat .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 8px; }
+  .stat.hl { border-color: rgba(94,23,235,.3); background: rgba(94,23,235,.04); }
+  .stat.hl .v { color: var(--accent-primary); }
   table.sales { width: 100%; border-collapse: collapse; font-size: 14px; }
-  table.sales th, table.sales td { text-align: left; padding: 10px 10px; border-bottom: 1px solid var(--line); }
+  table.sales th, table.sales td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); }
   table.sales th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
-  .pill { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 4px 9px; border-radius: 999px; }
+  table.sales tr:last-child td { border-bottom: none; }
+  .pill { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 5px 10px; border-radius: 999px; }
   .pill.pending { background: #fdf0e6; color: #b5651d; }
   .pill.confirmed { background: #e7f6ee; color: #1a7f4b; }
   .pill.cancelled { background: #f1f1f3; color: #8a8a94; }
-  .aff-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .setup-note { margin-top: 30px; padding: 16px 18px; border: 1px dashed var(--line-strong); border-radius: 12px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  .foot-note { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  h2.sec { font-size: 1.1rem; margin: 0 0 14px; }
   @media (max-width: 640px) { .stat-row { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
 <body>
-<div class="aff-wrap">
-  <div class="aff-head"><img src="/logo.png" alt="TOP Pep"><h1 style="font-size:1.4rem;">Affiliate dashboard</h1></div>
-  <p class="aff-sub">Sign in to see your referral link, clicks, confirmed sales and commission.</p>
+
+<div class="af-top">
+  <a class="brand" href="/"><img src="/logo.png" alt="TOP Pep"><span>Affiliates</span></a>
+  <button class="btn btn-sm btn-outline" id="signOutBtn" style="display:none;">Sign out</button>
+</div>
+
+<div class="af-wrap">
 
   <!-- LOGIN -->
-  <div class="aff-card aff-login" id="loginCard" style="display:none;">
-    <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email"></div>
-    <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password"></div>
-    <button class="btn btn-block" id="loginBtn">Sign in</button>
-    <p class="aff-msg" id="loginMsg"></p>
+  <div id="loginView" style="display:none;">
+    <div class="login-hero">
+      <span class="af-eyebrow">Affiliate program</span>
+      <h1 class="af-h1">Your partner <span class="accent">dashboard</span></h1>
+      <p class="af-lede">Sign in to track your clicks, confirmed sales and commission in real time.</p>
+    </div>
+    <div class="card login-card" style="max-width:440px;margin:0 auto;">
+      <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email"></div>
+      <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password"></div>
+      <button class="btn btn-block" id="loginBtn">Sign in</button>
+      <p class="msg" id="loginMsg"></p>
+    </div>
   </div>
 
   <!-- DASHBOARD -->
   <div id="dash" style="display:none;">
-    <div class="aff-card">
-      <div class="aff-top">
-        <div><b id="affName"></b> · <span class="text-muted" id="affPct"></span></div>
-        <button class="btn btn-sm btn-outline" id="logoutBtn">Sign out</button>
+    <div class="welcome">
+      <div>
+        <span class="af-eyebrow">Signed in</span>
+        <h1 class="af-h1" style="margin-bottom:4px;">Hi, <span class="accent" id="affName"></span></h1>
+        <p class="af-lede" style="margin:0;" id="affPct"></p>
       </div>
-      <div style="margin-top:14px;">
-        <label style="display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;">Your referral link</label>
-        <div class="ref-link"><code id="refLink"></code><button class="btn btn-sm" id="copyBtn">Copy</button></div>
-      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec">Your referral link</h2>
+      <div class="ref-box"><code id="refLink"></code><button class="btn btn-sm" id="copyBtn">Copy link</button></div>
+      <div class="code-chip" id="codeChip" style="display:none;"></div>
     </div>
 
     <div class="stat-row">
@@ -74,29 +112,27 @@
       <div class="stat"><div class="v" id="stPending">–</div><div class="l">Pending commission</div></div>
     </div>
 
-    <div class="aff-card">
-      <h2 style="font-size:1.05rem;margin:0 0 12px;">Recent sales</h2>
+    <div class="card">
+      <h2 class="sec">Recent sales</h2>
       <div style="overflow-x:auto;">
         <table class="sales">
           <thead><tr><th>Order</th><th>Base</th><th>Commission</th><th>Status</th><th>Date</th></tr></thead>
           <tbody id="salesBody"><tr><td colspan="5" class="text-muted" style="padding:16px 10px;">Loading…</td></tr></tbody>
         </table>
       </div>
+      <p class="foot-note">Pending commissions are shown but not yet payable — cash-on-delivery orders confirm once the parcel is delivered.</p>
     </div>
-    <p class="aff-sub" style="margin-top:14px;">Pending commissions are shown but not yet payable — cash-on-delivery orders confirm once the parcel is delivered.</p>
   </div>
 
-  <div class="aff-card" id="notReady" style="display:none;">
-    <p class="aff-msg err" style="margin:0;">The affiliate dashboard isn't configured yet. Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> in <code>data.js</code>.</p>
+  <!-- NOT CONFIGURED -->
+  <div class="card" id="notReady" style="display:none;">
+    <p class="msg err" style="margin:0;">The affiliate dashboard isn't configured yet. Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> in <code>data.js</code>.</p>
   </div>
 
-  <div class="setup-note">
-    Affiliate accounts are created by the admin: add a user in Supabase Auth, then a row in <code>affiliates</code> with that user's <code>user_id</code>, a unique <code>referral_code</code>, and the commission %. Row-Level-Security ensures each affiliate only ever sees their own data.
-  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/data.js?v=39"></script>
+<script src="/data.js?v=40"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
@@ -107,19 +143,26 @@
   var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
 
   function show(view) {
-    $('loginCard').style.display = view === 'login' ? 'block' : 'none';
+    $('loginView').style.display = view === 'login' ? 'block' : 'none';
     $('dash').style.display = view === 'dash' ? 'block' : 'none';
+    $('signOutBtn').style.display = view === 'dash' ? '' : 'none';
   }
 
   async function loadDashboard() {
     show('dash');
     // RLS returns only THIS affiliate's own row
-    var affRes = await sb.from('affiliates').select('name, referral_code, commission_pct').maybeSingle();
+    var affRes = await sb.from('affiliates').select('name, referral_code, commission_pct, discount_pct').maybeSingle();
+    // fall back gracefully if the discount_pct column hasn't been migrated yet
+    if (affRes.error) affRes = await sb.from('affiliates').select('name, referral_code, commission_pct').maybeSingle();
     var aff = affRes.data;
-    if (!aff) { $('salesBody').innerHTML = '<tr><td colspan="5" class="aff-msg err" style="padding:16px 10px;">No affiliate profile linked to this login.</td></tr>'; return; }
+    if (!aff) { $('salesBody').innerHTML = '<tr><td colspan="5" class="msg err" style="padding:16px 10px;">No affiliate profile linked to this login.</td></tr>'; return; }
     $('affName').textContent = aff.name;
-    $('affPct').textContent = aff.commission_pct + '% commission';
+    $('affPct').textContent = 'You earn ' + aff.commission_pct + '% commission on every referred order.';
     $('refLink').textContent = location.origin + '/?ref=' + aff.referral_code;
+    if (Number(aff.discount_pct) > 0) {
+      $('codeChip').style.display = 'inline-flex';
+      $('codeChip').innerHTML = 'Customers get ' + aff.discount_pct + '% off with code <b>' + aff.referral_code + '</b>';
+    }
 
     var clicksRes = await sb.from('clicks').select('id', { count: 'exact', head: true });
     $('stClicks').textContent = clicksRes.count != null ? clicksRes.count : 0;
@@ -146,16 +189,16 @@
   }
 
   $('loginBtn').addEventListener('click', async function () {
-    var msg = $('loginMsg'); msg.className = 'aff-msg'; msg.textContent = 'Signing in…';
+    var msg = $('loginMsg'); msg.className = 'msg'; msg.textContent = 'Signing in…';
     var res = await sb.auth.signInWithPassword({ email: $('email').value.trim(), password: $('password').value });
-    if (res.error) { msg.className = 'aff-msg err'; msg.textContent = res.error.message; return; }
+    if (res.error) { msg.className = 'msg err'; msg.textContent = res.error.message; return; }
     msg.textContent = ''; loadDashboard();
   });
-  $('logoutBtn').addEventListener('click', async function () { await sb.auth.signOut(); show('login'); });
+  $('signOutBtn').addEventListener('click', async function () { await sb.auth.signOut(); show('login'); });
   $('copyBtn').addEventListener('click', function () {
     navigator.clipboard && navigator.clipboard.writeText($('refLink').textContent);
     $('copyBtn').textContent = 'Copied';
-    setTimeout(function () { $('copyBtn').textContent = 'Copy'; }, 1500);
+    setTimeout(function () { $('copyBtn').textContent = 'Copy link'; }, 1500);
   });
 
   route();
