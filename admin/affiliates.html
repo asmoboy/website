@@ -9,14 +9,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=36">
+<link rel="stylesheet" href="/styles.css?v=37">
 <style>
   .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 90px; }
   .admin-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
   .admin-head img { height: 40px; width: auto; }
   .admin-sub { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
-  .tokrow { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
-  .tokrow input { flex: 1; min-width: 240px; padding: 11px 14px; border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; }
   h2.sec { font-size: 1.1rem; margin: 30px 0 12px; }
   .aff-group { border: 1px solid var(--line-strong); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
   .aff-group .top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
@@ -29,61 +27,165 @@
   .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
   .msg.err { color: #e0533d; } .msg.ok { color: #1a7f37; }
   .empty { color: var(--muted); padding: 24px 0; }
+  /* login */
+  .login-card { max-width: 380px; border: 1px solid var(--line-strong); border-radius: 14px; padding: 24px; margin: 0 auto; }
+  .login-card .field { margin-bottom: 14px; }
+  .login-card label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .login-card input { width: 100%; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; font-size: 15px; box-sizing: border-box; }
+  .login-card .hint { font-size: 13px; color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
+  .admin-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; }
 </style>
 </head>
 <body>
 <div class="admin-wrap">
-  <div class="admin-head"><img src="/logo.png" alt="TOP Pep"><h1 style="font-size:1.4rem;">Affiliate payouts</h1></div>
-  <p class="admin-sub">Open (confirmed, unpaid) commissions per affiliate, plus cash-on-delivery orders awaiting a delivery confirmation.</p>
+  <div class="admin-head"><img src="/logo.png" alt="TOP Pep"><h1 style="font-size:1.4rem;">Affiliate admin</h1></div>
 
-  <div class="tokrow">
-    <input id="token" type="password" placeholder="Admin token (ADMIN_TOKEN)" aria-label="Admin token">
-    <button class="btn" id="loadBtn">Load</button>
+  <!-- LOGIN STEP 1: email + password -->
+  <div class="login-card" id="stepPassword">
+    <p class="hint">Sign in with your admin account.</p>
+    <div class="field"><label for="lEmail">Email</label><input id="lEmail" type="email" autocomplete="email"></div>
+    <div class="field"><label for="lPassword">Password</label><input id="lPassword" type="password" autocomplete="current-password"></div>
+    <button class="btn btn-block" id="signInBtn">Sign in</button>
+    <p class="msg" id="passwordMsg"></p>
   </div>
-  <p class="msg" id="msg"></p>
 
-  <h2 class="sec">Affiliates</h2>
-  <p class="admin-sub" style="margin-bottom:12px;">Each row is one influencer — this is where you see which referral code &amp; link belongs to whom. Add one below (a password also creates their dashboard login at <code>/affiliate/</code>).</p>
-  <div class="aff-group" style="margin-bottom:16px;">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <input id="cName" placeholder="Name (influencer)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
-      <input id="cEmail" type="email" placeholder="Email" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
-      <input id="cCode" placeholder="Referral code (e.g. ANNA10)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
-      <input id="cPct" type="number" min="0" max="100" step="1" placeholder="Commission %" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
-      <input id="cPayMethod" placeholder="Payout method (paypal / bank)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
-      <input id="cPayDetails" placeholder="Payout details (PayPal email / IBAN)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
-      <input id="cPassword" type="text" placeholder="Login password (optional — creates their login)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;grid-column:1/3;">
+  <!-- LOGIN STEP 2: emailed 6-digit code -->
+  <div class="login-card" id="stepCode" style="display:none;">
+    <p class="hint">We emailed a 6-digit code to your admin address. Enter it below — it expires in 10 minutes.</p>
+    <div class="field"><label for="lCode">Code</label><input id="lCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+    <button class="btn btn-block" id="verifyBtn">Verify</button>
+    <p class="msg" id="codeMsg"></p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" style="display:none;">
+    <div class="admin-top">
+      <p class="admin-sub" style="margin:0;">Signed in as <b id="whoAmI"></b></p>
+      <button class="btn btn-sm btn-outline" id="signOutBtn">Sign out</button>
     </div>
-    <button class="btn" id="createBtn" style="margin-top:12px;">Add affiliate</button>
-    <p class="msg" id="createMsg"></p>
+
+    <h2 class="sec">Affiliates</h2>
+    <p class="admin-sub" style="margin-bottom:12px;">Each row is one influencer — this is where you see which referral code &amp; link belongs to whom. Add one below (a password also creates their dashboard login at <code>/affiliate/</code>).</p>
+    <div class="aff-group" style="margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <input id="cName" placeholder="Name (influencer)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
+        <input id="cEmail" type="email" placeholder="Email" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
+        <input id="cCode" placeholder="Referral code (e.g. ANNA10)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
+        <input id="cPct" type="number" min="0" max="100" step="1" placeholder="Commission %" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
+        <input id="cPayMethod" placeholder="Payout method (paypal / bank)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
+        <input id="cPayDetails" placeholder="Payout details (PayPal email / IBAN)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;">
+        <input id="cPassword" type="text" placeholder="Login password (optional — creates their login)" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;grid-column:1/3;">
+      </div>
+      <button class="btn" id="createBtn" style="margin-top:12px;">Add affiliate</button>
+      <p class="msg" id="createMsg"></p>
+    </div>
+    <div id="affList"><p class="empty">Loading…</p></div>
+
+    <h2 class="sec">Open payouts</h2>
+    <p class="msg" id="msg"></p>
+    <div id="payouts"><p class="empty">Loading…</p></div>
+
+    <h2 class="sec">Cash-on-delivery — awaiting delivery</h2>
+    <p class="admin-sub" style="margin-bottom:12px;">Mark a COD order delivered once the parcel is handed over and paid — this releases the affiliate commission. If it was refused / undeliverable, leave it (or cancel the order).</p>
+    <div id="cods"><p class="empty">—</p></div>
   </div>
-  <div id="affList"><p class="empty">Load to see all affiliates.</p></div>
-
-  <h2 class="sec">Open payouts</h2>
-  <div id="payouts"><p class="empty">Enter the admin token and press Load.</p></div>
-
-  <h2 class="sec">Cash-on-delivery — awaiting delivery</h2>
-  <p class="admin-sub" style="margin-bottom:12px;">Mark a COD order delivered once the parcel is handed over and paid — this releases the affiliate commission. If it was refused / undeliverable, leave it (or cancel the order).</p>
-  <div id="cods"><p class="empty">—</p></div>
 </div>
 
-<script src="/data.js?v=36"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/data.js?v=37"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
   var $ = function (id) { return document.getElementById(id); };
   var api = T.orderApiUrl;
   var money = function (n) { return (Number(n) || 0).toFixed(2) + '€'; };
-  var TKEY = 'toppep_admin_token';
+  var SESS_KEY = 'toppep_admin_session'; // { token, expires_at, email }
 
-  $('token').value = localStorage.getItem(TKEY) || '';
+  if (!T.supabaseUrl || !T.supabaseAnonKey || !window.supabase) {
+    $('stepPassword').innerHTML = '<p class="msg err">Admin login isn\'t configured yet. Set SUPABASE_URL / SUPABASE_ANON_KEY in data.js.</p>';
+    return;
+  }
+  var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
 
-  function headers() { return { 'Authorization': 'Bearer ' + $('token').value.trim(), 'Content-Type': 'application/json' }; }
+  function getSession() { try { return JSON.parse(localStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; } }
+  function setSession(s) { localStorage.setItem(SESS_KEY, JSON.stringify(s)); }
+  function clearSession() { localStorage.removeItem(SESS_KEY); }
+  function headers() {
+    var s = getSession();
+    return { 'Authorization': 'Bearer ' + (s ? s.token : ''), 'Content-Type': 'application/json' };
+  }
+
+  function show(view) {
+    $('stepPassword').style.display = view === 'password' ? 'block' : 'none';
+    $('stepCode').style.display = view === 'code' ? 'block' : 'none';
+    $('dash').style.display = view === 'dash' ? 'block' : 'none';
+  }
   function setMsg(text, cls) { var m = $('msg'); m.className = 'msg ' + (cls || ''); m.textContent = text || ''; }
 
+  // ---- step 1: password sign-in, then request the emailed code ----
+  $('signInBtn').addEventListener('click', async function () {
+    var m = $('passwordMsg'); m.className = 'msg'; m.textContent = 'Signing in…';
+    var res = await sb.auth.signInWithPassword({ email: $('lEmail').value.trim(), password: $('lPassword').value });
+    if (res.error) { m.className = 'msg err'; m.textContent = res.error.message; return; }
+    var accessToken = res.data.session.access_token;
+    var r = await fetch(api + '/admin/login/request-code', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' }
+    });
+    if (!r.ok) {
+      m.className = 'msg err';
+      m.textContent = r.status === 403 ? 'This account is not an admin.' : ('Could not send code (' + r.status + ')');
+      await sb.auth.signOut();
+      return;
+    }
+    window.__pendingAccessToken = accessToken; // kept only in memory, only until step 2 completes
+    m.textContent = '';
+    show('code');
+  });
+
+  // ---- step 2: verify the emailed code -> get the admin session token ----
+  $('verifyBtn').addEventListener('click', async function () {
+    var m = $('codeMsg'); m.className = 'msg'; m.textContent = 'Verifying…';
+    var accessToken = window.__pendingAccessToken;
+    if (!accessToken) { m.className = 'msg err'; m.textContent = 'Session expired — sign in again.'; show('password'); return; }
+    var r = await fetch(api + '/admin/login/verify-code', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: $('lCode').value.trim() })
+    });
+    var data = await r.json().catch(function () { return {}; });
+    if (!r.ok) { m.className = 'msg err'; m.textContent = data.error || ('Failed (' + r.status + ')'); return; }
+    setSession({ token: data.token, expires_at: data.expires_at, email: $('lEmail').value.trim() });
+    window.__pendingAccessToken = null;
+    await sb.auth.signOut(); // the Supabase password session isn't needed any more — only our admin session token is
+    enterDashboard();
+  });
+
+  $('signOutBtn').addEventListener('click', async function () {
+    await fetch(api + '/admin/logout', { method: 'POST', headers: headers() }).catch(function () {});
+    clearSession();
+    location.reload();
+  });
+
+  async function enterDashboard() {
+    var s = getSession();
+    $('whoAmI').textContent = s.email;
+    show('dash');
+    setMsg('Loading…');
+    try { await loadAffiliates(); await loadPayouts(); await loadCods(); setMsg(''); }
+    catch (e) {
+      if (e.forbidden) { clearSession(); show('password'); return; }
+      setMsg(e.message, 'err');
+    }
+  }
+
+  async function apiFetch(path, opts) {
+    var r = await fetch(api + path, Object.assign({ headers: headers() }, opts || {}));
+    if (r.status === 403) { var e = new Error('Session expired — sign in again.'); e.forbidden = true; throw e; }
+    return r;
+  }
+
   async function loadAffiliates() {
-    var res = await fetch(api + '/affiliate/list', { headers: headers() });
-    if (!res.ok) { throw new Error(res.status === 403 ? 'Wrong admin token' : ('List error ' + res.status)); }
+    var res = await apiFetch('/affiliate/list');
+    if (!res.ok) throw new Error('List error ' + res.status);
     var data = await res.json();
     var affs = data.affiliates || [];
     $('affList').innerHTML = affs.length ? ('<div style="overflow-x:auto;"><table class="t"><thead><tr>' +
@@ -113,7 +215,8 @@
       payout_method: $('cPayMethod').value.trim(), payout_details: $('cPayDetails').value.trim(),
       password: $('cPassword').value
     };
-    var res = await fetch(api + '/affiliate/create', { method: 'POST', headers: headers(), body: JSON.stringify(payload) });
+    var res = await apiFetch('/affiliate/create', { method: 'POST', body: JSON.stringify(payload) }).catch(function (e) { m.className = 'msg err'; m.textContent = e.message; return null; });
+    if (!res) return;
     var data = await res.json().catch(function () { return {}; });
     if (!res.ok) { m.className = 'msg err'; m.textContent = data.error || ('Failed (' + res.status + ')'); return; }
     m.className = 'msg ok'; m.textContent = 'Added ' + payload.name + ' · code ' + payload.referral_code;
@@ -122,11 +225,10 @@
   });
 
   async function loadPayouts() {
-    var res = await fetch(api + '/affiliate/payouts', { headers: headers() });
-    if (!res.ok) { throw new Error(res.status === 403 ? 'Wrong admin token' : ('Payouts error ' + res.status)); }
+    var res = await apiFetch('/affiliate/payouts');
+    if (!res.ok) throw new Error('Payouts error ' + res.status);
     var data = await res.json();
     var sales = data.sales || [];
-    // group by affiliate
     var groups = {};
     sales.forEach(function (s) {
       var k = s.affiliate_id || 'unknown';
@@ -150,14 +252,14 @@
     document.querySelectorAll('[data-payout]').forEach(function (b) {
       b.addEventListener('click', async function () {
         b.disabled = true; b.textContent = '…';
-        var r = await fetch(api + '/affiliate/sales/' + b.dataset.payout + '/payout', { method: 'PATCH', headers: headers() });
-        if (r.ok) { setMsg('Marked paid.', 'ok'); loadPayouts(); } else { b.disabled = false; b.textContent = 'Mark paid'; setMsg('Payout failed (' + r.status + ')', 'err'); }
+        var r = await apiFetch('/affiliate/sales/' + b.dataset.payout + '/payout', { method: 'PATCH' }).catch(function (e) { setMsg(e.message, 'err'); return null; });
+        if (r && r.ok) { setMsg('Marked paid.', 'ok'); loadPayouts(); } else if (r) { b.disabled = false; b.textContent = 'Mark paid'; setMsg('Payout failed (' + r.status + ')', 'err'); }
       });
     });
   }
 
   async function loadCods() {
-    var res = await fetch(api + '/orders?status=cod', { headers: headers() });
+    var res = await apiFetch('/orders?status=cod');
     if (!res.ok) { $('cods').innerHTML = '<p class="empty">—</p>'; return; }
     var data = await res.json();
     var orders = data.orders || [];
@@ -170,18 +272,18 @@
     document.querySelectorAll('[data-deliver]').forEach(function (b) {
       b.addEventListener('click', async function () {
         b.disabled = true; b.textContent = '…';
-        var r = await fetch(api + '/orders/' + encodeURIComponent(b.dataset.deliver) + '/delivered', { method: 'PATCH', headers: headers() });
-        if (r.ok) { setMsg('Delivered — commission released.', 'ok'); loadCods(); loadPayouts(); } else { b.disabled = false; b.textContent = 'Mark delivered'; setMsg('Failed (' + r.status + ')', 'err'); }
+        var r = await apiFetch('/orders/' + encodeURIComponent(b.dataset.deliver) + '/delivered', { method: 'PATCH' }).catch(function (e) { setMsg(e.message, 'err'); return null; });
+        if (r && r.ok) { setMsg('Delivered — commission released.', 'ok'); loadCods(); loadPayouts(); } else if (r) { b.disabled = false; b.textContent = 'Mark delivered'; setMsg('Failed (' + r.status + ')', 'err'); }
       });
     });
   }
 
-  $('loadBtn').addEventListener('click', async function () {
-    localStorage.setItem(TKEY, $('token').value.trim());
-    setMsg('Loading…');
-    try { await loadAffiliates(); await loadPayouts(); await loadCods(); setMsg(''); }
-    catch (e) { setMsg(e.message, 'err'); }
-  });
+  // resume an existing, still-valid admin session on page load
+  (function boot() {
+    var s = getSession();
+    if (s && s.expires_at && new Date(s.expires_at) > new Date()) { enterDashboard(); }
+    else { clearSession(); show('password'); }
+  })();
 })();
 </script>
 </body>

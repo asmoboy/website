@@ -40,21 +40,20 @@ Two things a static site cannot do on its own:
    ```
    wrangler secret put SUPABASE_URL
    wrangler secret put SUPABASE_SERVICE_KEY
-   wrangler secret put ADMIN_TOKEN
    wrangler secret put RESEND_API_KEY
    ```
    - `SUPABASE_URL` / `SUPABASE_SERVICE_KEY`: Supabase project → Settings → API
      (use the **service_role** key — server-side only, never expose it client-side).
-   - `ADMIN_TOKEN`: any long random string you choose; guards `GET /orders` and
-     `PATCH /orders/:ref/paid`.
-   - `RESEND_API_KEY`: from resend.com, used to send the thank-you email.
+   - `RESEND_API_KEY`: from resend.com, used to send the thank-you email and the
+     admin 2FA login code.
 4. `npm run deploy` (or `wrangler deploy`). Note the `*.workers.dev` URL it prints.
 5. In `data.js`, set `ORDER_API_URL` to that URL. The site then POSTs every
    new order to it automatically (it already tries this when the value is
    non-empty) — the DB becomes the source of truth for uniqueness.
-6. Point `/admin/` at the API (`GET /orders`, with `Authorization: Bearer <ADMIN_TOKEN>`)
-   instead of localStorage, so you can manage orders from anywhere. Marking
-   paid there fires the automatic email.
+6. Admin access to `/admin/affiliates.html` (orders, payouts, affiliates) is a
+   real login now, not a shared token — see `admin-auth-schema.sql`: run it,
+   create your Supabase Auth user with a password, sign in on the page, and
+   confirm the 6-digit code emailed to you.
 
 Bank details live in **one place** — `PAYMENT_BANK_DETAILS` in `data.js` (and
 mirrored in `order-api.js` for server-side emails). Change them once.

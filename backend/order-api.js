@@ -5,7 +5,17 @@
  *
  *   POST   /orders              → create a pending order (DB unique ref)
  *   PATCH  /orders/:ref/paid    → mark paid + send the thank-you email
- *   GET    /orders?status=...   → admin list (protected by ADMIN_TOKEN)
+ *   GET    /orders?status=...   → admin list (protected by an admin session — see below)
+ *
+ * Admin auth (replaces the old static ADMIN_TOKEN):
+ *   POST /admin/login/request-code → body {}, header Authorization: Bearer
+ *        <Supabase access token from signInWithPassword>. Only emails present
+ *        in the `admins` table get a 6-digit code emailed to them.
+ *   POST /admin/login/verify-code  → body { code }, same header. On success
+ *        returns a short-lived (12h) admin session token — every admin-only
+ *        route below checks THIS token against `admin_sessions`, not the
+ *        Supabase JWT and not any static secret.
+ *   POST /admin/logout             → revokes the given admin session token.
  *
  * The static site posts new orders here when data.js `ORDER_API_URL` is set.
  * All secrets are read from `env` (Worker secrets/vars) — never hardcoded.
@@ -22,8 +32,7 @@
  * Required env bindings:
  *   SUPABASE_URL          – e.g. https://xxxx.supabase.co
  *   SUPABASE_SERVICE_KEY   – Supabase service_role key (server-side only!)
- *   ADMIN_TOKEN            – bearer token that guards GET /orders + PATCH .../paid
- *   RESEND_API_KEY         – Resend API key for the thank-you email
+ *   RESEND_API_KEY         – Resend API key for the thank-you email + admin 2FA code
  *   STRIPE_SECRET_KEY      – Stripe secret key (sk_...) — CARD PAYMENTS, server-only!
  *   STRIPE_WEBHOOK_SECRET  – Stripe webhook signing secret (whsec_...) for /stripe/webhook
  *   SITE_URL               – (optional) public site origin for Stripe success/cancel URLs
@@ -512,24 +521,124 @@ function thankYouTemplate(o) {
   return T[o.lang] || T.en;
 }
 
-async function sendThankYouEmail(order, env) {
-  const tpl = thankYouTemplate(order);
+// generic sender (Resend) — used for the thank-you email and the admin 2FA code
+async function sendEmail(env, { to, subject, text }) {
   if (!env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured');
-
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: FROM, to: order.email, subject: tpl.s, text: tpl.b }),
+    body: JSON.stringify({ from: FROM, to, subject, text }),
   });
-
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error(`Resend API error ${res.status}: ${body}`);
   }
+}
+
+async function sendThankYouEmail(order, env) {
+  const tpl = thankYouTemplate(order);
+  await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b });
   return tpl;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADMIN AUTH — Supabase email+password login, then a 6-digit code emailed
+// to the admin as a second factor. Only emails listed in the `admins` table
+// may ever pass. On success the client receives a short-lived, revocable
+// "admin session" token (NOT the Supabase JWT) that every admin endpoint
+// checks against the `admin_sessions` table — this replaces the old static
+// ADMIN_TOKEN entirely.
+// ═══════════════════════════════════════════════════════════════
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+function randomToken(bytes) {
+  const arr = new Uint8Array(bytes);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+function randomCode() {
+  // 6 digits, zero-padded — crypto.getRandomValues so it isn't Math.random-guessable
+  const arr = new Uint32Array(1);
+  crypto.getRandomValues(arr);
+  return String(arr[0] % 1000000).padStart(6, '0');
+}
+
+// resolve the Supabase user behind a client-held access token (from
+// signInWithPassword) — this only tells us WHO they are, not that they're an
+// admin; isAdminEmail() below is the actual gate.
+async function resolveSupabaseUser(db, accessToken) {
+  if (!accessToken) return null;
+  const { data, error } = await db.auth.getUser(accessToken);
+  if (error || !data || !data.user) return null;
+  return data.user.email;
+}
+async function isAdminEmail(db, email) {
+  if (!email) return false;
+  const { data } = await db.from('admins').select('email').eq('email', email.toLowerCase()).maybeSingle();
+  return !!data;
+}
+
+// ---- POST /admin/login/request-code ----
+// body: {} ; header: Authorization: Bearer <supabase access token from signInWithPassword>
+async function requestAdminCode(env, db, accessToken) {
+  const email = await resolveSupabaseUser(db, accessToken);
+  if (!email || !(await isAdminEmail(db, email))) return { error: 'forbidden', status: 403 };
+  const code = randomCode();
+  const codeHash = await sha256Hex(code);
+  await db.from('admin_mfa_codes').insert({
+    email: email.toLowerCase(), code_hash: codeHash,
+    expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+  });
+  await sendEmail(env, {
+    to: email, subject: 'Your TOP Pep admin login code',
+    text: `Your admin login code is: ${code}\n\nIt expires in 10 minutes. If you didn't request this, ignore this email.`,
+  });
+  return { ok: true };
+}
+
+// ---- POST /admin/login/verify-code ----
+// body: { code } ; header: Authorization: Bearer <supabase access token>
+async function verifyAdminCode(db, accessToken, code) {
+  const email = await resolveSupabaseUser(db, accessToken);
+  if (!email || !(await isAdminEmail(db, email))) return { error: 'forbidden', status: 403 };
+  const codeHash = await sha256Hex(String(code || '').trim());
+  const { data: match } = await db.from('admin_mfa_codes').select('id')
+    .eq('email', email.toLowerCase()).eq('code_hash', codeHash).eq('used', false)
+    .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (!match) return { error: 'invalid or expired code', status: 401 };
+  await db.from('admin_mfa_codes').update({ used: true }).eq('id', match.id);
+
+  const token = randomToken(32);
+  const tokenHash = await sha256Hex(token);
+  const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(); // 12h admin session
+  await db.from('admin_sessions').insert({ email: email.toLowerCase(), token_hash: tokenHash, expires_at: expiresAt });
+  return { ok: true, token, expires_at: expiresAt };
+}
+
+// ---- POST /admin/logout ----
+async function adminLogout(db, sessionToken) {
+  if (!sessionToken) return { ok: true };
+  const tokenHash = await sha256Hex(sessionToken);
+  await db.from('admin_sessions').update({ revoked: true }).eq('token_hash', tokenHash);
+  return { ok: true };
+}
+
+// gate for every admin-only route: validates the ADMIN SESSION token (issued
+// by verifyAdminCode above) against admin_sessions — NOT the Supabase JWT.
+async function requireAdminSession(db, request) {
+  const auth = request.headers.get('authorization') || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+  if (!token) return null;
+  const tokenHash = await sha256Hex(token);
+  const { data } = await db.from('admin_sessions').select('email, expires_at, revoked')
+    .eq('token_hash', tokenHash).maybeSingle();
+  if (!data || data.revoked || new Date(data.expires_at) < new Date()) return null;
+  return data.email;
 }
 
 // ---- CORS ----
@@ -558,12 +667,10 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(env) });
     }
 
-    // Accept either naming convention for these two secrets — Supabase's own
+    // Accept either naming convention for this secret — Supabase's own
     // dashboard calls it "service_role", so both `wrangler secret put
-    // SUPABASE_SERVICE_KEY` and `...SUPABASE_SERVICE_ROLE_KEY` work, same for
-    // ADMIN_TOKEN / ADMIN_SECRET.
+    // SUPABASE_SERVICE_KEY` and `...SUPABASE_SERVICE_ROLE_KEY` work.
     const SUPABASE_SERVICE_KEY = env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
-    const ADMIN_TOKEN = env.ADMIN_TOKEN || env.ADMIN_SECRET;
 
     // Supabase is optional for the Stripe routes (card payments can run without
     // it, at the cost of DB-guaranteed unique refs + automatic paid/email).
@@ -596,43 +703,72 @@ export default {
         return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which codes exist
       }
 
-      // ---- affiliate: admin management (ADMIN_TOKEN) ----
+      // ---- admin login: Supabase password session -> emailed 6-digit code ----
+      // step 1: browser already did sb.auth.signInWithPassword(); it sends us
+      // that Supabase access token so we can check the admins table + email a code.
+      if (request.method === 'POST' && url.pathname === '/admin/login/request-code') {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        const authz = request.headers.get('authorization') || '';
+        const accessToken = authz.startsWith('Bearer ') ? authz.slice(7).trim() : '';
+        const res = await requestAdminCode(env, db, accessToken);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+      // step 2: the code from that email is submitted -> issues the admin session token
+      if (request.method === 'POST' && url.pathname === '/admin/login/verify-code') {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        const authz = request.headers.get('authorization') || '';
+        const accessToken = authz.startsWith('Bearer ') ? authz.slice(7).trim() : '';
+        const body = await request.json().catch(() => ({}));
+        const res = await verifyAdminCode(db, accessToken, body.code);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+      if (request.method === 'POST' && url.pathname === '/admin/logout') {
+        if (!db) return jsonResponse({ ok: true }, {}, env);
+        const authz = request.headers.get('authorization') || '';
+        const token = authz.startsWith('Bearer ') ? authz.slice(7).trim() : '';
+        const res = await adminLogout(db, token);
+        return jsonResponse(res, {}, env);
+      }
+
+      // ---- affiliate: admin management (admin session) ----
       if (request.method === 'POST' && url.pathname === '/affiliate/create') {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
-        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
         const body = await request.json().catch(() => ({}));
         const res = await createAffiliate(db, body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, { status: 201 }, env);
       }
       if (request.method === 'GET' && url.pathname === '/affiliate/list') {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
-        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
         const res = await listAffiliates(db);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
       }
 
-      // ---- affiliate: admin payout views (ADMIN_TOKEN) ----
+      // ---- affiliate: admin payout views (admin session) ----
       if (request.method === 'GET' && url.pathname === '/affiliate/payouts') {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
-        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
         const res = await listPayouts(db);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
       }
       const payoutMatch = url.pathname.match(/^\/affiliate\/sales\/(\d+)\/payout$/);
       if (request.method === 'PATCH' && payoutMatch) {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
-        if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
         const res = await markPayout(db, payoutMatch[1]);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
@@ -666,7 +802,7 @@ export default {
 
       const paidMatch = url.pathname.match(/^\/orders\/([^/]+)\/paid$/);
       if (request.method === 'PATCH' && paidMatch) {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await markPaid(db, paidMatch[1], env);
@@ -676,7 +812,7 @@ export default {
 
       const deliveredMatch = url.pathname.match(/^\/orders\/([^/]+)\/delivered$/);
       if (request.method === 'PATCH' && deliveredMatch) {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await markDelivered(db, deliveredMatch[1]);
@@ -685,7 +821,7 @@ export default {
       }
 
       if (request.method === 'GET' && url.pathname === '/orders') {
-        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
+        if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const status = url.searchParams.get('status') || undefined;
