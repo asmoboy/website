@@ -16,6 +16,10 @@ create table if not exists affiliates (
   email          text        not null,
   referral_code  text        not null unique,          -- the ?ref=CODE token
   commission_pct numeric(5,2) not null default 20 check (commission_pct >= 0 and commission_pct <= 100),
+  -- % off the order when a CUSTOMER types this same referral_code as a promo
+  -- code at checkout — independent of commission_pct (what the affiliate
+  -- earns); 0 = code still tracks/attributes but gives no discount.
+  discount_pct   numeric(5,2) not null default 0 check (discount_pct >= 0 and discount_pct <= 100),
   payout_method  text        check (payout_method in ('paypal','bank')),
   payout_details text,                                  -- PayPal email or IBAN
   active         boolean     not null default true,

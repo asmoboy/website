@@ -109,13 +109,32 @@ function promoRate(code) {
   return PROMO_CODES[key] || 0;
 }
 
-function computeAmountCents(payload) {
+// A code the customer types at checkout can be either a static promo code
+// (PROMO_CODES above) OR an affiliate's own referral_code — in which case it
+// ALSO doubles as the discount code they can hand out ("use code ANNA10 for
+// 10% off"), independent of whether the customer arrived via their ?ref= link.
+// This is the single source of truth for "how much does this code discount";
+// createSale() below uses it too, so the commission base and the customer's
+// discount always agree.
+async function resolveDiscountRate(db, code) {
+  const trimmed = String(code || '').trim();
+  if (!trimmed) return 0;
+  const staticRate = promoRate(trimmed);
+  if (staticRate > 0) return staticRate;
+  if (!db) return 0;
+  const { data } = await db.from('affiliates').select('discount_pct, active')
+    .ilike('referral_code', trimmed).maybeSingle();
+  if (!data || data.active === false) return 0;
+  return Number(data.discount_pct || 0) / 100;
+}
+
+async function computeAmountCents(db, payload) {
   let items = (payload.items || []).reduce(function (n, i) {
     const qty = Math.max(1, parseInt(i.qty, 10) || 1);
     return n + toMinorUnits(i.price) * qty;
   }, 0);
   // percentage discount applies to the item subtotal only (not shipping)
-  const rate = promoRate(payload.promo);
+  const rate = await resolveDiscountRate(db, payload.promo);
   if (rate > 0) items -= Math.round(items * rate);
   let total = items;
   if (Number(payload.shipping) > 0) total += toMinorUnits(payload.shipping);
@@ -134,7 +153,7 @@ async function createPaymentIntent(env, db, payload) {
   const addrError = validateAddress(base);
   if (addrError) return { error: addrError, status: 400 };
   const currency = (payload.currency || 'eur').toLowerCase();
-  const amount = computeAmountCents(payload);
+  const amount = await computeAmountCents(db, payload);
   if (amount < 1) return { error: 'no items', status: 400 };
 
   let ref;
@@ -385,7 +404,7 @@ function itemsSubtotal(payload) {
 async function recordClick(db, payload, ip) {
   const code = String(payload.ref || '').trim();
   if (!code) return;
-  const { data: aff } = await db.from('affiliates').select('id, active').eq('referral_code', code).maybeSingle();
+  const { data: aff } = await db.from('affiliates').select('id, active').ilike('referral_code', code).maybeSingle();
   if (!aff || aff.active === false) return;
   await db.from('clicks').insert({
     referral_code: code,
@@ -396,14 +415,18 @@ async function recordClick(db, payload, ip) {
   });
 }
 
-// create the sale row for a freshly-inserted order (if it carried a ref code)
+// create the sale row for a freshly-inserted order. Attribution prefers the
+// ?ref= cookie (payload.ref_code); if that's empty, a manually-typed promo
+// code that happens to be an affiliate's own referral_code counts too — a
+// customer typing "ANNA10" at checkout is exactly as much a referral as
+// clicking her link.
 async function createSale(db, order, payload) {
-  const code = String(payload.ref_code || '').trim();
+  const code = String(payload.ref_code || payload.promo || '').trim();
   if (!code) return;
   const { data: aff } = await db.from('affiliates')
-    .select('id, email, commission_pct, active').eq('referral_code', code).maybeSingle();
+    .select('id, email, commission_pct, active').ilike('referral_code', code).maybeSingle();
   if (!aff || aff.active === false) return;           // unknown/inactive code → no attribution
-  const base = round2(itemsSubtotal(payload) * (1 - promoRate(payload.promo)));
+  const base = round2(itemsSubtotal(payload) * (1 - await resolveDiscountRate(db, payload.promo)));
   const pct = Number(aff.commission_pct);
   const commission = round2(base * pct / 100);
   const selfRef = String(order.email || '').trim().toLowerCase() === String(aff.email || '').trim().toLowerCase();
@@ -464,9 +487,16 @@ async function createAffiliate(db, body) {
   const email = String(body.email || '').trim().toLowerCase();
   const code = String(body.referral_code || '').trim();
   const pct = Number(body.commission_pct);
+  // customer-facing discount this same code gives when typed at checkout —
+  // independent of commission_pct (what the affiliate earns); 0 = no discount,
+  // the code still works purely for tracking.
+  const discountPct = body.discount_pct === undefined || body.discount_pct === '' ? 0 : Number(body.discount_pct);
   const password = String(body.password || '');
   if (!name || !email || !code || !(pct >= 0 && pct <= 100)) {
     return { error: 'name, email, referral_code and a commission_pct (0–100) are required', status: 400 };
+  }
+  if (!(discountPct >= 0 && discountPct <= 100)) {
+    return { error: 'discount_pct must be between 0 and 100', status: 400 };
   }
   let userId = null;
   if (password) {
@@ -476,7 +506,7 @@ async function createAffiliate(db, body) {
     userId = created.user.id;
   }
   const { data, error } = await db.from('affiliates').insert({
-    user_id: userId, name, email, referral_code: code, commission_pct: pct,
+    user_id: userId, name, email, referral_code: code, commission_pct: pct, discount_pct: discountPct,
     payout_method: body.payout_method || null, payout_details: body.payout_details || null,
   }).select().single();
   if (error) return { error: error.message, status: isUniqueViolation(error) ? 409 : 500 };
@@ -701,6 +731,14 @@ export default {
           await recordClick(db, body, ip).catch(() => {});
         }
         return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which codes exist
+      }
+
+      // ---- checkout: validate a typed code (public) — static promo code OR
+      // an affiliate's own referral_code used as a discount code ----
+      if (request.method === 'POST' && url.pathname === '/promo/check') {
+        const body = await request.json().catch(() => ({}));
+        const rate = await resolveDiscountRate(db, body.code);
+        return jsonResponse({ ok: true, valid: rate > 0, pct: Math.round(rate * 10000) / 100 }, {}, env);
       }
 
       // ---- admin login: Supabase password session -> emailed 6-digit code ----

@@ -62,7 +62,7 @@
       categories: 'Categories', continue_shopping: 'Continue shopping', search_ph: 'Search compounds…',
       popular: 'Popular items', no_results: 'No compounds match', results: 'results',
       coa_verified: 'Verified', coa_in_testing: 'In testing', coa_report_soon: 'awaiting Janoshik — report coming soon',
-      coa_verified_count: 'lots verified', coa_coming_soon: 'Coming Soon', coa_open_janoshik: 'Open on Janoshik official site', promo_code: 'Promo code', promo_enter: 'Enter code', apply: 'Apply', promo_applied: 'Code applied — 20% off', promo_invalid: 'That code isn’t valid.', discount_word: 'Discount', search_lot_ph: 'Search by compound',
+      coa_verified_count: 'lots verified', coa_coming_soon: 'Coming Soon', coa_open_janoshik: 'Open on Janoshik official site', promo_code: 'Promo code', promo_enter: 'Enter code', apply: 'Apply', promo_applied: 'Code applied — {pct}% off', promo_checking: 'Checking code…', promo_invalid: 'That code isn’t valid.', discount_word: 'Discount', search_lot_ph: 'Search by compound',
       remove: 'Remove', qty: 'Qty', research_only: 'Research use only', free_shipping_over: 'Free shipping over',
       place_order: 'Place order', order_placed: 'Order placed ✓', secured_demo: 'You’ll get our bank details and a unique payment reference on the next step. No card details are stored.',
       order_summary: 'Order summary', shipping_word: 'Shipping', total: 'Total', free_word: 'Free',
@@ -275,7 +275,7 @@
       categories: 'Kategorien', continue_shopping: 'Weiter einkaufen', search_ph: 'Wirkstoffe suchen…',
       popular: 'Beliebte Produkte', no_results: 'Keine Treffer für', results: 'Treffer',
       coa_verified: 'Verifiziert', coa_in_testing: 'In Prüfung', coa_report_soon: 'wird von Janoshik geprüft — Bericht folgt in Kürze',
-      coa_verified_count: 'Chargen verifiziert', coa_coming_soon: 'Demnächst', coa_open_janoshik: 'Auf der offiziellen Janoshik-Seite öffnen', promo_code: 'Gutscheincode', promo_enter: 'Code eingeben', apply: 'Anwenden', promo_applied: 'Code eingelöst — 20% Rabatt', promo_invalid: 'Dieser Code ist ungültig.', discount_word: 'Rabatt', search_lot_ph: 'Suche nach Wirkstoff',
+      coa_verified_count: 'Chargen verifiziert', coa_coming_soon: 'Demnächst', coa_open_janoshik: 'Auf der offiziellen Janoshik-Seite öffnen', promo_code: 'Gutscheincode', promo_enter: 'Code eingeben', apply: 'Anwenden', promo_applied: 'Code eingelöst — {pct}% Rabatt', promo_checking: 'Code wird geprüft…', promo_invalid: 'Dieser Code ist ungültig.', discount_word: 'Rabatt', search_lot_ph: 'Suche nach Wirkstoff',
       remove: 'Entfernen', qty: 'Menge', research_only: 'Nur für Forschungszwecke', free_shipping_over: 'Gratisversand ab',
       place_order: 'Bestellung aufgeben', order_placed: 'Bestellung aufgegeben ✓', secured_demo: 'Im nächsten Schritt erhältst du unsere Bankdaten und eine eindeutige Zahlungsreferenz. Es werden keine Kartendaten gespeichert.',
       order_summary: 'Bestellübersicht', shipping_word: 'Versand', total: 'Gesamt', free_word: 'Gratis',
@@ -489,7 +489,7 @@
       categories: 'Categorii', continue_shopping: 'Continuă cumpărăturile', search_ph: 'Caută compuși…',
       popular: 'Produse populare', no_results: 'Niciun rezultat pentru', results: 'rezultate',
       coa_verified: 'Verificat', coa_in_testing: 'În testare', coa_report_soon: 'în așteptare la Janoshik — raportul urmează în curând',
-      coa_verified_count: 'loturi verificate', coa_coming_soon: 'În curând', coa_open_janoshik: 'Deschide pe site-ul oficial Janoshik', promo_code: 'Cod promoțional', promo_enter: 'Introdu codul', apply: 'Aplică', promo_applied: 'Cod aplicat — 20% reducere', promo_invalid: 'Acest cod nu este valid.', discount_word: 'Reducere', search_lot_ph: 'Caută după compus',
+      coa_verified_count: 'loturi verificate', coa_coming_soon: 'În curând', coa_open_janoshik: 'Deschide pe site-ul oficial Janoshik', promo_code: 'Cod promoțional', promo_enter: 'Introdu codul', apply: 'Aplică', promo_applied: 'Cod aplicat — {pct}% reducere', promo_checking: 'Se verifică codul…', promo_invalid: 'Acest cod nu este valid.', discount_word: 'Reducere', search_lot_ph: 'Caută după compus',
       remove: 'Elimină', qty: 'Cant.', research_only: 'Doar pentru cercetare', free_shipping_over: 'Livrare gratuită peste',
       place_order: 'Plasează comanda', order_placed: 'Comandă plasată ✓', secured_demo: 'La pasul următor primești datele noastre bancare și o referință de plată unică. Nu se stochează date de card.',
       order_summary: 'Sumar comandă', shipping_word: 'Transport', total: 'Total', free_word: 'Gratuit',
@@ -2106,10 +2106,10 @@
   var stripeJs = null, stripeElements = null, stripeMounted = false;
   var coMethod = 'card'; // 'card' | 'cod' — selected payment method at checkout
 
-  /* ---- promo code ---- : the only live code is STIFI = 20% off the subtotal.
-     The Cloudflare Worker re-validates this server-side and recomputes the
-     charged amount, so a tampered front-end can't invent a discount. */
-  var PROMO_CODES = { 'STIFI': 0.20 };
+  /* ---- promo code ---- : a code is either the static STIFI code or an
+     affiliate's own referral_code used as a discount code (see /promo/check
+     on the Worker — that's the single source of truth; the front-end never
+     decides validity itself, so it can't be tricked into a fake discount). */
   var promoCode = '';        // the accepted code (uppercased), '' if none
   var promoPct = 0;          // discount fraction, e.g. 0.10
   function promoDiscount(sub) { return promoPct > 0 ? Math.round(sub * promoPct * 100) / 100 : 0; }
@@ -2532,22 +2532,38 @@
         pt.setAttribute('aria-expanded', String(open));
       });
     }
-    // promo code apply — validates against PROMO_CODES; the Worker re-checks it
+    // promo code apply — asks the Worker (/promo/check) whether the typed
+    // code is valid, either the static STIFI code or an affiliate's own
+    // referral_code doubling as a discount code. Same code also earns that
+    // affiliate commission (see order-api.js createSale) even if the
+    // customer never clicked their ?ref= link.
     var pApply = $('#promoApply'), pInput = $('#promoInput'), pMsg = $('#promoMsg');
     if (pInput && promoCode) pInput.value = promoCode; // keep across re-renders
     if (pApply && !pApply.dataset.wired) {
       pApply.dataset.wired = '1';
       pApply.addEventListener('click', function () {
         var code = (pInput && pInput.value || '').trim().toUpperCase();
-        if (PROMO_CODES[code]) {
-          promoCode = code; promoPct = PROMO_CODES[code];
-          if (pMsg) { pMsg.className = 'promo-msg ok'; pMsg.textContent = t('promo_applied'); }
-        } else {
+        if (!code || !T.orderApiUrl) return;
+        pApply.disabled = true;
+        if (pMsg) { pMsg.className = 'promo-msg'; pMsg.textContent = t('promo_checking'); }
+        fetch(T.orderApiUrl + '/promo/check', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: code })
+        }).then(function (r) { return r.json(); }).then(function (res) {
+          pApply.disabled = false;
+          if (res && res.valid && res.pct > 0) {
+            promoCode = code; promoPct = res.pct / 100;
+            if (pMsg) { pMsg.className = 'promo-msg ok'; pMsg.textContent = t('promo_applied').replace('{pct}', res.pct); }
+          } else {
+            promoCode = ''; promoPct = 0;
+            if (pMsg) { pMsg.className = 'promo-msg err'; pMsg.textContent = t('promo_invalid'); }
+          }
+          renderCheckout();                 // reflect the discount in totals + Stripe amount
+          updateStripeAmount();
+        }).catch(function () {
+          pApply.disabled = false;
           promoCode = ''; promoPct = 0;
           if (pMsg) { pMsg.className = 'promo-msg err'; pMsg.textContent = t('promo_invalid'); }
-        }
-        renderCheckout();                 // reflect the discount in totals + Stripe amount
-        updateStripeAmount();
+        });
       });
     }
   }
