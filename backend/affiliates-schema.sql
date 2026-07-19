@@ -67,7 +67,7 @@ create index if not exists sales_status_idx    on sales (status);
 -- Add a "delivered" state to orders so COD sales can be confirmed on delivery.
 alter table orders drop constraint if exists orders_status_check;
 alter table orders add constraint orders_status_check
-  check (status in ('pending','paid','cod','shipped','delivered','cancelled'));
+  check (status in ('received','pending','paid','cod','shipped','delivered','cancelled'));
 alter table orders add column if not exists delivered_at timestamptz;
 
 -- ═════════════════════════════════════════════════════════════
