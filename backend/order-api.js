@@ -558,10 +558,17 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(env) });
     }
 
+    // Accept either naming convention for these two secrets — Supabase's own
+    // dashboard calls it "service_role", so both `wrangler secret put
+    // SUPABASE_SERVICE_KEY` and `...SUPABASE_SERVICE_ROLE_KEY` work, same for
+    // ADMIN_TOKEN / ADMIN_SECRET.
+    const SUPABASE_SERVICE_KEY = env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+    const ADMIN_TOKEN = env.ADMIN_TOKEN || env.ADMIN_SECRET;
+
     // Supabase is optional for the Stripe routes (card payments can run without
     // it, at the cost of DB-guaranteed unique refs + automatic paid/email).
-    const db = (env.SUPABASE_URL && env.SUPABASE_SERVICE_KEY)
-      ? createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
+    const db = (env.SUPABASE_URL && SUPABASE_SERVICE_KEY)
+      ? createClient(env.SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
       : null;
 
     try {
@@ -591,7 +598,7 @@ export default {
 
       // ---- affiliate: admin management (ADMIN_TOKEN) ----
       if (request.method === 'POST' && url.pathname === '/affiliate/create') {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
@@ -601,7 +608,7 @@ export default {
         return jsonResponse(res, { status: 201 }, env);
       }
       if (request.method === 'GET' && url.pathname === '/affiliate/list') {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
@@ -612,7 +619,7 @@ export default {
 
       // ---- affiliate: admin payout views (ADMIN_TOKEN) ----
       if (request.method === 'GET' && url.pathname === '/affiliate/payouts') {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
@@ -622,7 +629,7 @@ export default {
       }
       const payoutMatch = url.pathname.match(/^\/affiliate\/sales\/(\d+)\/payout$/);
       if (request.method === 'PATCH' && payoutMatch) {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         if (!db) return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
@@ -659,7 +666,7 @@ export default {
 
       const paidMatch = url.pathname.match(/^\/orders\/([^/]+)\/paid$/);
       if (request.method === 'PATCH' && paidMatch) {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await markPaid(db, paidMatch[1], env);
@@ -669,7 +676,7 @@ export default {
 
       const deliveredMatch = url.pathname.match(/^\/orders\/([^/]+)\/delivered$/);
       if (request.method === 'PATCH' && deliveredMatch) {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await markDelivered(db, deliveredMatch[1]);
@@ -678,7 +685,7 @@ export default {
       }
 
       if (request.method === 'GET' && url.pathname === '/orders') {
-        if (request.headers.get('authorization') !== `Bearer ${env.ADMIN_TOKEN}`) {
+        if (request.headers.get('authorization') !== `Bearer ${ADMIN_TOKEN}`) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const status = url.searchParams.get('status') || undefined;
