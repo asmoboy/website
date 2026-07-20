@@ -530,11 +530,11 @@ async function sendAffiliatePasswordSetup(env, db, email) {
   // ensure a Supabase Auth user exists for this email (recovery links need one)
   let userId = aff.user_id;
   if (!userId) {
-    const { data: created } = await db.auth.admin.createUser({
+    const cr = await db.auth.admin.createUser({
       email: clean, email_confirm: true, password: randomToken(16),
-    }).catch(() => ({ data: null }));
-    if (created && created.user) {
-      userId = created.user.id;
+    }).catch(() => ({ error: true }));
+    if (cr && cr.data && cr.data.user) {
+      userId = cr.data.user.id;
       await db.from('affiliates').update({ user_id: userId }).eq('id', aff.id).catch(() => {});
     }
     // if createUser failed because the user already exists, generateLink below
