@@ -191,7 +191,7 @@
       sort_recommended: 'Recommended', sort_az: 'A → Z', sort_price_asc: 'Price ↑', sort_price_desc: 'Price ↓',
       acc_welcome: 'Welcome back', acc_create_title: 'Create your account', acc_signin: 'Sign in', acc_create: 'Create account',
       acc_google: 'Continue with Google', acc_or_email: 'or with email', acc_name: 'Full name', acc_pass: 'Password',
-      acc_remember: 'Remember me', acc_forgot: 'Forgot password?', acc_demo: 'Demo only — no account was created.',
+      acc_remember: 'Remember me', acc_forgot: 'Forgot password?', acc_demo: 'Demo only — no account was created.', acc_signed_as: 'Signed in as', acc_signout: 'Sign out', acc_reset_sent: 'If that email has an account, we’ve emailed a password reset link.', acc_enter_email: 'Enter your email above first.', acc_signup_check: 'Almost done — check your email to confirm your account, then sign in.', acc_setpw_title: 'Choose a new password', acc_setpw_save: 'Save password', acc_pw_min: 'Password must be at least 8 characters.', acc_working: 'Please wait…',
       pay_bank: 'Bank transfer', pay_bank_body: 'Transfer details are emailed after you place the order; we dispatch on receipt of cleared funds.',
       pay_crypto: 'Crypto', pay_crypto_body: 'Pay in BTC, ETH or USDT. A wallet address and the exact amount are shown after you place the order.',
       cc_num: 'Card number', cc_exp: 'Expiry', cc_cvc: 'CVC', co_added: 'Added',
@@ -404,7 +404,7 @@
       sort_recommended: 'Empfohlen', sort_az: 'A → Z', sort_price_asc: 'Preis ↑', sort_price_desc: 'Preis ↓',
       acc_welcome: 'Willkommen zurück', acc_create_title: 'Konto erstellen', acc_signin: 'Anmelden', acc_create: 'Konto erstellen',
       acc_google: 'Mit Google fortfahren', acc_or_email: 'oder mit E-Mail', acc_name: 'Vollständiger Name', acc_pass: 'Passwort',
-      acc_remember: 'Angemeldet bleiben', acc_forgot: 'Passwort vergessen?', acc_demo: 'Nur zur Demo — es wurde kein Konto erstellt.',
+      acc_remember: 'Angemeldet bleiben', acc_forgot: 'Passwort vergessen?', acc_demo: 'Nur zur Demo — es wurde kein Konto erstellt.', acc_signed_as: 'Angemeldet als', acc_signout: 'Abmelden', acc_reset_sent: 'Falls zu dieser E-Mail ein Konto existiert, haben wir dir einen Link zum Zurücksetzen des Passworts geschickt.', acc_enter_email: 'Gib zuerst oben deine E-Mail ein.', acc_signup_check: 'Fast fertig — bestätige dein Konto über die E-Mail, dann melde dich an.', acc_setpw_title: 'Neues Passwort wählen', acc_setpw_save: 'Passwort speichern', acc_pw_min: 'Das Passwort muss mindestens 8 Zeichen haben.', acc_working: 'Bitte warten…',
       pay_bank: 'Banküberweisung', pay_bank_body: 'Die Überweisungsdaten erhältst du nach der Bestellung per E-Mail; wir versenden nach Zahlungseingang.',
       pay_crypto: 'Krypto', pay_crypto_body: 'Zahle in BTC, ETH oder USDT. Wallet-Adresse und der genaue Betrag werden nach der Bestellung angezeigt.',
       cc_num: 'Kartennummer', cc_exp: 'Gültig bis', cc_cvc: 'Prüfziffer', co_added: 'Hinzugefügt',
@@ -618,7 +618,7 @@
       sort_recommended: 'Recomandate', sort_az: 'A → Z', sort_price_asc: 'Preț ↑', sort_price_desc: 'Preț ↓',
       acc_welcome: 'Bine ai revenit', acc_create_title: 'Creează-ți contul', acc_signin: 'Autentificare', acc_create: 'Creează cont',
       acc_google: 'Continuă cu Google', acc_or_email: 'sau cu e-mail', acc_name: 'Nume complet', acc_pass: 'Parolă',
-      acc_remember: 'Ține-mă minte', acc_forgot: 'Ai uitat parola?', acc_demo: 'Doar demo — nu a fost creat niciun cont.',
+      acc_remember: 'Ține-mă minte', acc_forgot: 'Ai uitat parola?', acc_demo: 'Doar demo — nu a fost creat niciun cont.', acc_signed_as: 'Autentificat ca', acc_signout: 'Deconectare', acc_reset_sent: 'Dacă există un cont cu acest e-mail, ți-am trimis un link de resetare a parolei.', acc_enter_email: 'Introdu mai întâi e-mailul mai sus.', acc_signup_check: 'Aproape gata — confirmă-ți contul din e-mail, apoi autentifică-te.', acc_setpw_title: 'Alege o parolă nouă', acc_setpw_save: 'Salvează parola', acc_pw_min: 'Parola trebuie să aibă cel puțin 8 caractere.', acc_working: 'Te rugăm așteaptă…',
       pay_bank: 'Transfer bancar', pay_bank_body: 'Detaliile de transfer îți sunt trimise pe e-mail după plasarea comenzii; expediem la confirmarea plății.',
       pay_crypto: 'Cripto', pay_crypto_body: 'Plătește în BTC, ETH sau USDT. Adresa portofelului și suma exactă apar după plasarea comenzii.',
       cc_num: 'Număr card', cc_exp: 'Expiră', cc_cvc: 'CVC', co_added: 'Adăugat',
@@ -1488,8 +1488,8 @@
     account: function () {
       var params = new URLSearchParams(location.search);
       if (params.get('mode') === 'register') switchAuth('register');
-      $$('.auth-tab').forEach(function (t) { t.addEventListener('click', function () { switchAuth(t.dataset.mode); }); });
-      $('#authForm').addEventListener('submit', function (e) { e.preventDefault(); $('#authStatus').textContent = t('acc_demo'); });
+      $$('.auth-tab').forEach(function (tab) { tab.addEventListener('click', function () { switchAuth(tab.dataset.mode); }); });
+      initAccountAuth();
     },
 
     coa: function () {
@@ -2566,6 +2566,78 @@
         });
       });
     }
+  }
+
+  /* ---- customer account: real Supabase auth (sign in / register / reset) ---- */
+  function initAccountAuth() {
+    var form = $('#authForm'), status = $('#authStatus');
+    var sb = (window.supabase && T.supabaseUrl && T.supabaseAnonKey)
+      ? window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey) : null;
+    if (!sb) { // Supabase unavailable → keep the old demo message so nothing breaks
+      form.addEventListener('submit', function (e) { e.preventDefault(); status.textContent = t('acc_demo'); });
+      return;
+    }
+    function setMsg(msg, ok) { status.style.color = ok ? '#1a7f37' : ''; status.textContent = msg || ''; }
+    function currentMode() { var s = document.querySelector('.auth-tab[aria-selected="true"]'); return s ? s.dataset.mode : 'login'; }
+
+    function showSignedIn(email) {
+      var card = document.querySelector('.auth-card');
+      card.innerHTML = '<h1 style="font-size:1.5rem;margin-bottom:10px;">' + t('acc_welcome') + '</h1>' +
+        '<p class="text-muted" style="margin-bottom:22px;">' + t('acc_signed_as') + ' <b>' + esc(email || '') + '</b></p>' +
+        '<button class="btn btn-block" id="acSignOut">' + t('acc_signout') + '</button>';
+      $('#acSignOut').addEventListener('click', function () { sb.auth.signOut().then(function () { location.reload(); }); });
+    }
+    function showSetPassword() {
+      var card = document.querySelector('.auth-card');
+      card.innerHTML = '<h1 style="font-size:1.5rem;margin-bottom:18px;">' + t('acc_setpw_title') + '</h1>' +
+        '<div class="field"><label for="acNewPw">' + t('acc_pass') + '</label><input id="acNewPw" type="password" autocomplete="new-password" minlength="8"></div>' +
+        '<button class="btn btn-block" id="acSetPw">' + t('acc_setpw_save') + '</button>' +
+        '<p class="drawer-note" id="acSetMsg" style="margin-top:14px;min-height:16px;"></p>';
+      $('#acSetPw').addEventListener('click', function () {
+        var pw = $('#acNewPw').value, m = $('#acSetMsg');
+        if (pw.length < 8) { m.textContent = t('acc_pw_min'); return; }
+        m.textContent = t('acc_working');
+        sb.auth.updateUser({ password: pw }).then(function (r) {
+          if (r.error) { m.textContent = r.error.message; return; }
+          if (location.hash) history.replaceState(null, '', location.pathname);
+          sb.auth.getUser().then(function (u) { showSignedIn(u.data.user && u.data.user.email); });
+        });
+      });
+    }
+
+    sb.auth.onAuthStateChange(function (event) { if (event === 'PASSWORD_RECOVERY') showSetPassword(); });
+    if (/type=recovery/.test(location.hash)) showSetPassword();
+    else sb.auth.getSession().then(function (s) { if (s.data.session) showSignedIn(s.data.session.user.email); });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = $('#acEmail').value.trim(), pass = $('#acPass').value;
+      setMsg(t('acc_working'));
+      if (currentMode() === 'register') {
+        var name = ($('#acName') && $('#acName').value.trim()) || '';
+        sb.auth.signUp({ email: email, password: pass, options: { data: { full_name: name }, emailRedirectTo: location.origin + '/account/' } }).then(function (r) {
+          if (r.error) { setMsg(r.error.message); return; }
+          if (r.data.session) showSignedIn(email);      // email confirmations off → straight in
+          else setMsg(t('acc_signup_check'), true);      // confirmations on → email sent
+        });
+      } else {
+        sb.auth.signInWithPassword({ email: email, password: pass }).then(function (r) {
+          if (r.error) { setMsg(r.error.message); return; }
+          showSignedIn(email);
+        });
+      }
+    });
+
+    var forgot = document.querySelector('.auth-forgot');
+    if (forgot) forgot.addEventListener('click', function (e) {
+      e.preventDefault();
+      var email = $('#acEmail').value.trim();
+      if (!email) { setMsg(t('acc_enter_email')); $('#acEmail').focus(); return; }
+      setMsg(t('acc_working'));
+      sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/account/' }).then(function () {
+        setMsg(t('acc_reset_sent'), true);
+      });
+    });
   }
 
   /* ---- account tabs ---- */
