@@ -514,6 +514,50 @@ async function createAffiliate(db, body) {
   return { ok: true, affiliate: data };
 }
 
+// ---- POST /affiliate/auth/reset — send a "set / reset password" email ----
+// PUBLIC but gated: only emails that belong to a real, active affiliate ever
+// get an email — everyone else gets the same generic {ok:true} so the endpoint
+// can't be used to probe which emails exist. Handles BOTH first-time setup
+// (affiliate created by the admin with no password yet → we create the Auth
+// user, then send a set-password link) and normal "forgot password".
+async function sendAffiliatePasswordSetup(env, db, email) {
+  const clean = String(email || '').trim().toLowerCase();
+  if (!clean) return { ok: true };
+  const { data: aff } = await db.from('affiliates')
+    .select('id, user_id, active, name').ilike('email', clean).maybeSingle();
+  if (!aff || aff.active === false) return { ok: true }; // never leak non-affiliates
+
+  // ensure a Supabase Auth user exists for this email (recovery links need one)
+  let userId = aff.user_id;
+  if (!userId) {
+    const { data: created } = await db.auth.admin.createUser({
+      email: clean, email_confirm: true, password: randomToken(16),
+    }).catch(() => ({ data: null }));
+    if (created && created.user) {
+      userId = created.user.id;
+      await db.from('affiliates').update({ user_id: userId }).eq('id', aff.id).catch(() => {});
+    }
+    // if createUser failed because the user already exists, generateLink below
+    // still works — it resolves the Auth user by email, not by our user_id.
+  }
+
+  const site = env.SITE_URL || 'https://www.top-pep.com';
+  const { data: linkData, error: lErr } = await db.auth.admin.generateLink({
+    type: 'recovery', email: clean, options: { redirectTo: site + '/affiliate/' },
+  });
+  if (lErr || !linkData || !linkData.properties) return { ok: true }; // stay generic on failure
+  const actionLink = linkData.properties.action_link;
+  await sendEmail(env, {
+    to: clean,
+    subject: 'Set your TOP Pep affiliate password',
+    text: 'Hi' + (aff.name ? ' ' + aff.name : '') + ',\n\n' +
+      'Use the link below to set (or reset) the password for your TOP Pep affiliate dashboard:\n\n' +
+      actionLink + '\n\n' +
+      'The link opens your dashboard and lets you choose a new password. If you didn\'t request this, just ignore this email.\n\n— The TOP Pep team',
+  }).catch(() => {});
+  return { ok: true };
+}
+
 // ---- PATCH /affiliate/:id — edit an existing affiliate ----
 // Only touches fields actually present in the body, so the admin panel can
 // send just the changed ones. Does NOT touch the Supabase Auth login/password
@@ -771,6 +815,15 @@ export default {
         const body = await request.json().catch(() => ({}));
         const rate = await resolveDiscountRate(db, body.code);
         return jsonResponse({ ok: true, valid: rate > 0, pct: Math.round(rate * 10000) / 100 }, {}, env);
+      }
+
+      // ---- affiliate: send a set/reset-password email (public, gated) ----
+      if (request.method === 'POST' && url.pathname === '/affiliate/auth/reset') {
+        if (db) {
+          const body = await request.json().catch(() => ({}));
+          await sendAffiliatePasswordSetup(env, db, body.email).catch(() => {});
+        }
+        return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which emails exist
       }
 
       // ---- admin login: Supabase password session -> emailed 6-digit code ----

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=40">
+<link rel="stylesheet" href="/styles.css?v=41">
 <style>
   body { background: var(--bg-light); }
   .af-top { display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -85,7 +85,23 @@
       <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email"></div>
       <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password"></div>
       <button class="btn btn-block" id="loginBtn">Sign in</button>
+      <p style="text-align:center;margin:14px 0 0;"><a href="#" id="forgotLink" style="font-size:13px;color:var(--accent-primary);">Set / forgot password</a></p>
       <p class="msg" id="loginMsg"></p>
+    </div>
+  </div>
+
+  <!-- SET PASSWORD (first-time setup or reset, reached via the email link) -->
+  <div id="setPwView" style="display:none;">
+    <div class="login-hero">
+      <span class="af-eyebrow">Almost there</span>
+      <h1 class="af-h1">Set your <span class="accent">password</span></h1>
+      <p class="af-lede">Choose a password for your affiliate dashboard.</p>
+    </div>
+    <div class="card login-card" style="max-width:440px;margin:0 auto;">
+      <div class="field"><label for="newPw">New password</label><input id="newPw" type="password" autocomplete="new-password" minlength="8"></div>
+      <div class="field"><label for="newPw2">Repeat password</label><input id="newPw2" type="password" autocomplete="new-password" minlength="8"></div>
+      <button class="btn btn-block" id="setPwBtn">Save password &amp; sign in</button>
+      <p class="msg" id="setPwMsg"></p>
     </div>
   </div>
 
@@ -132,7 +148,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/data.js?v=40"></script>
+<script src="/data.js?v=41"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
@@ -142,11 +158,20 @@
   if (!T.supabaseUrl || !T.supabaseAnonKey || !window.supabase) { $('notReady').style.display = 'block'; return; }
   var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
 
+  var recovering = false; // true while the user arrived via a set-password email link
+
   function show(view) {
     $('loginView').style.display = view === 'login' ? 'block' : 'none';
+    $('setPwView').style.display = view === 'setpw' ? 'block' : 'none';
     $('dash').style.display = view === 'dash' ? 'block' : 'none';
     $('signOutBtn').style.display = view === 'dash' ? '' : 'none';
   }
+
+  // Supabase fires this when the page is opened from a recovery/set-password
+  // email link — show the "choose a password" form instead of the login.
+  sb.auth.onAuthStateChange(function (event) {
+    if (event === 'PASSWORD_RECOVERY') { recovering = true; show('setpw'); }
+  });
 
   async function loadDashboard() {
     show('dash');
@@ -184,6 +209,8 @@
   }
 
   async function route() {
+    // wait a beat so onAuthStateChange can fire PASSWORD_RECOVERY from a link hash
+    if (recovering || /type=recovery/.test(location.hash)) { show('setpw'); return; }
     var sess = await sb.auth.getSession();
     if (sess.data.session) loadDashboard(); else show('login');
   }
@@ -193,6 +220,37 @@
     var res = await sb.auth.signInWithPassword({ email: $('email').value.trim(), password: $('password').value });
     if (res.error) { msg.className = 'msg err'; msg.textContent = res.error.message; return; }
     msg.textContent = ''; loadDashboard();
+  });
+
+  // "Set / forgot password" — asks the Worker to email a set-password link.
+  // Gated server-side to real affiliate emails; response is always generic.
+  $('forgotLink').addEventListener('click', async function (e) {
+    e.preventDefault();
+    var msg = $('loginMsg');
+    var email = $('email').value.trim();
+    if (!email) { msg.className = 'msg err'; msg.textContent = 'Enter your email above first, then click again.'; $('email').focus(); return; }
+    msg.className = 'msg'; msg.textContent = 'Sending…';
+    try {
+      await fetch(T.orderApiUrl + '/affiliate/auth/reset', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email })
+      });
+    } catch (err) {}
+    msg.className = 'msg ok';
+    msg.textContent = 'If ' + email + ' is a registered affiliate, we\'ve emailed you a link to set your password.';
+  });
+
+  // save the chosen password after arriving via the email link
+  $('setPwBtn').addEventListener('click', async function () {
+    var msg = $('setPwMsg'); msg.className = 'msg';
+    var pw = $('newPw').value, pw2 = $('newPw2').value;
+    if (pw.length < 8) { msg.className = 'msg err'; msg.textContent = 'Password must be at least 8 characters.'; return; }
+    if (pw !== pw2) { msg.className = 'msg err'; msg.textContent = 'The two passwords don\'t match.'; return; }
+    msg.textContent = 'Saving…';
+    var res = await sb.auth.updateUser({ password: pw });
+    if (res.error) { msg.className = 'msg err'; msg.textContent = res.error.message; return; }
+    recovering = false;
+    if (location.hash) history.replaceState(null, '', location.pathname); // drop the recovery token from the URL
+    loadDashboard();
   });
   $('signOutBtn').addEventListener('click', async function () { await sb.auth.signOut(); show('login'); });
   $('copyBtn').addEventListener('click', function () {
