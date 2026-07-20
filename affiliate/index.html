@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=41">
+<link rel="stylesheet" href="/styles.css?v=42">
 <style>
   body { background: var(--bg-light); }
   .af-top { display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -17,6 +17,11 @@
   .af-top .brand { display: flex; align-items: center; gap: 10px; }
   .af-top .brand img { height: 34px; width: auto; }
   .af-top .brand span { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+  .af-top-right { display: flex; align-items: center; gap: 14px; }
+  .af-lang { display: inline-flex; gap: 4px; }
+  .af-lang button { font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+    padding: 6px 9px; border: 1px solid var(--line-strong); background: var(--white); color: var(--muted); border-radius: 8px; cursor: pointer; }
+  .af-lang button.on { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
   .af-wrap { max-width: 960px; margin: 0 auto; padding: 56px 24px 100px; }
   .af-eyebrow { display: inline-block; border: 1px solid var(--line-strong); border-radius: 999px;
     padding: 7px 16px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
@@ -26,8 +31,6 @@
   .af-lede { color: var(--muted); font-size: 16px; max-width: 480px; margin: 0 0 34px; }
   .card { background: var(--white); border: 1px solid var(--line); border-radius: 18px;
     box-shadow: 0 20px 50px rgba(10,10,10,0.07); padding: 26px; margin-bottom: 20px; }
-
-  /* login */
   .login-hero { display: grid; grid-template-columns: 1fr; gap: 8px; max-width: 440px; margin: 0 auto; text-align: center; }
   .login-hero .af-eyebrow, .login-hero .af-lede { margin-left: auto; margin-right: auto; }
   .login-card { text-align: left; }
@@ -37,8 +40,6 @@
   .field input:focus { outline: none; border-color: var(--accent-primary); }
   .msg { font-size: 13px; margin: 12px 0 0; min-height: 16px; }
   .msg.err { color: #e0533d; } .msg.ok { color: #1a7f37; }
-
-  /* dashboard */
   .welcome { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
   .ref-box { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
   .ref-box code { flex: 1; min-width: 240px; background: var(--bg-light); border: 1px solid var(--line);
@@ -69,7 +70,12 @@
 
 <div class="af-top">
   <a class="brand" href="/"><img src="/logo.png" alt="TOP Pep"><span>Affiliates</span></a>
-  <button class="btn btn-sm btn-outline" id="signOutBtn" style="display:none;">Sign out</button>
+  <div class="af-top-right">
+    <div class="af-lang" id="langSwitch">
+      <button data-lang="en">EN</button><button data-lang="de">DE</button><button data-lang="ro">RO</button>
+    </div>
+    <button class="btn btn-sm btn-outline" id="signOutBtn" style="display:none;">Sign out</button>
+  </div>
 </div>
 
 <div class="af-wrap">
@@ -77,29 +83,29 @@
   <!-- LOGIN -->
   <div id="loginView" style="display:none;">
     <div class="login-hero">
-      <span class="af-eyebrow">Affiliate program</span>
-      <h1 class="af-h1">Your partner <span class="accent">dashboard</span></h1>
-      <p class="af-lede">Sign in to track your clicks, confirmed sales and commission in real time.</p>
+      <span class="af-eyebrow" id="afProgramEb">Affiliate program</span>
+      <h1 class="af-h1" id="afLoginH">Your partner <span class="accent">dashboard</span></h1>
+      <p class="af-lede" id="afLoginSub">Sign in to track your clicks, confirmed sales and commission in real time.</p>
     </div>
     <div class="card login-card" style="max-width:440px;margin:0 auto;">
-      <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email"></div>
-      <div class="field"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password"></div>
+      <div class="field"><label for="email" id="lblEmail">Email</label><input id="email" type="email" autocomplete="email"></div>
+      <div class="field"><label for="password" id="lblPassword">Password</label><input id="password" type="password" autocomplete="current-password"></div>
       <button class="btn btn-block" id="loginBtn">Sign in</button>
       <p style="text-align:center;margin:14px 0 0;"><a href="#" id="forgotLink" style="font-size:13px;color:var(--accent-primary);">Set / forgot password</a></p>
       <p class="msg" id="loginMsg"></p>
     </div>
   </div>
 
-  <!-- SET PASSWORD (first-time setup or reset, reached via the email link) -->
+  <!-- SET PASSWORD -->
   <div id="setPwView" style="display:none;">
     <div class="login-hero">
-      <span class="af-eyebrow">Almost there</span>
-      <h1 class="af-h1">Set your <span class="accent">password</span></h1>
-      <p class="af-lede">Choose a password for your affiliate dashboard.</p>
+      <span class="af-eyebrow" id="afAlmostEb">Almost there</span>
+      <h1 class="af-h1" id="afSetpwH">Set your <span class="accent">password</span></h1>
+      <p class="af-lede" id="afSetpwSub">Choose a password for your affiliate dashboard.</p>
     </div>
     <div class="card login-card" style="max-width:440px;margin:0 auto;">
-      <div class="field"><label for="newPw">New password</label><input id="newPw" type="password" autocomplete="new-password" minlength="8"></div>
-      <div class="field"><label for="newPw2">Repeat password</label><input id="newPw2" type="password" autocomplete="new-password" minlength="8"></div>
+      <div class="field"><label for="newPw" id="lblNewPw">New password</label><input id="newPw" type="password" autocomplete="new-password" minlength="8"></div>
+      <div class="field"><label for="newPw2" id="lblNewPw2">Repeat password</label><input id="newPw2" type="password" autocomplete="new-password" minlength="8"></div>
       <button class="btn btn-block" id="setPwBtn">Save password &amp; sign in</button>
       <p class="msg" id="setPwMsg"></p>
     </div>
@@ -109,34 +115,34 @@
   <div id="dash" style="display:none;">
     <div class="welcome">
       <div>
-        <span class="af-eyebrow">Signed in</span>
-        <h1 class="af-h1" style="margin-bottom:4px;">Hi, <span class="accent" id="affName"></span></h1>
+        <span class="af-eyebrow" id="afSignedInEb">Signed in</span>
+        <h1 class="af-h1" style="margin-bottom:4px;"><span id="afHiText">Hi,</span> <span class="accent" id="affName"></span></h1>
         <p class="af-lede" style="margin:0;" id="affPct"></p>
       </div>
     </div>
 
     <div class="card">
-      <h2 class="sec">Your referral link</h2>
+      <h2 class="sec" id="afYourLink">Your referral link</h2>
       <div class="ref-box"><code id="refLink"></code><button class="btn btn-sm" id="copyBtn">Copy link</button></div>
       <div class="code-chip" id="codeChip" style="display:none;"></div>
     </div>
 
     <div class="stat-row">
-      <div class="stat"><div class="v" id="stClicks">–</div><div class="l">Clicks</div></div>
-      <div class="stat"><div class="v" id="stSales">–</div><div class="l">Confirmed sales</div></div>
-      <div class="stat hl"><div class="v" id="stConfirmed">–</div><div class="l">Confirmed commission</div></div>
-      <div class="stat"><div class="v" id="stPending">–</div><div class="l">Pending commission</div></div>
+      <div class="stat"><div class="v" id="stClicks">–</div><div class="l" id="lblClicks">Clicks</div></div>
+      <div class="stat"><div class="v" id="stSales">–</div><div class="l" id="lblSales">Confirmed sales</div></div>
+      <div class="stat hl"><div class="v" id="stConfirmed">–</div><div class="l" id="lblConfirmed">Confirmed commission</div></div>
+      <div class="stat"><div class="v" id="stPending">–</div><div class="l" id="lblPending">Pending commission</div></div>
     </div>
 
     <div class="card">
-      <h2 class="sec">Recent sales</h2>
+      <h2 class="sec" id="afRecent">Recent sales</h2>
       <div style="overflow-x:auto;">
         <table class="sales">
-          <thead><tr><th>Order</th><th>Base</th><th>Commission</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody id="salesBody"><tr><td colspan="5" class="text-muted" style="padding:16px 10px;">Loading…</td></tr></tbody>
+          <thead><tr><th id="thOrder">Order</th><th id="thBase">Base</th><th id="thCommission">Commission</th><th id="thStatus">Status</th><th id="thDate">Date</th></tr></thead>
+          <tbody id="salesBody"><tr><td colspan="5" class="text-muted" style="padding:16px 10px;">…</td></tr></tbody>
         </table>
       </div>
-      <p class="foot-note">Pending commissions are shown but not yet payable — cash-on-delivery orders confirm once the parcel is delivered.</p>
+      <p class="foot-note" id="afFootnote">Pending commissions are shown but not yet payable — cash-on-delivery orders confirm once the parcel is delivered.</p>
     </div>
   </div>
 
@@ -148,17 +154,117 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/data.js?v=41"></script>
+<script src="/data.js?v=42"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
   var $ = function (id) { return document.getElementById(id); };
   var money = function (n) { return (Number(n) || 0).toFixed(2) + '€'; };
 
-  if (!T.supabaseUrl || !T.supabaseAnonKey || !window.supabase) { $('notReady').style.display = 'block'; return; }
-  var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
+  /* ---- i18n (EN / DE / RO) ---- */
+  var DICT = {
+    en: {
+      program: 'Affiliate program', login_pre: 'Your partner ', login_accent: 'dashboard',
+      login_sub: 'Sign in to track your clicks, confirmed sales and commission in real time.',
+      email: 'Email', password: 'Password', signin: 'Sign in', forgot: 'Set / forgot password',
+      almost: 'Almost there', setpw_pre: 'Set your ', setpw_accent: 'password',
+      setpw_sub: 'Choose a password for your affiliate dashboard.',
+      newpw: 'New password', newpw2: 'Repeat password', save_signin: 'Save password & sign in',
+      signed_in: 'Signed in', hi: 'Hi,',
+      commission_line: 'You earn {pct}% commission on every referred order.',
+      your_link: 'Your referral link', copy: 'Copy link', copied: 'Copied',
+      discount_chip: 'Customers get {pct}% off with code',
+      clicks: 'Clicks', confirmed_sales: 'Confirmed sales', confirmed_comm: 'Confirmed commission', pending_comm: 'Pending commission',
+      recent: 'Recent sales', th_order: 'Order', th_base: 'Base', th_commission: 'Commission', th_status: 'Status', th_date: 'Date',
+      no_sales: 'No sales yet.', no_profile: 'No affiliate profile linked to this login.',
+      footnote: 'Pending commissions are shown but not yet payable — cash-on-delivery orders confirm once the parcel is delivered.',
+      signout: 'Sign out', signing_in: 'Signing in…', sending: 'Sending…', saving: 'Saving…', loading: 'Loading…',
+      reset_sent: 'If {email} is a registered affiliate, we’ve emailed you a link to set your password.',
+      enter_email_first: 'Enter your email above first, then click again.',
+      pw_min: 'Password must be at least 8 characters.', pw_mismatch: 'The two passwords don’t match.',
+      st_pending: 'pending', st_confirmed: 'confirmed', st_cancelled: 'cancelled',
+    },
+    de: {
+      program: 'Partnerprogramm', login_pre: 'Dein Partner-', login_accent: 'Dashboard',
+      login_sub: 'Melde dich an, um deine Klicks, bestätigten Verkäufe und Provision in Echtzeit zu verfolgen.',
+      email: 'E-Mail', password: 'Passwort', signin: 'Anmelden', forgot: 'Passwort setzen / vergessen',
+      almost: 'Fast geschafft', setpw_pre: 'Wähle dein ', setpw_accent: 'Passwort',
+      setpw_sub: 'Wähle ein Passwort für dein Affiliate-Dashboard.',
+      newpw: 'Neues Passwort', newpw2: 'Passwort wiederholen', save_signin: 'Passwort speichern & anmelden',
+      signed_in: 'Angemeldet', hi: 'Hallo,',
+      commission_line: 'Du erhältst {pct}% Provision auf jede vermittelte Bestellung.',
+      your_link: 'Dein Referral-Link', copy: 'Link kopieren', copied: 'Kopiert',
+      discount_chip: 'Kunden erhalten {pct}% Rabatt mit dem Code',
+      clicks: 'Klicks', confirmed_sales: 'Bestätigte Verkäufe', confirmed_comm: 'Bestätigte Provision', pending_comm: 'Ausstehende Provision',
+      recent: 'Letzte Verkäufe', th_order: 'Bestellung', th_base: 'Basis', th_commission: 'Provision', th_status: 'Status', th_date: 'Datum',
+      no_sales: 'Noch keine Verkäufe.', no_profile: 'Kein Affiliate-Profil mit diesem Login verknüpft.',
+      footnote: 'Ausstehende Provisionen werden angezeigt, sind aber noch nicht auszahlbar — Nachnahme-Bestellungen werden bestätigt, sobald das Paket zugestellt ist.',
+      signout: 'Abmelden', signing_in: 'Anmeldung…', sending: 'Wird gesendet…', saving: 'Wird gespeichert…', loading: 'Wird geladen…',
+      reset_sent: 'Falls {email} ein registrierter Affiliate ist, haben wir dir einen Link zum Setzen deines Passworts geschickt.',
+      enter_email_first: 'Gib zuerst oben deine E-Mail ein, dann klicke erneut.',
+      pw_min: 'Das Passwort muss mindestens 8 Zeichen haben.', pw_mismatch: 'Die beiden Passwörter stimmen nicht überein.',
+      st_pending: 'ausstehend', st_confirmed: 'bestätigt', st_cancelled: 'storniert',
+    },
+    ro: {
+      program: 'Program de afiliere', login_pre: 'Panoul tău de ', login_accent: 'afiliat',
+      login_sub: 'Autentifică-te pentru a-ți urmări clicurile, vânzările confirmate și comisionul în timp real.',
+      email: 'E-mail', password: 'Parolă', signin: 'Autentificare', forgot: 'Setează / ai uitat parola',
+      almost: 'Aproape gata', setpw_pre: 'Alege-ți ', setpw_accent: 'parola',
+      setpw_sub: 'Alege o parolă pentru panoul tău de afiliat.',
+      newpw: 'Parolă nouă', newpw2: 'Repetă parola', save_signin: 'Salvează parola & autentifică-te',
+      signed_in: 'Autentificat', hi: 'Salut,',
+      commission_line: 'Câștigi {pct}% comision la fiecare comandă recomandată.',
+      your_link: 'Linkul tău de recomandare', copy: 'Copiază linkul', copied: 'Copiat',
+      discount_chip: 'Clienții primesc {pct}% reducere cu codul',
+      clicks: 'Clicuri', confirmed_sales: 'Vânzări confirmate', confirmed_comm: 'Comision confirmat', pending_comm: 'Comision în așteptare',
+      recent: 'Vânzări recente', th_order: 'Comandă', th_base: 'Bază', th_commission: 'Comision', th_status: 'Status', th_date: 'Dată',
+      no_sales: 'Încă nicio vânzare.', no_profile: 'Niciun profil de afiliat asociat acestui cont.',
+      footnote: 'Comisioanele în așteptare sunt afișate, dar nu sunt încă plătibile — comenzile cu ramburs se confirmă după livrarea coletului.',
+      signout: 'Deconectare', signing_in: 'Se autentifică…', sending: 'Se trimite…', saving: 'Se salvează…', loading: 'Se încarcă…',
+      reset_sent: 'Dacă {email} este un afiliat înregistrat, ți-am trimis un link pentru a-ți seta parola.',
+      enter_email_first: 'Introdu mai întâi e-mailul mai sus, apoi dă clic din nou.',
+      pw_min: 'Parola trebuie să aibă cel puțin 8 caractere.', pw_mismatch: 'Cele două parole nu se potrivesc.',
+      st_pending: 'în așteptare', st_confirmed: 'confirmat', st_cancelled: 'anulat',
+    }
+  };
+  // pick language: saved choice (shared with the main site) → browser locale → en
+  var lang = (function () {
+    try { var s = localStorage.getItem('toppep_lang'); if (s && DICT[s]) return s; } catch (e) {}
+    var nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+    return DICT[nav] ? nav : 'en';
+  })();
+  function t(k) { return (DICT[lang] && DICT[lang][k]) || DICT.en[k] || k; }
 
-  var recovering = false; // true while the user arrived via a set-password email link
+  var lastAff = null; // remember loaded affiliate so language switch can re-render
+
+  function applyStatic() {
+    document.documentElement.lang = lang;
+    $('afProgramEb').textContent = t('program');
+    $('afLoginH').innerHTML = t('login_pre') + '<span class="accent">' + t('login_accent') + '</span>';
+    $('afLoginSub').textContent = t('login_sub');
+    $('lblEmail').textContent = t('email'); $('lblPassword').textContent = t('password');
+    $('loginBtn').textContent = t('signin'); $('forgotLink').textContent = t('forgot');
+    $('afAlmostEb').textContent = t('almost');
+    $('afSetpwH').innerHTML = t('setpw_pre') + '<span class="accent">' + t('setpw_accent') + '</span>';
+    $('afSetpwSub').textContent = t('setpw_sub');
+    $('lblNewPw').textContent = t('newpw'); $('lblNewPw2').textContent = t('newpw2');
+    $('setPwBtn').textContent = t('save_signin');
+    $('afSignedInEb').textContent = t('signed_in'); $('afHiText').textContent = t('hi');
+    $('afYourLink').textContent = t('your_link'); $('copyBtn').textContent = t('copy');
+    $('lblClicks').textContent = t('clicks'); $('lblSales').textContent = t('confirmed_sales');
+    $('lblConfirmed').textContent = t('confirmed_comm'); $('lblPending').textContent = t('pending_comm');
+    $('afRecent').textContent = t('recent');
+    $('thOrder').textContent = t('th_order'); $('thBase').textContent = t('th_base');
+    $('thCommission').textContent = t('th_commission'); $('thStatus').textContent = t('th_status'); $('thDate').textContent = t('th_date');
+    $('afFootnote').textContent = t('footnote'); $('signOutBtn').textContent = t('signout');
+    Array.prototype.forEach.call(document.querySelectorAll('#langSwitch button'), function (b) {
+      b.classList.toggle('on', b.dataset.lang === lang);
+    });
+  }
+
+  if (!T.supabaseUrl || !T.supabaseAnonKey || !window.supabase) { applyStatic(); $('notReady').style.display = 'block'; return; }
+  var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
+  var recovering = false;
 
   function show(view) {
     $('loginView').style.display = view === 'login' ? 'block' : 'none';
@@ -167,98 +273,102 @@
     $('signOutBtn').style.display = view === 'dash' ? '' : 'none';
   }
 
-  // Supabase fires this when the page is opened from a recovery/set-password
-  // email link — show the "choose a password" form instead of the login.
   sb.auth.onAuthStateChange(function (event) {
     if (event === 'PASSWORD_RECOVERY') { recovering = true; show('setpw'); }
   });
 
-  async function loadDashboard() {
-    show('dash');
-    // RLS returns only THIS affiliate's own row
-    var affRes = await sb.from('affiliates').select('name, referral_code, commission_pct, discount_pct').maybeSingle();
-    // fall back gracefully if the discount_pct column hasn't been migrated yet
-    if (affRes.error) affRes = await sb.from('affiliates').select('name, referral_code, commission_pct').maybeSingle();
-    var aff = affRes.data;
-    if (!aff) { $('salesBody').innerHTML = '<tr><td colspan="5" class="msg err" style="padding:16px 10px;">No affiliate profile linked to this login.</td></tr>'; return; }
+  function renderDashboardData(aff, clicks, sales) {
     $('affName').textContent = aff.name;
-    $('affPct').textContent = 'You earn ' + aff.commission_pct + '% commission on every referred order.';
+    $('affPct').textContent = t('commission_line').replace('{pct}', aff.commission_pct);
     $('refLink').textContent = location.origin + '/?ref=' + aff.referral_code;
     if (Number(aff.discount_pct) > 0) {
       $('codeChip').style.display = 'inline-flex';
-      $('codeChip').innerHTML = 'Customers get ' + aff.discount_pct + '% off with code <b>' + aff.referral_code + '</b>';
-    }
-
-    var clicksRes = await sb.from('clicks').select('id', { count: 'exact', head: true });
-    $('stClicks').textContent = clicksRes.count != null ? clicksRes.count : 0;
-
-    var salesRes = await sb.from('sales').select('order_no, order_total, commission, status, created_at').order('created_at', { ascending: false });
-    var sales = salesRes.data || [];
+      $('codeChip').innerHTML = t('discount_chip').replace('{pct}', aff.discount_pct) + ' <b>' + aff.referral_code + '</b>';
+    } else { $('codeChip').style.display = 'none'; }
+    $('stClicks').textContent = clicks != null ? clicks : 0;
     var confirmed = sales.filter(function (s) { return s.status === 'confirmed'; });
     var pending = sales.filter(function (s) { return s.status === 'pending'; });
     var sum = function (arr) { return arr.reduce(function (n, s) { return n + Number(s.commission || 0); }, 0); };
     $('stSales').textContent = confirmed.length;
     $('stConfirmed').textContent = money(sum(confirmed));
     $('stPending').textContent = money(sum(pending));
-
     $('salesBody').innerHTML = sales.length ? sales.map(function (s) {
+      var label = t('st_' + s.status) || s.status;
       return '<tr><td>' + (s.order_no || '—') + '</td><td>' + money(s.order_total) + '</td><td><b>' + money(s.commission) + '</b></td>' +
-        '<td><span class="pill ' + s.status + '">' + s.status + '</span></td>' +
+        '<td><span class="pill ' + s.status + '">' + label + '</span></td>' +
         '<td class="text-muted">' + new Date(s.created_at).toLocaleDateString() + '</td></tr>';
-    }).join('') : '<tr><td colspan="5" class="text-muted" style="padding:16px 10px;">No sales yet.</td></tr>';
+    }).join('') : '<tr><td colspan="5" class="text-muted" style="padding:16px 10px;">' + t('no_sales') + '</td></tr>';
+  }
+
+  async function loadDashboard() {
+    show('dash');
+    var affRes = await sb.from('affiliates').select('name, referral_code, commission_pct, discount_pct').maybeSingle();
+    if (affRes.error) affRes = await sb.from('affiliates').select('name, referral_code, commission_pct').maybeSingle();
+    var aff = affRes.data;
+    if (!aff) { lastAff = null; $('salesBody').innerHTML = '<tr><td colspan="5" class="msg err" style="padding:16px 10px;">' + t('no_profile') + '</td></tr>'; return; }
+    var clicksRes = await sb.from('clicks').select('id', { count: 'exact', head: true });
+    var salesRes = await sb.from('sales').select('order_no, order_total, commission, status, created_at').order('created_at', { ascending: false });
+    lastAff = { aff: aff, clicks: clicksRes.count, sales: salesRes.data || [] };
+    renderDashboardData(aff, clicksRes.count, salesRes.data || []);
   }
 
   async function route() {
-    // wait a beat so onAuthStateChange can fire PASSWORD_RECOVERY from a link hash
     if (recovering || /type=recovery/.test(location.hash)) { show('setpw'); return; }
     var sess = await sb.auth.getSession();
     if (sess.data.session) loadDashboard(); else show('login');
   }
 
+  // language switcher — updates static labels + re-renders any loaded data
+  Array.prototype.forEach.call(document.querySelectorAll('#langSwitch button'), function (b) {
+    b.addEventListener('click', function () {
+      lang = b.dataset.lang;
+      try { localStorage.setItem('toppep_lang', lang); } catch (e) {}
+      applyStatic();
+      if ($('dash').style.display !== 'none' && lastAff) renderDashboardData(lastAff.aff, lastAff.clicks, lastAff.sales);
+    });
+  });
+
   $('loginBtn').addEventListener('click', async function () {
-    var msg = $('loginMsg'); msg.className = 'msg'; msg.textContent = 'Signing in…';
+    var msg = $('loginMsg'); msg.className = 'msg'; msg.textContent = t('signing_in');
     var res = await sb.auth.signInWithPassword({ email: $('email').value.trim(), password: $('password').value });
     if (res.error) { msg.className = 'msg err'; msg.textContent = res.error.message; return; }
     msg.textContent = ''; loadDashboard();
   });
 
-  // "Set / forgot password" — asks the Worker to email a set-password link.
-  // Gated server-side to real affiliate emails; response is always generic.
   $('forgotLink').addEventListener('click', async function (e) {
     e.preventDefault();
-    var msg = $('loginMsg');
-    var email = $('email').value.trim();
-    if (!email) { msg.className = 'msg err'; msg.textContent = 'Enter your email above first, then click again.'; $('email').focus(); return; }
-    msg.className = 'msg'; msg.textContent = 'Sending…';
+    var msg = $('loginMsg'); var email = $('email').value.trim();
+    if (!email) { msg.className = 'msg err'; msg.textContent = t('enter_email_first'); $('email').focus(); return; }
+    msg.className = 'msg'; msg.textContent = t('sending');
     try {
       await fetch(T.orderApiUrl + '/affiliate/auth/reset', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email })
       });
     } catch (err) {}
-    msg.className = 'msg ok';
-    msg.textContent = 'If ' + email + ' is a registered affiliate, we\'ve emailed you a link to set your password.';
+    msg.className = 'msg ok'; msg.textContent = t('reset_sent').replace('{email}', email);
   });
 
-  // save the chosen password after arriving via the email link
   $('setPwBtn').addEventListener('click', async function () {
     var msg = $('setPwMsg'); msg.className = 'msg';
     var pw = $('newPw').value, pw2 = $('newPw2').value;
-    if (pw.length < 8) { msg.className = 'msg err'; msg.textContent = 'Password must be at least 8 characters.'; return; }
-    if (pw !== pw2) { msg.className = 'msg err'; msg.textContent = 'The two passwords don\'t match.'; return; }
-    msg.textContent = 'Saving…';
+    if (pw.length < 8) { msg.className = 'msg err'; msg.textContent = t('pw_min'); return; }
+    if (pw !== pw2) { msg.className = 'msg err'; msg.textContent = t('pw_mismatch'); return; }
+    msg.textContent = t('saving');
     var res = await sb.auth.updateUser({ password: pw });
     if (res.error) { msg.className = 'msg err'; msg.textContent = res.error.message; return; }
     recovering = false;
-    if (location.hash) history.replaceState(null, '', location.pathname); // drop the recovery token from the URL
+    if (location.hash) history.replaceState(null, '', location.pathname);
     loadDashboard();
   });
+
   $('signOutBtn').addEventListener('click', async function () { await sb.auth.signOut(); show('login'); });
   $('copyBtn').addEventListener('click', function () {
     navigator.clipboard && navigator.clipboard.writeText($('refLink').textContent);
-    $('copyBtn').textContent = 'Copied';
-    setTimeout(function () { $('copyBtn').textContent = 'Copy link'; }, 1500);
+    $('copyBtn').textContent = t('copied');
+    setTimeout(function () { $('copyBtn').textContent = t('copy'); }, 1500);
   });
 
+  applyStatic();
   route();
 })();
 </script>
