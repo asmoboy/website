@@ -85,16 +85,19 @@ alter table affiliates enable row level security;
 alter table clicks     enable row level security;
 alter table sales      enable row level security;
 
+-- Match each affiliate to the logged-in user by their (verified) JWT email —
+-- robust even if the affiliate row's user_id was never linked (e.g. the login
+-- was created via the set-password flow rather than at creation time).
 drop policy if exists "affiliate reads own profile" on affiliates;
 create policy "affiliate reads own profile" on affiliates
-  for select using (user_id = auth.uid());
+  for select using (lower(email) = lower(auth.jwt() ->> 'email'));
 
 drop policy if exists "affiliate reads own clicks" on clicks;
 create policy "affiliate reads own clicks" on clicks
-  for select using (affiliate_id in (select id from affiliates where user_id = auth.uid()));
+  for select using (affiliate_id in (select id from affiliates where lower(email) = lower(auth.jwt() ->> 'email')));
 
 drop policy if exists "affiliate reads own sales" on sales;
 create policy "affiliate reads own sales" on sales
-  for select using (affiliate_id in (select id from affiliates where user_id = auth.uid()));
+  for select using (affiliate_id in (select id from affiliates where lower(email) = lower(auth.jwt() ->> 'email')));
 -- No INSERT/UPDATE/DELETE policies for anon/authenticated → the dashboard is
 -- read-only; every write goes through the Worker (service_role).
