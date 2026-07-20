@@ -109,23 +109,24 @@ function promoRate(code) {
   return PROMO_CODES[key] || 0;
 }
 
-// A code the customer types at checkout can be either a static promo code
-// (PROMO_CODES above) OR an affiliate's own referral_code — in which case it
-// ALSO doubles as the discount code they can hand out ("use code ANNA10 for
-// 10% off"), independent of whether the customer arrived via their ?ref= link.
+// A code the customer types at checkout can be either an affiliate's own
+// referral_code (admin-managed in the affiliates table) OR one of the static
+// PROMO_CODES above. The AFFILIATE row wins when it exists — so promoting a
+// code to a managed affiliate (with its own commission + discount %) overrides
+// any static fallback of the same name; an inactive affiliate gives 0. Only
+// when no affiliate row exists at all do we fall back to the static list.
 // This is the single source of truth for "how much does this code discount";
 // createSale() below uses it too, so the commission base and the customer's
 // discount always agree.
 async function resolveDiscountRate(db, code) {
   const trimmed = String(code || '').trim();
   if (!trimmed) return 0;
-  const staticRate = promoRate(trimmed);
-  if (staticRate > 0) return staticRate;
-  if (!db) return 0;
-  const { data } = await db.from('affiliates').select('discount_pct, active')
-    .ilike('referral_code', trimmed).maybeSingle();
-  if (!data || data.active === false) return 0;
-  return Number(data.discount_pct || 0) / 100;
+  if (db) {
+    const { data } = await db.from('affiliates').select('discount_pct, active')
+      .ilike('referral_code', trimmed).maybeSingle();
+    if (data) return data.active === false ? 0 : Number(data.discount_pct || 0) / 100;
+  }
+  return promoRate(trimmed); // no affiliate row → static promo code fallback
 }
 
 async function computeAmountCents(db, payload) {
