@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=47">
+<link rel="stylesheet" href="/styles.css?v=48">
 <style>
   :root { --ok:#1a7f37; --okbg:#e3f6e9; --warn:#a35a00; --warnbg:#fff2e0; --info:#2a44c0; --infobg:#e7ecfb; }
   body { background: #f6f6f8; }
@@ -105,6 +105,15 @@
 
     <div class="stats" id="stats"></div>
 
+    <div class="toolbar" style="margin-bottom:6px;">
+      <input id="testTo" type="email" placeholder="Send test emails to…" value="dubistklein15@gmail.com" style="flex:1;min-width:200px;padding:11px 14px;border:1px solid var(--line-strong);border-radius:10px;font:inherit;background:#fff;">
+      <select id="testLang" style="padding:11px 12px;border:1px solid var(--line-strong);border-radius:10px;font:inherit;background:#fff;">
+        <option value="de">Deutsch</option><option value="en">English</option><option value="ro">Română</option>
+      </select>
+      <button class="btn btn-sm" id="testBtn">Send all test emails</button>
+    </div>
+    <p class="admin-sub" style="margin:0 0 16px;">Sends one of each template (confirmation, COD confirmation, shipped/tracking, cart reminder) with sample data to the address above.</p>
+
     <div class="toolbar">
       <input id="search" type="search" placeholder="Search by reference, order no., name or email…">
       <select id="statusFilter">
@@ -128,7 +137,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/data.js?v=47"></script>
+<script src="/data.js?v=48"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
@@ -295,6 +304,16 @@
       '</div>';
     }).join('');
   }
+
+  $('testBtn').addEventListener('click', async function () {
+    var to = ($('testTo').value || '').trim();
+    if (!to || !/.+@.+\..+/.test(to)) { setMsg('Enter a valid email first.', 'err'); return; }
+    var b = $('testBtn'); b.disabled = true; b.textContent = 'Sending…';
+    var r = await apiFetch('/orders/test-email', { method: 'POST', body: JSON.stringify({ to: to, lang: $('testLang').value }) }).catch(function (e) { setMsg(e.message, 'err'); return null; });
+    b.disabled = false; b.textContent = 'Send all test emails';
+    if (r && r.ok) { setMsg('Test emails sent to ' + to + ' — check the inbox (and spam).', 'ok'); }
+    else if (r) { var d = await r.json().catch(function () { return {}; }); setMsg(d.error || ('Failed (' + r.status + ')'), 'err'); }
+  });
 
   $('search').addEventListener('input', renderOrders);
   $('statusFilter').addEventListener('change', renderOrders);

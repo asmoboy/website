@@ -1171,6 +1171,25 @@ async function processAbandonedCarts(env, db) {
   }
 }
 
+// ---- send every customer-facing template (sample data) to one address ----
+async function sendTestEmails(env, to, lang) {
+  const L = (lang && ['en', 'de', 'ro'].includes(lang)) ? lang : 'de';
+  const order = {
+    name: 'Test Customer', email: to, order_no: 'TP-TEST01', ref: 'TEST-1234', lang: L,
+    currency: 'EUR', total_text: '94,98 €', payment_method: 'card', status: 'paid',
+    org: '', address: 'Musterstr. 5', city: 'Berlin', zip: '10115', country: 'Germany',
+    tracking_url: 'https://www.dhl.de/tracking?piececode=TEST123456',
+    items: [{ name: 'BPC-157 · 10 mg', qty: 2, price: 42 }, { name: 'Bacteriostatic Water · 10 ml', qty: 1, price: 4.99 }],
+  };
+  const cart = { email: to, name: 'Test Customer', lang: L, currency: 'EUR', total_text: '94,98 €', items: order.items };
+  const results = {};
+  try { await sendThankYouEmail(order, env); results.confirmation = 'sent'; } catch (e) { results.confirmation = 'error: ' + e.message; }
+  try { await sendCodConfirmation(Object.assign({}, order, { payment_method: 'cod', status: 'cod' }), env); results.cod_confirmation = 'sent'; } catch (e) { results.cod_confirmation = 'error: ' + e.message; }
+  try { await sendShipped(order, env); results.shipped = 'sent'; } catch (e) { results.shipped = 'error: ' + e.message; }
+  try { await sendCartReminder(cart, env); results.cart_reminder = 'sent'; } catch (e) { results.cart_reminder = 'error: ' + e.message; }
+  return { ok: true, to, lang: L, results };
+}
+
 // generic sender (Resend) — used for the thank-you email and the admin 2FA code
 async function sendEmail(env, { to, subject, text, html }) {
   if (!env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured');
@@ -1554,6 +1573,17 @@ export default {
         }
         const res = await listOrdersFull(db);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+
+      // admin-only: send every customer email template (sample data) to one address
+      if (request.method === 'POST' && url.pathname === '/orders/test-email') {
+        if (!(await requireAdminSession(db, request))) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        const body = await request.json().catch(() => ({}));
+        if (!body.to || !/.+@.+\..+/.test(body.to)) return jsonResponse({ error: 'valid "to" email required' }, { status: 400 }, env);
+        const res = await sendTestEmails(env, body.to, body.lang);
         return jsonResponse(res, {}, env);
       }
 
