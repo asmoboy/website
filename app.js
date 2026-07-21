@@ -2283,14 +2283,9 @@
     Cart.clear();
     if (ref) {
       Orders.setStatus(ref, 'paid');
-      // notify the order inbox with the full shipping details (Stripe's
-      // dashboard has the payment but not the delivery address)
-      var paidOrder = Orders.byRef(ref);
-      if (paidOrder && !paidOrder._notified) {
-        emailOrderToInbox(paidOrder, { status: 'PAID via card (Stripe) — ready to ship', subjectTag: 'PAID card' });
-        paidOrder._notified = true;
-        Orders.save(Orders.all().map(function (o) { return o.ref === ref ? paidOrder : o; }));
-      }
+      // The seller + customer emails are sent server-side by the Stripe webhook
+      // (markPaid → Resend), which is authoritative and fires even if the
+      // browser closes here — so no client-side notification is needed.
     }
     var main = $('#main');
     if (!main) return;
@@ -2369,9 +2364,13 @@
 
     var note = $('#placeOrderNote');
     var btn = $('#placeOrder');
-    function finish() {
+    function finish(workerOk) {
       Orders.store(order); // already POSTed below, so store locally only
-      emailOrderToInbox(order, { status: 'CASH ON DELIVERY — collect ' + order.totalText + ' from courier', subjectTag: 'COD' });
+      // On a successful POST the Worker sends the seller notification (Resend).
+      // Only fall back to the FormSubmit email when the Worker didn't handle the
+      // order (unreachable / no API configured) — so a valid order is never lost
+      // and the seller never gets a duplicate on the normal path.
+      if (!workerOk) emailOrderToInbox(order, { status: 'CASH ON DELIVERY — collect ' + order.totalText + ' from courier', subjectTag: 'COD' });
       Cart.clear();
       showCodConfirmation(order);
     }
@@ -2391,7 +2390,7 @@
       }).then(function () {
         if (btn) btn.disabled = false;
         if (note) note.textContent = '';
-        finish();
+        finish(true); // Worker accepted the order → it sends the seller mail
       }).catch(function (e) {
         if (btn) btn.disabled = false;
         if (e && e.veto) {
@@ -2399,11 +2398,11 @@
           coMethod = 'card'; renderPaymentMethods(sub, ship, ins);
         } else {
           if (note) note.textContent = '';
-          finish(); // network error → don't block a valid order
+          finish(false); // network error → fall back to the email so the order isn't lost
         }
       });
     } else {
-      finish();
+      finish(false); // no order API configured → email fallback
     }
   }
 
