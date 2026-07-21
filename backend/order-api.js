@@ -1547,7 +1547,8 @@ export default {
         return jsonResponse(res, {}, env);
       }
 
-      if (request.method === 'GET' && url.pathname === '/admin/orders') {
+      // NB: must live under /orders/* — the guard above 404s anything else.
+      if (request.method === 'GET' && url.pathname === '/orders/full') {
         if (!(await requireAdminSession(db, request))) {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
