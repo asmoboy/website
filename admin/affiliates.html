@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=44">
+<link rel="stylesheet" href="/styles.css?v=45">
 <style>
   .admin-wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 90px; }
   .admin-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
@@ -86,6 +86,10 @@
     <p class="msg" id="msg"></p>
     <div id="payouts"><p class="empty">Loading…</p></div>
 
+    <h2 class="sec">Ready to ship</h2>
+    <p class="admin-sub" style="margin-bottom:12px;">Paid card orders and confirmed COD orders that haven't shipped yet. Paste the tracking link and mark it shipped — the customer gets a branded "your order is on its way" email (in their language) with the tracking button.</p>
+    <div id="ship"><p class="empty">—</p></div>
+
     <h2 class="sec">Cash-on-delivery — awaiting delivery</h2>
     <p class="admin-sub" style="margin-bottom:12px;">Mark a COD order delivered once the parcel is handed over and paid — this releases the affiliate commission. If it was refused / undeliverable, leave it (or cancel the order).</p>
     <div id="cods"><p class="empty">—</p></div>
@@ -93,7 +97,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/data.js?v=44"></script>
+<script src="/data.js?v=45"></script>
 <script>
 (function () {
   var T = window.TOPPEP;
@@ -171,7 +175,7 @@
     $('whoAmI').textContent = s.email;
     show('dash');
     setMsg('Loading…');
-    try { await loadAffiliates(); await loadPayouts(); await loadCods(); setMsg(''); }
+    try { await loadAffiliates(); await loadPayouts(); await loadShip(); await loadCods(); setMsg(''); }
     catch (e) {
       if (e.forbidden) { clearSession(); show('password'); return; }
       setMsg(e.message, 'err');
@@ -303,6 +307,37 @@
         b.disabled = true; b.textContent = '…';
         var r = await apiFetch('/affiliate/sales/' + b.dataset.payout + '/payout', { method: 'PATCH' }).catch(function (e) { setMsg(e.message, 'err'); return null; });
         if (r && r.ok) { setMsg('Marked paid.', 'ok'); loadPayouts(); } else if (r) { b.disabled = false; b.textContent = 'Mark paid'; setMsg('Payout failed (' + r.status + ')', 'err'); }
+      });
+    });
+  }
+
+  async function loadShip() {
+    // paid card orders + confirmed COD orders that haven't shipped yet
+    var out = [];
+    for (var st of ['paid', 'cod']) {
+      var res = await apiFetch('/orders?status=' + st).catch(function () { return null; });
+      if (res && res.ok) { var d = await res.json(); out = out.concat((d.orders || []).filter(function (o) { return !o.shipped_at; })); }
+    }
+    if (!out.length) { $('ship').innerHTML = '<p class="empty">Nothing waiting to ship.</p>'; return; }
+    $('ship').innerHTML = '<table class="t"><thead><tr><th>Ref</th><th>Order</th><th>Customer</th><th>Pay</th><th>Tracking link</th><th></th></tr></thead><tbody>' +
+      out.map(function (o) {
+        return '<tr><td>' + o.ref + '</td><td>' + o.order_no + '</td><td>' + o.name + '</td><td>' + (o.payment_method || '') + '</td>' +
+          '<td><input class="track-in" data-ref="' + o.ref + '" type="url" placeholder="https://tracking…" style="width:180px;padding:6px 8px;"></td>' +
+          '<td><button class="btn btn-sm" data-ship="' + o.ref + '">Mark shipped & email</button></td></tr>';
+      }).join('') + '</tbody></table>';
+
+    document.querySelectorAll('[data-ship]').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        var ref = b.dataset.ship;
+        var input = document.querySelector('.track-in[data-ref="' + ref + '"]');
+        var url = input ? input.value.trim() : '';
+        if (!url) { setMsg('Paste a tracking link first.', 'err'); if (input) input.focus(); return; }
+        b.disabled = true; b.textContent = '…';
+        var r = await apiFetch('/orders/' + encodeURIComponent(ref) + '/shipped', {
+          method: 'PATCH', body: JSON.stringify({ tracking_url: url })
+        }).catch(function (e) { setMsg(e.message, 'err'); return null; });
+        if (r && r.ok) { setMsg('Shipped — tracking email sent.', 'ok'); loadShip(); }
+        else if (r) { b.disabled = false; b.textContent = 'Mark shipped & email'; setMsg('Failed (' + r.status + ')', 'err'); }
       });
     });
   }

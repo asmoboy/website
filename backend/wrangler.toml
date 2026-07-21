@@ -16,3 +16,8 @@ compatibility_date = "2024-11-01"
 [vars]
 ALLOWED_ORIGIN = "https://www.top-pep.com"   # canonical domain (apex redirects here)
 SITE_URL = "https://www.top-pep.com"          # used for Stripe success/cancel redirects
+# CART_REMINDER_HOURS = "4"                   # (optional) hours before an abandoned-cart reminder
+
+# Abandoned-cart reminder: run the scheduled() handler every 30 minutes.
+[triggers]
+crons = ["*/30 * * * *"]

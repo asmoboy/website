@@ -1980,6 +1980,21 @@
       clearFieldMsg('coHouse');
     });
 
+    // Save the basket as soon as we have the customer's email, so an
+    // abandoned-cart reminder can be sent if they don't finish checkout.
+    var emailEl = $('#coEmail');
+    if (emailEl) emailEl.addEventListener('blur', function () {
+      var email = (emailEl.value || '').trim();
+      if (!email || !/.+@.+\..+/.test(email) || !Cart.items.length || !T.orderApiUrl) return;
+      var nm = (($('#coFirst') ? $('#coFirst').value : '') + ' ' + ($('#coLast') ? $('#coLast').value : '')).trim();
+      var sub = Cart.subtotal();
+      var items = Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i) }; });
+      fetch(T.orderApiUrl + '/cart/save', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, name: nm, lang: lang, currency: CUR, items: items, total: sub, total_text: money(sub) })
+      }).catch(function () {});
+    });
+
     function zipBlur() {
       var zip = ($('#coZip').value || '').trim();
       var country = selectedCountry();

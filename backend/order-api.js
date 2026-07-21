@@ -286,6 +286,16 @@ async function handleStripeWebhook(env, db, request) {
       // idempotent: markPaid just sets status=paid and emails once
       await markPaid(db, ref, env).catch(() => {});
     }
+  } else if (event.type === 'payment_intent.payment_failed' || event.type === 'checkout.session.expired') {
+    const obj = event.data.object;
+    const ref = obj.client_reference_id || (obj.metadata && obj.metadata.ref);
+    if (ref && db) {
+      // only email if the order is still unpaid — never contradict a paid order
+      const { data: order } = await db.from('orders').select('*').eq('ref', ref).maybeSingle();
+      if (order && order.email && order.status !== 'paid' && order.status !== 'shipped' && order.status !== 'delivered') {
+        await sendPaymentFailed(order, env).catch(() => {});
+      }
+    }
   }
   return { ok: true, received: true };
 }
@@ -419,6 +429,8 @@ async function createOrder(db, payload, env) {
       // attribute the sale to an affiliate if the order carried a ref code —
       // never let a tracking failure break the order itself
       await createSale(db, data, payload).catch(() => {});
+      // this basket is now an order → stop any abandoned-cart reminder
+      await markCartConverted(db, data.email);
       // COD has no payment step, so the order itself is the commitment: email
       // the customer their confirmation now, and notify the seller. Card orders
       // are still "pending" here (unpaid) — those emails fire in markPaid.
@@ -447,6 +459,7 @@ async function markPaid(db, ref, env) {
 
   // card/prepaid is final once paid (no returns) → release the commission
   await confirmSale(db, ref).catch(() => {});
+  await markCartConverted(db, order.email);
 
   // notify the seller once the card order is actually paid (not on the earlier
   // "pending" insert) — never let a notification failure affect the response
@@ -955,6 +968,203 @@ async function sendSellerNotification(order, env) {
   await sendEmail(env, { to, subject: tpl.s, text: tpl.b });
 }
 
+// ───────────────────────────────────────────────────────────────
+// Action emails (abandoned cart, payment failed, shipped/tracking).
+// Same branded shell as the order confirmation, but built around a single
+// call-to-action button. Copy lives in the *_COPY dicts below, so restyling
+// is one place. Language is always the customer's checkout language (o.lang).
+// ───────────────────────────────────────────────────────────────
+function ctaEmailHtml(o, L) {
+  const rows = (L.showItems && (o.items || []).length)
+    ? (o.items || []).map((i) => {
+        const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
+        return `<tr>
+          <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
+            <span style="display:inline-block;min-width:26px;color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${escHtml(i.name)}
+          </td>
+          <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">${line}</td>
+        </tr>`;
+      }).join('')
+    : '';
+  const itemsBlock = rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">${rows}
+        <tr><td style="padding:14px 0 0;font-size:16px;font-weight:700;color:${BRAND.ink};">${escHtml(L.totalLabel || '')}</td>
+        <td style="padding:14px 0 0;font-size:16px;font-weight:700;color:${BRAND.accent};text-align:right;white-space:nowrap;">${escHtml(o.total_text || '')}</td></tr></table>` : '';
+  const ctaUrl = typeof L.ctaUrl === 'function' ? L.ctaUrl(o) : L.ctaUrl;
+  const noteBlock = L.note ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;">
+        <tr><td style="padding:16px 18px;background:#f6f2ff;border-radius:12px;font-size:14px;line-height:1.55;color:${BRAND.ink};">${escHtml(L.note)}</td></tr></table>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="${escHtml(o.lang || 'en')}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><title>${escHtml(L.s(o))}</title></head>
+<body style="margin:0;padding:0;background:${BRAND.bg};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escHtml(L.preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.bg};padding:32px 12px;">
+<tr><td align="center">
+  <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:560px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(17,17,20,.06);">
+    <tr><td style="padding:28px 36px 8px;text-align:center;border-bottom:1px solid ${BRAND.line};">
+      <a href="${BRAND.site}" style="text-decoration:none;"><img src="${BRAND.logo}" alt="TOP Pep" width="132" style="width:132px;height:auto;border:0;display:inline-block;"></a>
+    </td></tr>
+    <tr><td style="height:4px;background:${BRAND.accent};line-height:4px;font-size:0;">&nbsp;</td></tr>
+    <tr><td style="padding:32px 36px 8px;">
+      <p style="margin:0 0 6px;font-size:18px;font-weight:600;color:${BRAND.ink};">${escHtml(L.hi(o))}</p>
+      <p style="margin:0 0 22px;font-size:15px;line-height:1.55;color:${BRAND.muted};">${escHtml(L.intro)}</p>
+      ${itemsBlock}
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0 4px;"><tr><td style="border-radius:12px;background:${BRAND.accent};">
+        <a href="${ctaUrl}" style="display:inline-block;padding:14px 30px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">${escHtml(L.cta)}</a>
+      </td></tr></table>
+      ${noteBlock}
+    </td></tr>
+    <tr><td style="padding:8px 36px 32px;">
+      <p style="margin:14px 0 0;font-size:14px;line-height:1.55;color:${BRAND.muted};">${escHtml(L.help)}</p>
+      <p style="margin:20px 0 0;font-size:15px;color:${BRAND.ink};">— ${escHtml(L.team)}</p>
+    </td></tr>
+    <tr><td style="padding:20px 36px;border-top:1px solid ${BRAND.line};text-align:center;">
+      <p style="margin:0;font-size:12px;line-height:1.5;color:${BRAND.muted};">${escHtml(L.legal)}<br><a href="${BRAND.site}" style="color:${BRAND.muted};">top-pep.com</a></p>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
+const LEGAL = {
+  en: 'TOP Pep · Research use only — not for human or veterinary use.',
+  de: 'TOP Pep · Nur zu Forschungszwecken — nicht zur Anwendung an Mensch oder Tier.',
+  ro: 'TOP Pep · Doar pentru cercetare — nu pentru uz uman sau veterinar.',
+};
+const TEAM = { en: 'The TOP Pep team', de: 'Dein TOP-Pep-Team', ro: 'Echipa TOP Pep' };
+
+// ---- abandoned cart ----
+const CART_COPY = {
+  en: { s: () => 'Your TOP Pep cart is waiting', preheader: 'You left items in your basket — finish your order.',
+    hi: (o) => `Hi${o.name ? ' ' + o.name : ''},`, intro: 'You left these items in your basket. We saved them for you — pick up right where you left off.',
+    showItems: true, totalLabel: 'Total', cta: 'Complete your order', ctaUrl: () => BRAND.site + '/checkout/',
+    note: 'Stock moves quickly — complete your order to make sure your items are reserved.', help: 'Questions? Just reply to this email.' },
+  de: { s: () => 'Dein TOP-Pep-Warenkorb wartet', preheader: 'Du hast Artikel im Warenkorb — schließe deine Bestellung ab.',
+    hi: (o) => `Hallo${o.name ? ' ' + o.name : ''},`, intro: 'Du hast diese Artikel in deinem Warenkorb gelassen. Wir haben sie für dich gespeichert — mach einfach dort weiter, wo du aufgehört hast.',
+    showItems: true, totalLabel: 'Gesamt', cta: 'Bestellung abschließen', ctaUrl: () => BRAND.site + '/checkout/',
+    note: 'Der Bestand ist begrenzt — schließe deine Bestellung ab, damit deine Artikel reserviert bleiben.', help: 'Fragen? Antworte einfach auf diese E-Mail.' },
+  ro: { s: () => 'Coșul tău TOP Pep te așteaptă', preheader: 'Ai produse în coș — finalizează comanda.',
+    hi: (o) => `Bună${o.name ? ' ' + o.name : ''},`, intro: 'Ai lăsat aceste produse în coș. Le-am păstrat pentru tine — continuă de unde ai rămas.',
+    showItems: true, totalLabel: 'Total', cta: 'Finalizează comanda', ctaUrl: () => BRAND.site + '/checkout/',
+    note: 'Stocul se mișcă repede — finalizează comanda ca produsele tale să rămână rezervate.', help: 'Întrebări? Răspunde direct la acest e-mail.' },
+};
+
+// ---- payment failed / not completed ----
+const FAILED_COPY = {
+  en: { s: (o) => `Your payment didn't go through — order ${o.ref}`, preheader: 'Your payment could not be completed — your items are saved.',
+    hi: (o) => `Hi ${o.name},`, intro: "Your recent payment couldn't be completed, so your order isn't confirmed yet. No charge was made. Your items are saved — you can try again below.",
+    showItems: true, totalLabel: 'Total', cta: 'Try payment again', ctaUrl: () => BRAND.site + '/checkout/',
+    help: 'If you keep having trouble, just reply to this email and we\'ll help.' },
+  de: { s: (o) => `Deine Zahlung war nicht erfolgreich — Bestellung ${o.ref}`, preheader: 'Deine Zahlung konnte nicht abgeschlossen werden — deine Artikel sind gespeichert.',
+    hi: (o) => `Hallo ${o.name},`, intro: 'Deine letzte Zahlung konnte nicht abgeschlossen werden, deine Bestellung ist daher noch nicht bestätigt. Es wurde nichts abgebucht. Deine Artikel sind gespeichert — du kannst es unten erneut versuchen.',
+    showItems: true, totalLabel: 'Gesamt', cta: 'Zahlung erneut versuchen', ctaUrl: () => BRAND.site + '/checkout/',
+    help: 'Falls es weiterhin nicht klappt, antworte einfach auf diese E-Mail — wir helfen dir.' },
+  ro: { s: (o) => `Plata nu a reușit — comanda ${o.ref}`, preheader: 'Plata nu a putut fi finalizată — produsele tale sunt salvate.',
+    hi: (o) => `Bună ${o.name},`, intro: 'Plata recentă nu a putut fi finalizată, așa că comanda ta nu este încă confirmată. Nu a fost efectuată nicio plată. Produsele tale sunt salvate — poți încerca din nou mai jos.',
+    showItems: true, totalLabel: 'Total', cta: 'Încearcă plata din nou', ctaUrl: () => BRAND.site + '/checkout/',
+    help: 'Dacă întâmpini în continuare probleme, răspunde la acest e-mail și te ajutăm.' },
+};
+
+// ---- shipped / tracking ----
+const SHIPPED_COPY = {
+  en: { s: (o) => `Your order has shipped — ${o.order_no}`, preheader: 'Good news — your order is on its way.',
+    hi: (o) => `Hi ${o.name},`, intro: (o) => `Good news — your order ${o.order_no} has shipped and is on its way to you.`,
+    showItems: true, totalLabel: 'Total', cta: 'Track your parcel', ctaUrl: (o) => o.tracking_url || (BRAND.site),
+    help: 'Questions about your delivery? Just reply to this email.' },
+  de: { s: (o) => `Deine Bestellung ist unterwegs — ${o.order_no}`, preheader: 'Gute Nachrichten — deine Bestellung ist unterwegs.',
+    hi: (o) => `Hallo ${o.name},`, intro: (o) => `Gute Nachrichten — deine Bestellung ${o.order_no} wurde versendet und ist auf dem Weg zu dir.`,
+    showItems: true, totalLabel: 'Gesamt', cta: 'Sendung verfolgen', ctaUrl: (o) => o.tracking_url || (BRAND.site),
+    help: 'Fragen zur Lieferung? Antworte einfach auf diese E-Mail.' },
+  ro: { s: (o) => `Comanda ta a fost expediată — ${o.order_no}`, preheader: 'Vești bune — comanda ta este pe drum.',
+    hi: (o) => `Bună ${o.name},`, intro: (o) => `Vești bune — comanda ta ${o.order_no} a fost expediată și este pe drum către tine.`,
+    showItems: true, totalLabel: 'Total', cta: 'Urmărește coletul', ctaUrl: (o) => o.tracking_url || (BRAND.site),
+    help: 'Întrebări despre livrare? Răspunde direct la acest e-mail.' },
+};
+
+function ctaTemplate(o, copy) {
+  const base = copy[o.lang] || copy.en;
+  // resolve function-or-string intro, and inject shared team/legal
+  const L = Object.assign({}, base, {
+    intro: typeof base.intro === 'function' ? base.intro(o) : base.intro,
+    team: TEAM[o.lang] || TEAM.en,
+    legal: LEGAL[o.lang] || LEGAL.en,
+  });
+  const itemsText = (L.showItems && (o.items || []).length)
+    ? '\n' + (o.items || []).map((i) => `  ${i.qty}× ${i.name}`).join('\n') + (o.total_text ? `\n${L.totalLabel}: ${o.total_text}` : '') + '\n'
+    : '';
+  const ctaUrl = typeof L.ctaUrl === 'function' ? L.ctaUrl(o) : L.ctaUrl;
+  const b = `${L.hi(o)}\n\n${L.intro}\n${itemsText}\n${L.cta}: ${ctaUrl}\n\n— ${L.team}`;
+  return { s: L.s(o), b, html: ctaEmailHtml(o, L) };
+}
+
+async function sendCartReminder(cart, env) {
+  const tpl = ctaTemplate(cart, CART_COPY);
+  await sendEmail(env, { to: cart.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+}
+async function sendPaymentFailed(order, env) {
+  const tpl = ctaTemplate(order, FAILED_COPY);
+  await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+}
+async function sendShipped(order, env) {
+  const tpl = ctaTemplate(order, SHIPPED_COPY);
+  await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+}
+
+// ---- carts: upsert on checkout email, mark converted on order ----
+async function saveCart(db, body) {
+  const email = String(body.email || '').trim().toLowerCase();
+  if (!email || !/.+@.+\..+/.test(email)) return { error: 'valid email required', status: 400 };
+  if (!Array.isArray(body.items) || !body.items.length) return { error: 'no items', status: 400 };
+  const row = {
+    email,
+    name: body.name || null,
+    lang: body.lang || 'en',
+    currency: body.currency || 'eur',
+    items: body.items,
+    total: body.total != null ? Number(body.total) : null,
+    total_text: body.total_text || null,
+    updated_at: new Date().toISOString(),
+    reminded_at: null,     // a fresh basket → eligible for a new reminder
+    converted: false,
+  };
+  const { error } = await db.from('carts').upsert(row, { onConflict: 'email' });
+  if (error) return { error: error.message, status: 500 };
+  return { ok: true };
+}
+async function markCartConverted(db, email) {
+  if (!email) return;
+  await db.from('carts').update({ converted: true }).eq('email', String(email).toLowerCase()).catch(() => {});
+}
+
+// ---- PATCH /orders/:ref/shipped — set tracking + email the customer ----
+async function markShipped(db, ref, body, env) {
+  const patch = { status: 'shipped', shipped_at: new Date().toISOString() };
+  if (body && body.tracking_url) patch.tracking_url = String(body.tracking_url);
+  if (body && body.carrier) patch.carrier = String(body.carrier);
+  const { data: order, error } = await db.from('orders').update(patch).eq('ref', ref).select().single();
+  if (error) return { error: error.message, status: error.code === 'PGRST116' ? 404 : 500 };
+  try { await sendShipped(order, env); }
+  catch (e) { return { ok: true, order, emailError: e.message }; }
+  return { ok: true, order };
+}
+
+// ---- cron: send one reminder for baskets abandoned a few hours ago ----
+async function processAbandonedCarts(env, db) {
+  const HOURS = Number(env.CART_REMINDER_HOURS || 4);
+  const cutoff = new Date(Date.now() - HOURS * 3600 * 1000).toISOString();
+  const { data: carts, error } = await db.from('carts').select('*')
+    .lt('updated_at', cutoff).is('reminded_at', null).eq('converted', false).limit(100);
+  if (error || !carts) return;
+  for (const c of carts) {
+    if (!c.email || !(c.items || []).length) continue;
+    try {
+      await sendCartReminder(c, env);
+      await db.from('carts').update({ reminded_at: new Date().toISOString() }).eq('id', c.id);
+    } catch (e) { /* leave un-reminded so the next run retries */ }
+  }
+}
+
 // generic sender (Resend) — used for the thank-you email and the admin 2FA code
 async function sendEmail(env, { to, subject, text, html }) {
   if (!env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured');
@@ -1096,6 +1306,15 @@ function jsonResponse(body, init, env) {
 
 // ---- request router ----
 export default {
+  // Cloudflare Cron Trigger → send abandoned-cart reminders on a schedule.
+  async scheduled(event, env, ctx) {
+    const SUPABASE_SERVICE_KEY = env.SUPABASE_SERVICE_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
+    const db = (env.SUPABASE_URL && SUPABASE_SERVICE_KEY)
+      ? createClient(env.SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
+      : null;
+    if (db) ctx.waitUntil(processAbandonedCarts(env, db));
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
 
@@ -1141,6 +1360,14 @@ export default {
 
       // ---- checkout: validate a typed code (public) — static promo code OR
       // an affiliate's own referral_code used as a discount code ----
+      if (request.method === 'POST' && url.pathname === '/cart/save') {
+        if (!db) return jsonResponse({ ok: true }, {}, env); // no DB → nothing to save, don't error the checkout
+        const body = await request.json().catch(() => ({}));
+        const res = await saveCart(db, body);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+
       if (request.method === 'POST' && url.pathname === '/promo/check') {
         const body = await request.json().catch(() => ({}));
         const rate = await resolveDiscountRate(db, body.code);
@@ -1279,6 +1506,17 @@ export default {
           return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
         }
         const res = await markPaid(db, paidMatch[1], env);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+
+      const shippedMatch = url.pathname.match(/^\/orders\/([^/]+)\/shipped$/);
+      if (request.method === 'PATCH' && shippedMatch) {
+        if (!(await requireAdminSession(db, request))) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        const body = await request.json().catch(() => ({}));
+        const res = await markShipped(db, shippedMatch[1], body, env);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
       }
