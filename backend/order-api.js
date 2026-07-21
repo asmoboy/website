@@ -425,7 +425,8 @@ async function createOrder(db, payload, env) {
       // the customer their confirmation now, and notify the seller. Card orders
       // are still "pending" here (unpaid) — those emails fire in markPaid.
       if (env && isCod) {
-        await sendCodConfirmation(data, env).catch(() => {});
+        const codTpl = await sendCodConfirmation(data, env).catch(() => null);
+        if (codTpl) await logEmail(db, { email: data.email, order_ref: data.ref, kind: 'cod_confirmation', subject: codTpl.s });
         await sendSellerNotification(data, env).catch(() => {});
       }
       return { ok: true, order: data };
@@ -456,7 +457,8 @@ async function markPaid(db, ref, env) {
   await sendSellerNotification(order, env).catch(() => {});
 
   try {
-    await sendThankYouEmail(order, env);
+    const tpl = await sendThankYouEmail(order, env);
+    await logEmail(db, { email: order.email, order_ref: order.ref, kind: 'confirmation', subject: tpl && tpl.s });
   } catch (e) {
     // Order is already marked paid in the DB; surface the email failure
     // separately so it can be retried without re-triggering payment logic.
@@ -950,6 +952,7 @@ function sellerNotifyTemplate(o) {
 async function sendCodConfirmation(order, env) {
   const tpl = codTemplate(order);
   await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+  return tpl;
 }
 
 async function sendSellerNotification(order, env) {
@@ -1075,10 +1078,40 @@ function ctaTemplate(o, copy) {
 async function sendCartReminder(cart, env) {
   const tpl = ctaTemplate(cart, CART_COPY);
   await sendEmail(env, { to: cart.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+  return tpl;
+}
+
+// ---- full orders dashboard: every order + which emails it received ----
+async function listOrdersFull(db) {
+  const { data: orders, error } = await db.from('orders').select('*')
+    .order('created_at', { ascending: false }).limit(500);
+  if (error) return { error: error.message, status: 500 };
+  const { data: logs } = await db.from('email_log').select('*').order('created_at', { ascending: true });
+  const byRef = {}, byEmail = {};
+  (logs || []).forEach((l) => {
+    const rec = { kind: l.kind, subject: l.subject, at: l.created_at };
+    if (l.order_ref) (byRef[l.order_ref] = byRef[l.order_ref] || []).push(rec);
+    else { const k = (l.email || '').toLowerCase(); (byEmail[k] = byEmail[k] || []).push(rec); }
+  });
+  const out = (orders || []).map((o) => Object.assign({}, o, {
+    emails: (byRef[o.ref] || []).concat(byEmail[(o.email || '').toLowerCase()] || []),
+  }));
+  const { data: carts } = await db.from('carts').select('email,name,items,total_text,currency,lang,updated_at,reminded_at,converted')
+    .eq('converted', false).order('updated_at', { ascending: false }).limit(200);
+  return { ok: true, orders: out, carts: carts || [] };
 }
 async function sendShipped(order, env) {
   const tpl = ctaTemplate(order, SHIPPED_COPY);
   await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+  return tpl;
+}
+
+// record one customer email so the orders dashboard can show what was sent
+async function logEmail(db, { email, order_ref, kind, subject }) {
+  if (!db || !email) return;
+  await db.from('email_log').insert({
+    email: String(email).toLowerCase(), order_ref: order_ref || null, kind, subject: subject || null,
+  }).catch(() => {});
 }
 
 // ---- carts: upsert on checkout email, mark converted on order ----
@@ -1114,8 +1147,10 @@ async function markShipped(db, ref, body, env) {
   if (body && body.carrier) patch.carrier = String(body.carrier);
   const { data: order, error } = await db.from('orders').update(patch).eq('ref', ref).select().single();
   if (error) return { error: error.message, status: error.code === 'PGRST116' ? 404 : 500 };
-  try { await sendShipped(order, env); }
-  catch (e) { return { ok: true, order, emailError: e.message }; }
+  try {
+    const tpl = await sendShipped(order, env);
+    await logEmail(db, { email: order.email, order_ref: order.ref, kind: 'shipped', subject: tpl && tpl.s });
+  } catch (e) { return { ok: true, order, emailError: e.message }; }
   return { ok: true, order };
 }
 
@@ -1129,8 +1164,9 @@ async function processAbandonedCarts(env, db) {
   for (const c of carts) {
     if (!c.email || !(c.items || []).length) continue;
     try {
-      await sendCartReminder(c, env);
+      const tpl = await sendCartReminder(c, env);
       await db.from('carts').update({ reminded_at: new Date().toISOString() }).eq('id', c.id);
+      await logEmail(db, { email: c.email, order_ref: null, kind: 'cart_reminder', subject: tpl && tpl.s });
     } catch (e) { /* leave un-reminded so the next run retries */ }
   }
 }
@@ -1507,6 +1543,15 @@ export default {
         }
         const status = url.searchParams.get('status') || undefined;
         const res = await listOrders(db, status);
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, {}, env);
+      }
+
+      if (request.method === 'GET' && url.pathname === '/admin/orders') {
+        if (!(await requireAdminSession(db, request))) {
+          return jsonResponse({ error: 'forbidden' }, { status: 403 }, env);
+        }
+        const res = await listOrdersFull(db);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
       }

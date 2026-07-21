@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Orders dashboard — TOP Pep</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=45">
+<style>
+  .admin-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 90px; }
+  .admin-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .admin-head img { height: 40px; width: auto; }
+  .admin-sub { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+  h2.sec { font-size: 1.1rem; margin: 30px 0 12px; }
+  .msg { font-size: 13px; margin: 8px 0; min-height: 16px; }
+  .msg.err { color: #e0533d; } .msg.ok { color: #1a7f37; }
+  .empty { color: var(--muted); padding: 24px 0; }
+  /* login (same flow as the affiliate admin) */
+  .login-card { max-width: 380px; border: 1px solid var(--line-strong); border-radius: 14px; padding: 24px; margin: 0 auto; }
+  .login-card .field { margin-bottom: 14px; }
+  .login-card label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .login-card input { width: 100%; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; font-size: 15px; box-sizing: border-box; }
+  .login-card .hint { font-size: 13px; color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
+  .admin-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .toolbar input[type=search] { flex: 1; min-width: 200px; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 10px; font: inherit; }
+  .ord { border: 1px solid var(--line-strong); border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+  .ord .row1 { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+  .ord .onum { font-weight: 700; font-family: var(--font-display); }
+  .ord .ref { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+  .ord .tot { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--brand); }
+  .ord .grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; margin-top: 12px; }
+  @media (max-width: 640px) { .ord .grid { grid-template-columns: 1fr; } }
+  .ord .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
+  .ord .addr, .ord .items { font-size: 14px; line-height: 1.5; white-space: pre-line; }
+  .ord .items div { display: flex; justify-content: space-between; gap: 10px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: .03em; }
+  .b-paid { background: #e3f6e9; color: #1a7f37; }
+  .b-cod { background: #fff2e0; color: #a35a00; }
+  .b-shipped { background: #e7ecfb; color: #2a44c0; }
+  .b-delivered { background: #eee9fd; color: #5e17eb; }
+  .b-pending, .b-received { background: #f1f1f4; color: #666; }
+  .b-cancelled { background: #fde8e6; color: #c02a1a; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: #f6f2ff; color: #5e17eb; }
+  .chip.none { background: #f1f1f4; color: #888; }
+  .ship-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .ship-row input { flex: 1; min-width: 180px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 8px; font: inherit; font-size: 13px; }
+  .track-link { font-size: 13px; }
+  .adminnav a { font-size: 13px; color: var(--brand); text-decoration: none; margin-right: 14px; }
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <div class="admin-head"><img src="/logo.png" alt="TOP Pep"><h1 style="font-size:1.4rem;">Orders dashboard</h1></div>
+
+  <!-- LOGIN STEP 1: email + password -->
+  <div class="login-card" id="stepPassword">
+    <p class="hint">Sign in with your admin account.</p>
+    <div class="field"><label for="lEmail">Email</label><input id="lEmail" type="email" autocomplete="email"></div>
+    <div class="field"><label for="lPassword">Password</label><input id="lPassword" type="password" autocomplete="current-password"></div>
+    <button class="btn btn-block" id="signInBtn">Sign in</button>
+    <p class="msg" id="passwordMsg"></p>
+  </div>
+
+  <!-- LOGIN STEP 2: emailed 6-digit code -->
+  <div class="login-card" id="stepCode" style="display:none;">
+    <p class="hint">We emailed a 6-digit code to your admin address. Enter it below — it expires in 10 minutes.</p>
+    <div class="field"><label for="lCode">Code</label><input id="lCode" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
+    <button class="btn btn-block" id="verifyBtn">Verify</button>
+    <p class="msg" id="codeMsg"></p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash" style="display:none;">
+    <div class="admin-top">
+      <p class="admin-sub" style="margin:0;">Signed in as <b id="whoAmI"></b></p>
+      <div>
+        <span class="adminnav"><a href="/admin/affiliates.html">Affiliate admin →</a></span>
+        <button class="btn btn-sm btn-outline" id="signOutBtn">Sign out</button>
+      </div>
+    </div>
+
+    <h2 class="sec">All orders</h2>
+    <p class="admin-sub" style="margin-bottom:12px;">Every order with the full delivery address and items. Paste a tracking link and press <b>Mark shipped &amp; email</b> — the customer automatically gets a branded tracking email in their language. The chips show which emails each customer has already received.</p>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search by reference, order no., name or email…">
+      <select id="statusFilter" style="padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;font:inherit;">
+        <option value="">All statuses</option>
+        <option value="paid">Paid (card)</option>
+        <option value="cod">COD</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <button class="btn btn-sm" id="refreshBtn">Refresh</button>
+    </div>
+    <p class="msg" id="msg"></p>
+    <div id="orders"><p class="empty">Loading…</p></div>
+
+    <h2 class="sec">Abandoned carts</h2>
+    <p class="admin-sub" style="margin-bottom:12px;">Baskets where the customer entered their email but didn't complete checkout. A reminder email is sent automatically a few hours later.</p>
+    <div id="carts"><p class="empty">—</p></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/data.js?v=45"></script>
+<script>
+(function () {
+  var T = window.TOPPEP;
+  var $ = function (id) { return document.getElementById(id); };
+  var api = T.orderApiUrl;
+  var SESS_KEY = 'toppep_admin_session';
+
+  if (!T.supabaseUrl || !T.supabaseAnonKey || !window.supabase) {
+    $('stepPassword').innerHTML = '<p class="msg err">Admin login isn\'t configured yet.</p>';
+    return;
+  }
+  var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
+
+  function getSession() { try { return JSON.parse(localStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; } }
+  function setSession(s) { localStorage.setItem(SESS_KEY, JSON.stringify(s)); }
+  function clearSession() { localStorage.removeItem(SESS_KEY); }
+  function headers() { var s = getSession(); return { 'Authorization': 'Bearer ' + (s ? s.token : ''), 'Content-Type': 'application/json' }; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  function show(view) {
+    $('stepPassword').style.display = view === 'password' ? 'block' : 'none';
+    $('stepCode').style.display = view === 'code' ? 'block' : 'none';
+    $('dash').style.display = view === 'dash' ? 'block' : 'none';
+  }
+  function setMsg(text, cls) { var m = $('msg'); m.className = 'msg ' + (cls || ''); m.textContent = text || ''; }
+
+  $('signInBtn').addEventListener('click', async function () {
+    var m = $('passwordMsg'); m.className = 'msg'; m.textContent = 'Signing in…';
+    var res = await sb.auth.signInWithPassword({ email: $('lEmail').value.trim(), password: $('lPassword').value });
+    if (res.error) { m.className = 'msg err'; m.textContent = res.error.message; return; }
+    var accessToken = res.data.session.access_token;
+    var r = await fetch(api + '/admin/login/request-code', { method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' } });
+    if (!r.ok) { m.className = 'msg err'; m.textContent = r.status === 403 ? 'This account is not an admin.' : ('Could not send code (' + r.status + ')'); await sb.auth.signOut(); return; }
+    window.__pendingAccessToken = accessToken; m.textContent = ''; show('code');
+  });
+
+  $('verifyBtn').addEventListener('click', async function () {
+    var m = $('codeMsg'); m.className = 'msg'; m.textContent = 'Verifying…';
+    var accessToken = window.__pendingAccessToken;
+    if (!accessToken) { m.className = 'msg err'; m.textContent = 'Session expired — sign in again.'; show('password'); return; }
+    var r = await fetch(api + '/admin/login/verify-code', { method: 'POST', headers: { 'Authorization': 'Bearer ' + accessToken, 'Content-Type': 'application/json' }, body: JSON.stringify({ code: $('lCode').value.trim() }) });
+    var data = await r.json().catch(function () { return {}; });
+    if (!r.ok) { m.className = 'msg err'; m.textContent = data.error || ('Failed (' + r.status + ')'); return; }
+    setSession({ token: data.token, expires_at: data.expires_at, email: $('lEmail').value.trim() });
+    window.__pendingAccessToken = null; await sb.auth.signOut(); enterDashboard();
+  });
+
+  $('signOutBtn').addEventListener('click', async function () {
+    await fetch(api + '/admin/logout', { method: 'POST', headers: headers() }).catch(function () {});
+    clearSession(); location.reload();
+  });
+
+  async function apiFetch(path, opts) {
+    var r = await fetch(api + path, Object.assign({ headers: headers() }, opts || {}));
+    if (r.status === 403) { var e = new Error('Session expired — sign in again.'); e.forbidden = true; throw e; }
+    return r;
+  }
+
+  var ALL = [];
+  var EMAIL_LABELS = { confirmation: 'Confirmation', cod_confirmation: 'COD confirmation', shipped: 'Shipped / tracking', cart_reminder: 'Cart reminder' };
+
+  async function enterDashboard() {
+    $('whoAmI').textContent = getSession().email;
+    show('dash'); setMsg('Loading…');
+    try { await loadOrders(); setMsg(''); }
+    catch (e) { if (e.forbidden) { clearSession(); show('password'); return; } setMsg(e.message, 'err'); }
+  }
+
+  async function loadOrders() {
+    var res = await apiFetch('/admin/orders');
+    if (!res.ok) throw new Error('Load error ' + res.status);
+    var data = await res.json();
+    ALL = data.orders || [];
+    renderOrders();
+    renderCarts(data.carts || []);
+  }
+
+  function fmtDate(s) { if (!s) return ''; try { return new Date(s).toLocaleString(); } catch (e) { return s; } }
+  function badge(status) { return '<span class="badge b-' + esc(status || 'pending') + '">' + esc(status || 'pending') + '</span>'; }
+
+  function itemsHtml(items) {
+    return (items || []).map(function (i) {
+      var amt = (i.price != null) ? (Number(i.price) * Number(i.qty || 1)).toFixed(2) : '';
+      return '<div><span>' + esc(i.qty) + '× ' + esc(i.name) + '</span><span>' + amt + '</span></div>';
+    }).join('') || '—';
+  }
+  function addrHtml(o) {
+    return esc([o.name, o.org, o.address, [o.zip, o.city].filter(Boolean).join(' '), o.country].filter(Boolean).join('\n')) +
+      '\n' + esc(o.email || '');
+  }
+  function emailChips(emails) {
+    if (!emails || !emails.length) return '<span class="chip none">No emails yet</span>';
+    return emails.map(function (e) { return '<span class="chip" title="' + esc(e.subject || '') + ' · ' + fmtDate(e.at) + '">' + esc(EMAIL_LABELS[e.kind] || e.kind) + '</span>'; }).join('');
+  }
+
+  function renderOrders() {
+    var q = ($('search').value || '').trim().toLowerCase();
+    var sf = $('statusFilter').value;
+    var list = ALL.filter(function (o) {
+      if (sf && o.status !== sf) return false;
+      if (!q) return true;
+      return [o.ref, o.order_no, o.name, o.email].some(function (v) { return String(v || '').toLowerCase().indexOf(q) !== -1; });
+    });
+    if (!list.length) { $('orders').innerHTML = '<p class="empty">No orders match.</p>'; return; }
+    $('orders').innerHTML = list.map(function (o) {
+      var canShip = !o.shipped_at && (o.status === 'paid' || o.status === 'cod');
+      var shipBlock = o.tracking_url
+        ? '<div class="track-link" style="margin-top:10px;">📦 Tracking: <a href="' + esc(o.tracking_url) + '" target="_blank" rel="noopener">' + esc(o.tracking_url) + '</a></div>'
+        : (canShip
+          ? '<div class="ship-row"><input type="url" class="track-in" data-ref="' + esc(o.ref) + '" placeholder="Paste tracking link…"><button class="btn btn-sm" data-ship="' + esc(o.ref) + '">Mark shipped &amp; email</button></div>'
+          : '');
+      return '<div class="ord">' +
+        '<div class="row1"><div><span class="onum">' + esc(o.order_no || '') + '</span> &nbsp;' + badge(o.status) +
+          ' &nbsp;<span class="ref">' + esc(o.ref) + ' · ' + fmtDate(o.created_at) + ' · ' + esc(o.payment_method || '') + '</span></div>' +
+          '<div class="tot">' + esc(o.total_text || '') + '</div></div>' +
+        '<div class="grid">' +
+          '<div><div class="lbl">Deliver to</div><div class="addr">' + addrHtml(o) + '</div></div>' +
+          '<div><div class="lbl">Items</div><div class="items">' + itemsHtml(o.items) + '</div></div>' +
+        '</div>' +
+        shipBlock +
+        '<div class="lbl" style="margin-top:12px;">Emails sent</div><div class="chips">' + emailChips(o.emails) + '</div>' +
+      '</div>';
+    }).join('');
+
+    document.querySelectorAll('[data-ship]').forEach(function (b) {
+      b.addEventListener('click', async function () {
+        var ref = b.dataset.ship;
+        var input = document.querySelector('.track-in[data-ref="' + ref + '"]');
+        var urlv = input ? input.value.trim() : '';
+        if (!urlv) { setMsg('Paste a tracking link first.', 'err'); if (input) input.focus(); return; }
+        b.disabled = true; b.textContent = '…';
+        var r = await apiFetch('/orders/' + encodeURIComponent(ref) + '/shipped', { method: 'PATCH', body: JSON.stringify({ tracking_url: urlv }) }).catch(function (e) { setMsg(e.message, 'err'); return null; });
+        if (r && r.ok) { setMsg('Shipped — tracking email sent.', 'ok'); loadOrders(); }
+        else if (r) { b.disabled = false; b.textContent = 'Mark shipped & email'; setMsg('Failed (' + r.status + ')', 'err'); }
+      });
+    });
+  }
+
+  function renderCarts(carts) {
+    if (!carts.length) { $('carts').innerHTML = '<p class="empty">No abandoned carts.</p>'; return; }
+    $('carts').innerHTML = carts.map(function (c) {
+      return '<div class="ord"><div class="row1"><div><b>' + esc(c.email) + '</b> &nbsp;<span class="ref">' + fmtDate(c.updated_at) + '</span></div>' +
+        '<div class="tot">' + esc(c.total_text || '') + '</div></div>' +
+        '<div class="items" style="margin-top:8px;">' + itemsHtml(c.items) + '</div>' +
+        '<div class="chips">' + (c.reminded_at ? '<span class="chip">Reminder sent · ' + fmtDate(c.reminded_at) + '</span>' : '<span class="chip none">Reminder pending</span>') + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  $('search').addEventListener('input', renderOrders);
+  $('statusFilter').addEventListener('change', renderOrders);
+  $('refreshBtn').addEventListener('click', function () { setMsg('Loading…'); loadOrders().then(function () { setMsg(''); }).catch(function (e) { setMsg(e.message, 'err'); }); });
+
+  (function boot() {
+    var s = getSession();
+    if (s && s.expires_at && new Date(s.expires_at) > new Date()) { enterDashboard(); }
+    else { clearSession(); show('password'); }
+  })();
+})();
+</script>
+</body>
+</html>
