@@ -785,12 +785,25 @@ function imageUrl(img) {
   return BRAND.site + p.split('/').map(encodeURIComponent).join('/');
 }
 
-// a product thumbnail cell for an item row (empty string if no image)
-function itemThumb(img) {
-  const u = imageUrl(img);
-  return u
-    ? `<img src="${u}" alt="" width="64" height="64" style="width:64px;height:64px;border-radius:10px;border:1px solid ${BRAND.line};object-fit:cover;vertical-align:middle;margin-right:13px;background:#fff;">`
+// one item row: large product image on the left, name + line total on the right
+function itemRowHtml(i, currency) {
+  const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), currency) : '';
+  const u = imageUrl(i.img);
+  const imgCell = u
+    ? `<td width="112" style="width:112px;vertical-align:middle;"><img src="${u}" alt="" width="112" height="112" style="width:112px;height:112px;border-radius:12px;border:1px solid ${BRAND.line};object-fit:cover;background:#fff;display:block;"></td>`
     : '';
+  const pad = u ? 'padding-left:16px;' : '';
+  return `<tr>
+    <td style="padding:14px 0;border-bottom:1px solid ${BRAND.line};">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>
+        ${imgCell}
+        <td style="vertical-align:middle;${pad}font-size:15px;color:${BRAND.ink};line-height:1.4;">
+          <span style="color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${escHtml(i.name)}
+        </td>
+      </tr></table>
+    </td>
+    <td style="padding:14px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;vertical-align:middle;font-variant-numeric:tabular-nums;">${line}</td>
+  </tr>`;
 }
 
 // per-language copy for the confirmation email
@@ -837,18 +850,8 @@ const ORDER_EMAIL_COPY = {
 };
 
 function orderEmailHtml(o, L) {
-  const rows = (o.items || []).map((i) => {
-    // i.name already carries the size/option (e.g. "BPC-157 · 10 mg") from the
-    // storefront, so don't append i.option again — that produced "· 10 mg · 10 mg".
-    const name = escHtml(i.name);
-    const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
-    return `<tr>
-      <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
-        ${itemThumb(i.img)}<span style="vertical-align:middle;"><span style="color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${name}</span>
-      </td>
-      <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:middle;">${line}</td>
-    </tr>`;
-  }).join('');
+  // i.name already carries the size/option (e.g. "BPC-157 · 10 mg") from the storefront.
+  const rows = (o.items || []).map((i) => itemRowHtml(i, o.currency)).join('');
 
   return `<!DOCTYPE html>
 <html lang="${escHtml(o.lang || 'en')}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -986,15 +989,7 @@ async function sendSellerNotification(order, env) {
 // ───────────────────────────────────────────────────────────────
 function ctaEmailHtml(o, L) {
   const rows = (L.showItems && (o.items || []).length)
-    ? (o.items || []).map((i) => {
-        const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
-        return `<tr>
-          <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
-            ${itemThumb(i.img)}<span style="vertical-align:middle;"><span style="color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${escHtml(i.name)}</span>
-          </td>
-          <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:middle;">${line}</td>
-        </tr>`;
-      }).join('')
+    ? (o.items || []).map((i) => itemRowHtml(i, o.currency)).join('')
     : '';
   const itemsBlock = rows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">${rows}
         <tr><td style="padding:14px 0 0;font-size:16px;font-weight:700;color:${BRAND.ink};">${escHtml(L.totalLabel || '')}</td>
