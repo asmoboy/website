@@ -223,7 +223,7 @@ async function createPaymentIntent(env, db, payload) {
 
   let ref;
   if (db) {
-    const created = await createOrder(db, payload);
+    const created = await createOrder(db, payload, env);
     if (created.error) return created;
     ref = created.order.ref;
   } else {
@@ -382,7 +382,7 @@ function validateCod(payload) {
 }
 
 // ---- POST /orders ----
-async function createOrder(db, payload) {
+async function createOrder(db, payload, env) {
   const base = pickOrderFields(payload);
   // items carry slug/option for the COD stock check — keep them on the record
   if (payload.items !== undefined) base.items = payload.items;
@@ -419,6 +419,13 @@ async function createOrder(db, payload) {
       // attribute the sale to an affiliate if the order carried a ref code —
       // never let a tracking failure break the order itself
       await createSale(db, data, payload).catch(() => {});
+      // COD has no payment step, so the order itself is the commitment: email
+      // the customer their confirmation now, and notify the seller. Card orders
+      // are still "pending" here (unpaid) — those emails fire in markPaid.
+      if (env && isCod) {
+        await sendCodConfirmation(data, env).catch(() => {});
+        await sendSellerNotification(data, env).catch(() => {});
+      }
       return { ok: true, order: data };
     }
     if (isUniqueViolation(error)) continue; // clash on ref → retry with a new one
@@ -440,6 +447,10 @@ async function markPaid(db, ref, env) {
 
   // card/prepaid is final once paid (no returns) → release the commission
   await confirmSale(db, ref).catch(() => {});
+
+  // notify the seller once the card order is actually paid (not on the earlier
+  // "pending" insert) — never let a notification failure affect the response
+  await sendSellerNotification(order, env).catch(() => {});
 
   try {
     await sendThankYouEmail(order, env);
@@ -864,11 +875,82 @@ function orderEmailHtml(o, L) {
 </body></html>`;
 }
 
-function thankYouTemplate(o) {
-  const L = ORDER_EMAIL_COPY[o.lang] || ORDER_EMAIL_COPY.en;
+// per-language copy for a cash-on-delivery (Nachnahme) order — NOT paid yet,
+// so the wording says "order received / pay on delivery", never "paid".
+const ORDER_EMAIL_COPY_COD = {
+  en: {
+    s: (o) => `Order received — order ${o.ref}`,
+    preheader: 'Order received — you pay the courier on delivery.',
+    hi: (o) => `Hi ${o.name},`,
+    intro: 'Thank you — we\'ve received your order. You\'ll pay in cash when the parcel is delivered.',
+    order: 'Order', reference: 'Reference',
+    item: 'Item', qty: 'Qty', amount: 'Amount',
+    total: 'To pay on delivery',
+    ship: "We're preparing your parcel now — it ships within 1 business day and you'll pay the courier on delivery. You'll get a tracking link by email.",
+    help: 'Questions? Just reply to this email.',
+    team: 'The TOP Pep team',
+    legal: 'TOP Pep · Research use only — not for human or veterinary use.',
+  },
+  de: {
+    s: (o) => `Bestellung erhalten — Bestellung ${o.ref}`,
+    preheader: 'Bestellung erhalten — Zahlung bei Lieferung (Nachnahme).',
+    hi: (o) => `Hallo ${o.name},`,
+    intro: 'Vielen Dank — wir haben deine Bestellung erhalten. Bezahlt wird bar bei der Lieferung (Nachnahme).',
+    order: 'Bestellung', reference: 'Referenz',
+    item: 'Artikel', qty: 'Menge', amount: 'Betrag',
+    total: 'Bei Lieferung zu zahlen',
+    ship: 'Wir bereiten dein Paket vor — Versand innerhalb von 1 Werktag, bezahlt wird bei der Zustellung. Den Tracking-Link bekommst du per E-Mail.',
+    help: 'Fragen? Antworte einfach auf diese E-Mail.',
+    team: 'Dein TOP-Pep-Team',
+    legal: 'TOP Pep · Nur zu Forschungszwecken — nicht zur Anwendung an Mensch oder Tier.',
+  },
+  ro: {
+    s: (o) => `Comandă primită — comanda ${o.ref}`,
+    preheader: 'Comandă primită — plătești la livrare (ramburs).',
+    hi: (o) => `Bună ${o.name},`,
+    intro: 'Mulțumim — am primit comanda ta. Plata se face în numerar la livrare (ramburs).',
+    order: 'Comanda', reference: 'Referință',
+    item: 'Produs', qty: 'Cant.', amount: 'Sumă',
+    total: 'De plată la livrare',
+    ship: 'Pregătim coletul — se expediază în 1 zi lucrătoare și plătești curierului la livrare. Vei primi linkul de urmărire pe e-mail.',
+    help: 'Întrebări? Răspunde direct la acest e-mail.',
+    team: 'Echipa TOP Pep',
+    legal: 'TOP Pep · Doar pentru cercetare — nu pentru uz uman sau veterinar.',
+  },
+};
+
+function buildOrderEmail(o, copy) {
+  const L = copy[o.lang] || copy.en;
   const itemsText = (o.items || []).map((i) => `  ${i.qty}× ${i.name}${i.option ? ' · ' + i.option : ''}`).join('\n');
   const b = `${L.hi(o)}\n\n${L.intro}\n\n${L.order}: ${o.order_no}   ${L.reference}: ${o.ref}\n\n${itemsText}\n${L.total}: ${o.total_text}\n\n${L.ship}\n\n— ${L.team}`;
   return { s: L.s(o), b, html: orderEmailHtml(o, L) };
+}
+
+function thankYouTemplate(o) { return buildOrderEmail(o, ORDER_EMAIL_COPY); }
+function codTemplate(o) { return buildOrderEmail(o, ORDER_EMAIL_COPY_COD); }
+
+// ---- seller notification (internal, German — one per real order) ----
+function sellerNotifyTemplate(o) {
+  const pm = o.payment_method === 'cod' ? 'Nachnahme (COD)'
+    : o.payment_method === 'card' ? 'Karte (Stripe)'
+    : (o.payment_method || '—');
+  const items = (o.items || []).map((i) => `  ${i.qty}× ${i.name}${i.option ? ' · ' + i.option : ''}`).join('\n');
+  const addr = [o.name, o.org, o.address, [o.zip, o.city].filter(Boolean).join(' '), o.country]
+    .filter(Boolean).join('\n');
+  const s = `Neue Bestellung ${o.order_no} — ${pm}`;
+  const b = `Neue Bestellung eingegangen.\n\nBestellung: ${o.order_no}\nReferenz: ${o.ref}\nZahlung: ${pm}\nStatus: ${o.status}\nSprache: ${o.lang || '—'}\n\nKunde:\n${addr}\nE-Mail: ${o.email}\n\nArtikel:\n${items}\nGesamt: ${o.total_text}`;
+  return { s, b };
+}
+
+async function sendCodConfirmation(order, env) {
+  const tpl = codTemplate(order);
+  await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b, html: tpl.html });
+}
+
+async function sendSellerNotification(order, env) {
+  const to = env.SELLER_NOTIFY_EMAIL || 'office@top-pep.com';
+  const tpl = sellerNotifyTemplate(order);
+  await sendEmail(env, { to, subject: tpl.s, text: tpl.b });
 }
 
 // generic sender (Resend) — used for the thank-you email and the admin 2FA code
@@ -1180,7 +1262,7 @@ export default {
         if (!db) {
           return jsonResponse({ error: 'server misconfigured: missing Supabase credentials' }, { status: 500 }, env);
         }
-        const res = await createOrder(db, body);
+        const res = await createOrder(db, body, env);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, { status: 201 }, env);
       }
