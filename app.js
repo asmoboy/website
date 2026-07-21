@@ -1647,9 +1647,14 @@
     document.title = p.name + ' — TOP Pep';
     var root = $('#productRoot');
     var isVar = p.type === 'variable';
-    // never preselect a sold-out size (bac water 3 ml is options[0])
+    // Preselect an IN-STOCK size by default; only if nothing is in stock fall
+    // back to the first not-sold-out size (e.g. a pre-order). Never a sold-out one.
     var firstBuyable = isVar
-      ? p.options.findIndex(function (o) { return !T.isSoldOut(p.slug, o.label); })
+      ? (function () {
+          var stocked = p.options.findIndex(function (o) { return T.inStock(p.slug, o.label); });
+          if (stocked > -1) return stocked;
+          return p.options.findIndex(function (o) { return !T.isSoldOut(p.slug, o.label); });
+        })()
       : -1;
     var selected = (isVar && firstBuyable > -1) ? p.options[firstBuyable] : null;
     var qty = 1;
