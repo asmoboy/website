@@ -67,7 +67,7 @@
       place_order: 'Place order', order_placed: 'Order placed ✓', secured_demo: 'You’ll get our bank details and a unique payment reference on the next step. No card details are stored.',
       order_summary: 'Order summary', shipping_word: 'Shipping', total: 'Total', free_word: 'Free',
       join: 'Join', nl_title: 'Lab updates, not noise.', nl_sub: 'New lots and COA releases once or twice a month. No spam, unsubscribe anytime.', nl_done: 'Subscribed — check your inbox to confirm.',
-      footer_desc: 'Research peptides sourced from accredited manufacturers, independently verified, and shipped discreetly.',
+      footer_desc: 'Research peptides sourced from accredited manufacturers, independently verified, and shipped discreetly. TOP Pep is also written \u201eToppep\u201c or \u201eTop Pep\u201c.',
       f_catalog: 'Catalog', f_company: 'Company', f_support: 'Support', f_affiliate: 'Affiliate login', fl_all: 'All products', fl_coa: 'COA library',
       disclaimer: 'All products are sold strictly for laboratory and in-vitro research use only. Nothing offered on this site is a drug, food, cosmetic, or medical device, and none of it is intended for human or veterinary use, consumption, or administration. By ordering you confirm you are a qualified researcher.',
       rights: 'For research use only.', reset: 'Reset', back_catalog: '← Back to catalog', description: 'Description', details: 'Details', specifications: 'Specifications', coa_in_box: 'Free lot-matched COA in every box', results_for: 'results for', product: 'Product', price: 'Price', proceed_checkout: 'Proceed to checkout', contact_label: 'Contact', shipping_method: 'Shipping method', payment: 'Payment', cart_empty_sub: 'Browse the catalog to add third-party tested research compounds — a lot-matched COA ships with every order.',
@@ -175,7 +175,7 @@
       fq_sq6: 'How do I get the Certificate of Analysis (COA) for my order?', fq_sa6: 'Send us your order number or the product name in chat, and we\'ll send over the COA for tested batches.',
       fq_sq7: 'My payment didn\'t go through — what should I do?', fq_sa7: 'Usually switching to a different card or payment method fixes it. Still stuck? Message us and we\'ll help figure out what\'s going on.',
       ab_eb: 'About', ab_h1: 'Documentation is the product.',
-      ab_p1: 'TOP Pep started from a simple frustration: research material sold on trust alone, with no paper to back it. We fixed the paper first, then built the catalog around it.',
+      ab_p1: 'TOP Pep — also written Toppep or Top Pep — started from a simple frustration: research material sold on trust alone, with no paper to back it. We fixed the paper first, then built the catalog around it.',
       ab_s1: 'Founded', ab_s2: 'Source per compound', ab_s3: 'Lots documented',
       ab_e1: 'The standard', ab_h2a: 'Proof before promises',
       ab_p2: 'Anyone can call a vial “high purity.” We publish the number, tie it to your lot, and let the certificate do the talking. If a lot doesn’t pass, it doesn’t ship — there’s no version of the story where marketing outruns the data.',
@@ -280,7 +280,7 @@
       place_order: 'Bestellung aufgeben', order_placed: 'Bestellung aufgegeben ✓', secured_demo: 'Im nächsten Schritt erhältst du unsere Bankdaten und eine eindeutige Zahlungsreferenz. Es werden keine Kartendaten gespeichert.',
       order_summary: 'Bestellübersicht', shipping_word: 'Versand', total: 'Gesamt', free_word: 'Gratis',
       join: 'Abonnieren', nl_title: 'Labor-Updates, kein Spam.', nl_sub: 'Neue Chargen und COA-Berichte ein- bis zweimal im Monat. Kein Spam, jederzeit abbestellbar.', nl_done: 'Abonniert — bitte bestätige in deinem Postfach.',
-      footer_desc: 'Forschungspeptide von akkreditierten Herstellern, unabhängig geprüft und diskret versendet.',
+      footer_desc: 'Forschungspeptide von akkreditierten Herstellern, unabhängig geprüft und diskret versendet. TOP Pep wird auch \u201eToppep\u201c oder \u201eTop Pep\u201c geschrieben.',
       f_catalog: 'Katalog', f_company: 'Unternehmen', f_support: 'Support', f_affiliate: 'Affiliate-Login', fl_all: 'Alle Produkte', fl_coa: 'Analysezertifikate (COA)',
       disclaimer: 'Alle Produkte werden ausschließlich für Labor- und In-vitro-Forschungszwecke verkauft. Nichts auf dieser Seite ist ein Arzneimittel, Lebensmittel, Kosmetikum oder Medizinprodukt, und nichts davon ist für den menschlichen oder tierischen Gebrauch, Verzehr oder die Verabreichung bestimmt. Mit der Bestellung bestätigst du, dass du ein qualifizierter Forscher bist.',
       rights: 'Nur für Forschungszwecke.', reset: 'Zurücksetzen', back_catalog: '← Zurück zum Katalog', description: 'Beschreibung', details: 'Details', specifications: 'Spezifikationen', coa_in_box: 'Gratis chargengenaues Analysezertifikat (COA) in jeder Box', results_for: 'Treffer für', product: 'Produkt', price: 'Preis', proceed_checkout: 'Zur Kasse gehen', contact_label: 'Kontakt', shipping_method: 'Versandart', payment: 'Zahlung', cart_empty_sub: 'Durchsuche den Katalog und füge extern getestete Forschungswirkstoffe hinzu — ein chargengenaues COA liegt jeder Bestellung bei.',
@@ -388,7 +388,7 @@
       fq_sq6: 'Wie bekomme ich das COA zu meiner Bestellung?', fq_sa6: 'Schick uns deine Bestellnummer oder den Produktnamen im Chat und wir senden dir das COA der getesteten Charge.',
       fq_sq7: 'Meine Zahlung ist fehlgeschlagen — was soll ich tun?', fq_sa7: 'Meist hilft eine andere Karte oder Zahlungsmethode. Klappt es trotzdem nicht, schreib uns und wir finden gemeinsam die Ursache.',
       ab_eb: 'Über uns', ab_h1: 'Die Dokumentation ist das Produkt.',
-      ab_p1: 'TOP Pep entstand aus einer einfachen Frustration: Forschungsmaterial, das nur auf Vertrauen verkauft wird — ohne Papiere. Wir haben zuerst die Papiere in Ordnung gebracht und dann den Katalog darum gebaut.',
+      ab_p1: 'TOP Pep — auch Toppep oder Top Pep geschrieben — entstand aus einer einfachen Frustration: Forschungsmaterial, das nur auf Vertrauen verkauft wird — ohne Papiere. Wir haben zuerst die Papiere in Ordnung gebracht und dann den Katalog darum gebaut.',
       ab_s1: 'Gegründet', ab_s2: 'Quelle pro Wirkstoff', ab_s3: 'Chargen dokumentiert',
       ab_e1: 'Der Standard', ab_h2a: 'Nachweis vor Versprechen',
       ab_p2: 'Jeder kann ein Vial „hochrein“ nennen. Wir veröffentlichen die Zahl, verknüpfen sie mit deiner Charge und lassen das Zertifikat sprechen. Besteht eine Charge nicht, wird sie nicht verschickt — Marketing überholt bei uns nie die Daten.',
@@ -494,7 +494,7 @@
       place_order: 'Plasează comanda', order_placed: 'Comandă plasată ✓', secured_demo: 'La pasul următor primești datele noastre bancare și o referință de plată unică. Nu se stochează date de card.',
       order_summary: 'Sumar comandă', shipping_word: 'Transport', total: 'Total', free_word: 'Gratuit',
       join: 'Abonează-te', nl_title: 'Noutăți de laborator, fără spam.', nl_sub: 'Loturi noi și rapoarte COA o dată sau de două ori pe lună. Fără spam, te dezabonezi oricând.', nl_done: 'Te-ai abonat — verifică e-mailul pentru confirmare.',
-      footer_desc: 'Peptide de cercetare de la producători acreditați, verificate independent și livrate discret.',
+      footer_desc: 'Peptide de cercetare de la producători acreditați, verificate independent și livrate discret. TOP Pep se mai scrie și \u201eToppep\u201d sau \u201eTop Pep\u201d.',
       f_catalog: 'Catalog', f_company: 'Companie', f_support: 'Asistență', f_affiliate: 'Login afiliați', fl_all: 'Toate produsele', fl_coa: 'Certificate de analiză (COA)',
       disclaimer: 'Toate produsele sunt vândute strict pentru utilizare în cercetare de laborator și in-vitro. Nimic de pe acest site nu este un medicament, aliment, cosmetic sau dispozitiv medical și nimic nu este destinat utilizării, consumului sau administrării umane ori veterinare. Prin plasarea comenzii confirmi că ești cercetător calificat.',
       rights: 'Doar pentru cercetare.', reset: 'Resetează', back_catalog: '← Înapoi la catalog', description: 'Descriere', details: 'Detalii', specifications: 'Specificații', coa_in_box: 'Certificate de analiză (COA) gratuit, per lot, în fiecare cutie', results_for: 'rezultate pentru', product: 'Produs', price: 'Preț', proceed_checkout: 'Continuă spre finalizare', contact_label: 'Contact', shipping_method: 'Metodă de livrare', payment: 'Plată', cart_empty_sub: 'Răsfoiește catalogul pentru a adăuga compuși de cercetare testați independent — fiecare comandă include un COA per lot.',
@@ -602,7 +602,7 @@
       fq_sq6: 'Cum primesc COA-ul pentru comanda mea?', fq_sa6: 'Trimite-ne numărul comenzii sau numele produsului în chat și îți trimitem COA-ul lotului testat.',
       fq_sq7: 'Plata nu a mers — ce să fac?', fq_sa7: 'De obicei ajută schimbarea cardului sau a metodei de plată. Tot nu merge? Scrie-ne și ne dăm seama împreună ce se întâmplă.',
       ab_eb: 'Despre', ab_h1: 'Documentația este produsul.',
-      ab_p1: 'TOP Pep a pornit dintr-o frustrare simplă: material de cercetare vândut doar pe încredere, fără acte. Am rezolvat mai întâi actele, apoi am construit catalogul în jurul lor.',
+      ab_p1: 'TOP Pep — scris și Toppep sau Top Pep — a pornit dintr-o frustrare simplă: material de cercetare vândut doar pe încredere, fără acte. Am rezolvat mai întâi actele, apoi am construit catalogul în jurul lor.',
       ab_s1: 'Fondat', ab_s2: 'Sursă per compus', ab_s3: 'Loturi documentate',
       ab_e1: 'Standardul', ab_h2a: 'Dovezi înaintea promisiunilor',
       ab_p2: 'Oricine poate numi un flacon „de puritate înaltă”. Noi publicăm cifra, o legăm de lotul tău și lăsăm certificatul să vorbească. Dacă un lot nu trece, nu se livrează — la noi marketingul nu întrece niciodată datele.',
@@ -751,7 +751,7 @@
     try { document.documentElement.lang = lang; } catch (e) {}
     var sk = $('.skip-link'); if (sk && SKIP[lang]) sk.textContent = SKIP[lang];
     var m = PAGE_META[page]; if (!m) return;
-    if (m.t && m.t[lang]) document.title = m.t[lang] + ' — TOP Pep';
+    if (m.t && m.t[lang]) document.title = m.t[lang] + ' — TOP Pep (Toppep)';
     var md = $('meta[name="description"]');
     if (md && m.d && m.d[lang]) md.setAttribute('content', m.d[lang]);
   }
@@ -1004,7 +1004,7 @@
           '<div><h3>' + t('f_support') + '</h3><ul><li><a href="/contact/">' + t('nav_contact') + '</a></li><li><a href="/shipping/">' + t('nav_shipping') + '</a></li><li><a href="/shipping-policy/">' + lg[2] + '</a></li><li><a href="/faq/">' + t('faq') + '</a></li><li><a href="/account/">' + t('sign_in') + '</a></li><li><a href="/affiliate/">' + t('f_affiliate') + '</a></li></ul></div>' +
         '</div>' +
         '<p class="footer-disclaimer">' + t('disclaimer') + '</p>' +
-        '<div class="footer-bottom"><span>© 2026 TOP Pep. ' + t('rights') + '</span><div class="legal-links">' +
+        '<div class="footer-bottom"><span>© 2026 TOP Pep (Toppep). ' + t('rights') + '</span><div class="legal-links">' +
           '<a href="/impressum/">' + t('nav_impressum') + '</a><a href="/terms/">' + lg[0] + '</a><a href="/privacy/">' + lg[1] + '</a><a href="/shipping-policy/">' + lg[2] + '</a><a href="/legal-agreement/">' + lg[3] + '</a>' +
         '</div></div>' +
       '</div></footer>';
@@ -2570,7 +2570,7 @@
 
   /* ---- customer account: real Supabase auth (sign in / register / reset) ---- */
   function initAccountAuth() {
-    var form = $('#authForm'), status = $('#authStatus');
+    var form = $('#authForm'), status = $('#authStatus'), googleBtn = $('#googleAuth');
     var sb = (window.supabase && T.supabaseUrl && T.supabaseAnonKey)
       ? window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey) : null;
     if (!sb) { // Supabase unavailable → keep the old demo message so nothing breaks
@@ -2609,6 +2609,23 @@
     if (/type=recovery/.test(location.hash)) showSetPassword();
     else sb.auth.getSession().then(function (s) { if (s.data.session) showSignedIn(s.data.session.user.email); });
 
+    if (googleBtn) googleBtn.addEventListener('click', function () {
+      setMsg(t('acc_working'));
+      googleBtn.disabled = true;
+      sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: location.origin + '/account/' }
+      }).then(function (r) {
+        if (r.error) {
+          googleBtn.disabled = false;
+          setMsg(r.error.message);
+        }
+      }).catch(function (err) {
+        googleBtn.disabled = false;
+        setMsg(err && err.message ? err.message : String(err));
+      });
+    });
+
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var email = $('#acEmail').value.trim(), pass = $('#acPass').value;
@@ -2634,9 +2651,14 @@
       var email = $('#acEmail').value.trim();
       if (!email) { setMsg(t('acc_enter_email')); $('#acEmail').focus(); return; }
       setMsg(t('acc_working'));
-      sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/account/' }).then(function () {
-        setMsg(t('acc_reset_sent'), true);
-      });
+      // Reset mail comes from TOP Pep (Resend) via our Worker, not from
+      // Supabase's default sender. Always show the same success message so we
+      // never reveal whether an account exists for this address.
+      fetch(T.orderApiUrl + '/account/auth/reset', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, lang: (document.documentElement.getAttribute('lang') || 'en') })
+      }).then(function () { setMsg(t('acc_reset_sent'), true); })
+        .catch(function () { setMsg(t('acc_reset_sent'), true); });
     });
   }
 

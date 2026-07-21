@@ -532,6 +532,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .auth-tab[aria-selected="true"] { background: var(--brand); color: var(--white); }
 .oauth-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 13px; border: 1px solid var(--line-strong); background: var(--white); font-weight: 600; font-size: 14px; margin-bottom: 20px; }
 .oauth-btn:hover { border-color: var(--ink); }
+.oauth-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.oauth-btn:disabled { opacity: .65; cursor: wait; }
 .oauth-btn svg { width: 18px; height: 18px; }
 .auth-divider { display: flex; align-items: center; gap: 14px; color: var(--muted); font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }

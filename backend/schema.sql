@@ -31,3 +31,13 @@ create index if not exists orders_status_idx on orders (status);
 -- The UNIQUE constraint on ref is the real guarantee that a payment
 -- reference can never repeat: a duplicate INSERT fails at the database
 -- level, so the API can retry with a fresh reference.
+
+-- ═════════════════════════════════════════════════════════════
+-- Row-Level Security — orders must NEVER be readable/writable with the
+-- public anon key. All order writes go through the Worker, which uses the
+-- service_role key (bypasses RLS). No anon/authenticated policy is defined,
+-- so the browser can never read or modify orders directly (customer PII:
+-- name, address, email). This is already enabled in production; the line
+-- below keeps a fresh `schema.sql` run secure by default too.
+-- ═════════════════════════════════════════════════════════════
+alter table orders enable row level security;

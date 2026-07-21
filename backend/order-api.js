@@ -129,10 +129,75 @@ async function resolveDiscountRate(db, code) {
   return promoRate(trimmed); // no affiliate row → static promo code fallback
 }
 
+// ---- server-authoritative price catalog ----
+// The single source of truth for what an item costs. Prices are looked up
+// HERE by slug + option, never trusted from the client payload — so a tampered
+// basket that claims price:0.01 is charged the real catalog price instead.
+// MUST stay in sync with the `products` list in data.js (like IN_STOCK/SOLD_OUT).
+// Keys: slug → { optionLabel: [EUR, RON] }; '' is the label for products
+// without size options.
+const CATALOG = {
+  'tirzepatide': { '5 mg': [60, 313.99], '10 mg': [74.99, 392.99], '15 mg': [119.99, 627.99], '20 mg': [140, 732.99], '30 mg': [155, 811.99], '60 mg': [240, 1256.99] },
+  'semaglutide': { '5 mg': [55, 287.99], '10 mg': [75, 392.99], '15 mg': [95, 496.99], '20 mg': [115, 601.99] },
+  'retatrutide': { '5 mg': [54.99, 287.99], '10 mg': [79.99, 418.99], '15 mg': [119.99, 627.99], '20 mg': [129.99, 680.99] },
+  'ghk-cu': { '50 mg': [44.99, 235.99], '100 mg': [74.99, 392.99] },
+  'hgh-somatropin': { '15 IU': [99.99, 523.99], '24 IU': [149.99, 784.99] },
+  'bacteriostatic-water': { '3 ml': [4.99, 25.99], '10 ml': [14.99, 77.99] },
+  'cagrilintide': { '': [119.99, 627.99] },
+  'hcg': { '': [69.99, 365.99] },
+  'cjc-1295-no-dac': { '': [64.99, 339.99] },
+  'cjc-1295-with-dac': { '': [149.99, 784.99] },
+  'cjc-1295-ipamorelin': { '': [74.99, 392.99] },
+  'ipamorelin': { '': [74.99, 392.99] },
+  'tesamorelin': { '': [85, 444.99] },
+  'sermorelin': { '': [129.99, 680.99] },
+  'igf1-lr3': { '': [89.99, 470.99] },
+  'bpc-157': { '': [44.99, 235.99] },
+  'tb-500': { '': [44.99, 235.99] },
+  'bpc-157-tb-500': { '': [79.99, 418.99] },
+  'glow-blend': { '': [99, 517.99] },
+  'ss-31': { '': [55.99, 292.99] },
+  'mots-c': { '': [64.99, 339.99] },
+  'thymosin-alpha-1': { '': [159.99, 837.99] },
+  'epitalon': { '': [64.99, 339.99] },
+  'semax': { '': [39.99, 208.99] },
+  'selank': { '': [39.99, 208.99] },
+  'dsip': { '': [59.99, 313.99] },
+  'nad-plus': { '': [74.99, 392.99] },
+  'pt-141': { '': [69.99, 365.99] },
+  'kpv': { '': [49.99, 261.99] },
+  'mt-2': { '': [34.99, 182.99] },
+  'ghk-cu-serum': { '': [49.99, 261.99] },
+};
+
+// authoritative unit price for one basket line, or null if slug/option unknown
+function unitPrice(slug, option, currency) {
+  const p = CATALOG[String(slug || '').trim()];
+  if (!p) return null;
+  const key = String(option || '').trim();
+  const entry = p[key] !== undefined ? p[key] : p[''];
+  if (!entry) return null;
+  return String(currency || 'eur').toLowerCase() === 'ron' ? entry[1] : entry[0];
+}
+
+// reject a basket that references an item we can't price (unknown slug/option) —
+// so a hand-crafted payload can't smuggle in a made-up product.
+function validatePricing(payload) {
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  if (!items.length) return 'no items';
+  for (const i of items) {
+    if (unitPrice(i.slug, i.option, payload.currency) === null) {
+      return 'unknown item in basket';
+    }
+  }
+  return null;
+}
+
 async function computeAmountCents(db, payload) {
   let items = (payload.items || []).reduce(function (n, i) {
     const qty = Math.max(1, parseInt(i.qty, 10) || 1);
-    return n + toMinorUnits(i.price) * qty;
+    // price comes from the server catalog, NEVER from i.price (client-supplied)
+    return n + toMinorUnits(unitPrice(i.slug, i.option, payload.currency) || 0) * qty;
   }, 0);
   // percentage discount applies to the item subtotal only (not shipping)
   const rate = await resolveDiscountRate(db, payload.promo);
@@ -153,6 +218,8 @@ async function createPaymentIntent(env, db, payload) {
   }
   const addrError = validateAddress(base);
   if (addrError) return { error: addrError, status: 400 };
+  const priceError = validatePricing(payload);
+  if (priceError) return { error: priceError, status: 400 };
   const currency = (payload.currency || 'eur').toLowerCase();
   const amount = await computeAmountCents(db, payload);
   if (amount < 1) return { error: 'no items', status: 400 };
@@ -330,6 +397,15 @@ async function createOrder(db, payload) {
   // cash-on-delivery guard — server is authoritative (frontend checks aren't enough)
   const codError = validateCod(payload);
   if (codError) return { error: codError, status: 400 };
+  // reject baskets referencing an item we can't price (server catalog is authoritative)
+  const priceError = validatePricing(payload);
+  if (priceError) return { error: priceError, status: 400 };
+  // the claimed total must not undercut the server-computed catalog total —
+  // blocks a tampered basket lowering the amount due for COD / bank transfer
+  const srvTotal = await serverTotal(db, payload);
+  if (Number(base.total) + 0.01 < srvTotal) {
+    return { error: 'order total does not match catalog pricing', status: 400 };
+  }
 
   const isCod = String(payload.payment_method || '') === 'cod';
   const startStatus = isCod ? 'cod' : 'pending';
@@ -397,8 +473,23 @@ async function listOrders(db, status) {
 function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
 function itemsSubtotal(payload) {
   return (payload.items || []).reduce(function (n, i) {
-    return n + (Number(i.price) || 0) * Math.max(1, parseInt(i.qty, 10) || 1);
+    // server catalog price, not the client-supplied i.price (see unitPrice)
+    return n + (unitPrice(i.slug, i.option, payload.currency) || 0) * Math.max(1, parseInt(i.qty, 10) || 1);
   }, 0);
+}
+
+// server-authoritative order total: catalog item prices − server discount, plus
+// the (additive-only) shipping/insurance. Used to reject a basket whose claimed
+// total undercuts real pricing (protects COD / bank-transfer amounts, where no
+// Stripe recompute happens).
+async function serverTotal(db, payload) {
+  let sub = itemsSubtotal(payload);
+  const rate = await resolveDiscountRate(db, payload.promo);
+  if (rate > 0) sub = sub * (1 - rate);
+  let total = sub;
+  if (Number(payload.shipping) > 0) total += Number(payload.shipping);
+  if (Number(payload.insurance) > 0) total += Number(payload.insurance);
+  return round2(total);
 }
 
 // record a referred click (only for codes that belong to a real affiliate)
@@ -555,6 +646,31 @@ async function sendAffiliatePasswordSetup(env, db, email) {
       actionLink + '\n\n' +
       'The link opens your dashboard and lets you choose a new password. If you didn\'t request this, just ignore this email.\n\n— The TOP Pep team',
   }).catch(() => {});
+  return { ok: true };
+}
+
+// ---- POST /account/auth/reset — customer "forgot password" email ----
+// Same idea as the affiliate reset, but for normal shop customers: we mint a
+// Supabase recovery link (generateLink sends NO Supabase email of its own) and
+// deliver it ourselves via Resend, so the mail comes from TOP Pep, not from
+// Supabase's default sender. Always returns {ok:true} — never leaks whether an
+// account exists (a non-existent user just makes generateLink error → generic ok).
+async function sendCustomerPasswordReset(env, db, email, lang) {
+  const clean = String(email || '').trim().toLowerCase();
+  if (!clean) return { ok: true };
+  const site = env.SITE_URL || 'https://www.top-pep.com';
+  const { data, error } = await db.auth.admin.generateLink({
+    type: 'recovery', email: clean, options: { redirectTo: site + '/account/' },
+  }).catch(() => ({ error: true }));
+  if (error || !data || !data.properties) return { ok: true };
+  const link = data.properties.action_link;
+  const T = {
+    en: { s: 'Reset your TOP Pep password', b: 'Hi,\n\nUse the link below to reset the password for your TOP Pep account:\n\n' + link + '\n\nIf you didn\'t request this, just ignore this email.\n\n— The TOP Pep team' },
+    de: { s: 'Passwort für dein TOP-Pep-Konto zurücksetzen', b: 'Hallo,\n\nüber den folgenden Link kannst du das Passwort für dein TOP-Pep-Konto neu setzen:\n\n' + link + '\n\nFalls du das nicht angefordert hast, ignoriere diese E-Mail einfach.\n\n— Dein TOP-Pep-Team' },
+    ro: { s: 'Resetează parola contului TOP Pep', b: 'Bună,\n\nFolosește linkul de mai jos pentru a reseta parola contului tău TOP Pep:\n\n' + link + '\n\nDacă nu ai cerut acest lucru, ignoră acest e-mail.\n\n— Echipa TOP Pep' },
+  };
+  const tpl = T[lang] || T.en;
+  await sendEmail(env, { to: clean, subject: tpl.s, text: tpl.b }).catch(() => {});
   return { ok: true };
 }
 
@@ -822,6 +938,15 @@ export default {
         if (db) {
           const body = await request.json().catch(() => ({}));
           await sendAffiliatePasswordSetup(env, db, body.email).catch(() => {});
+        }
+        return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which emails exist
+      }
+
+      // ---- customer: send a password-reset email (public, from TOP Pep via Resend) ----
+      if (request.method === 'POST' && url.pathname === '/account/auth/reset') {
+        if (db) {
+          const body = await request.json().catch(() => ({}));
+          await sendCustomerPasswordReset(env, db, body.email, body.lang).catch(() => {});
         }
         return jsonResponse({ ok: true }, {}, env); // always 200 — never leak which emails exist
       }
