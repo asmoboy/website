@@ -41,13 +41,10 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const BANK = {
-  accountName: 'Petru Birgauan',
-  iban: 'BE37 9050 9304 4528',
-  bic: 'TRWIBEB1XXX',
-  bank: 'Wise (TransferWise)',
-};
-const FROM = 'TOP Pep <orders@top-pep.com>';
+// Central sender for ALL Worker emails (order confirmation, admin login code,
+// affiliate + customer password reset). Any address @top-pep.com works as long
+// as the top-pep.com domain is verified in Resend.
+const FROM = 'TOP Pep <office@top-pep.com>';
 
 // =====================================================================
 //  STRIPE — card payments via hosted Checkout

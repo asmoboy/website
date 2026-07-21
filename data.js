@@ -16,16 +16,8 @@
   /* currency follows language: Romanian → lei, else → euro */
   var CUR = (localStorage.getItem('toppep_lang') === 'ro') ? 'ron' : 'eur';
 
-  /* =================================================================
-     PAYMENT CONFIG — single source of truth for bank-transfer details.
-     Referenced by the checkout confirmation, order emails and /admin/.
-  ================================================================= */
-  var PAYMENT_BANK_DETAILS = {
-    accountName: 'Petru Birgauan',
-    iban: 'BE37 9050 9304 4528',
-    bic: 'TRWIBEB1XXX',
-    bank: 'Wise (TransferWise)'
-  };
+  /* Bank-transfer as a payment method has been removed (checkout offers card +
+     cash-on-delivery only), so the IBAN/BIC no longer ship in the client. */
   var ORDER_INBOX = 'orders@top-pep.com';
   /* Phase 2: the deployed Cloudflare Worker (order records + Stripe checkout).
      While empty, orders are recorded via email + localStorage only, and card
@@ -368,7 +360,6 @@
     currency: CUR,
     freeShip: CUR === 'ron' ? 1230 : 250,
     shipCost: CUR === 'ron' ? 35 : 15.90,
-    bank: PAYMENT_BANK_DETAILS,
     orderInbox: ORDER_INBOX,
     orderApiUrl: ORDER_API_URL,
     stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
