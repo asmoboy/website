@@ -816,7 +816,9 @@ const ORDER_EMAIL_COPY = {
 
 function orderEmailHtml(o, L) {
   const rows = (o.items || []).map((i) => {
-    const name = escHtml(i.name) + (i.option ? ` <span style="color:${BRAND.muted}">· ${escHtml(i.option)}</span>` : '');
+    // i.name already carries the size/option (e.g. "BPC-157 · 10 mg") from the
+    // storefront, so don't append i.option again — that produced "· 10 mg · 10 mg".
+    const name = escHtml(i.name);
     const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
     return `<tr>
       <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
@@ -921,7 +923,7 @@ const ORDER_EMAIL_COPY_COD = {
 
 function buildOrderEmail(o, copy) {
   const L = copy[o.lang] || copy.en;
-  const itemsText = (o.items || []).map((i) => `  ${i.qty}× ${i.name}${i.option ? ' · ' + i.option : ''}`).join('\n');
+  const itemsText = (o.items || []).map((i) => `  ${i.qty}× ${i.name}`).join('\n');
   const b = `${L.hi(o)}\n\n${L.intro}\n\n${L.order}: ${o.order_no}   ${L.reference}: ${o.ref}\n\n${itemsText}\n${L.total}: ${o.total_text}\n\n${L.ship}\n\n— ${L.team}`;
   return { s: L.s(o), b, html: orderEmailHtml(o, L) };
 }
@@ -934,7 +936,7 @@ function sellerNotifyTemplate(o) {
   const pm = o.payment_method === 'cod' ? 'Nachnahme (COD)'
     : o.payment_method === 'card' ? 'Karte (Stripe)'
     : (o.payment_method || '—');
-  const items = (o.items || []).map((i) => `  ${i.qty}× ${i.name}${i.option ? ' · ' + i.option : ''}`).join('\n');
+  const items = (o.items || []).map((i) => `  ${i.qty}× ${i.name}`).join('\n');
   const addr = [o.name, o.org, o.address, [o.zip, o.city].filter(Boolean).join(' '), o.country]
     .filter(Boolean).join('\n');
   const s = `Neue Bestellung ${o.order_no} — ${pm}`;
