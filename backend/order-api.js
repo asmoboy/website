@@ -729,27 +729,160 @@ async function listAffiliates(db) {
   return { ok: true, affiliates: out };
 }
 
-// ---- thank-you email (localised) ----
+// ───────────────────────────────────────────────────────────────
+// Order-confirmation email (localised, branded HTML).
+//   • Language is whatever the customer used at checkout (o.lang).
+//   • A plain-text `b` version is always sent alongside the HTML so
+//     clients that don't render HTML still show a readable message.
+//   • To restyle the email, edit `orderEmailHtml()` below — it is the
+//     single source of the design (colours, logo, layout).
+// ───────────────────────────────────────────────────────────────
+const BRAND = {
+  accent: '#5E17EB',
+  ink: '#111114',
+  muted: '#6b6b76',
+  line: '#ececef',
+  bg: '#f4f4f6',
+  site: 'https://www.top-pep.com',
+  logo: 'https://www.top-pep.com/logo.png',
+};
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+}
+
+function money(n, currency) {
+  const v = Number(n || 0);
+  return (String(currency || '').toUpperCase() === 'RON')
+    ? v.toFixed(2).replace('.', ',') + ' lei'
+    : v.toFixed(2) + ' €';
+}
+
+// per-language copy for the confirmation email
+const ORDER_EMAIL_COPY = {
+  en: {
+    s: (o) => `Payment received — order ${o.ref}`,
+    preheader: 'Payment received — your order is confirmed.',
+    hi: (o) => `Hi ${o.name},`,
+    intro: 'Thank you — your payment has been received and your order is confirmed.',
+    order: 'Order', reference: 'Reference',
+    item: 'Item', qty: 'Qty', amount: 'Amount',
+    total: 'Total paid',
+    ship: "We're preparing your parcel now — it ships within 1 business day and you'll get a tracking link by email.",
+    help: 'Questions? Just reply to this email.',
+    team: 'The TOP Pep team',
+    legal: 'TOP Pep · Research use only — not for human or veterinary use.',
+  },
+  de: {
+    s: (o) => `Zahlung erhalten — Bestellung ${o.ref}`,
+    preheader: 'Zahlung erhalten — deine Bestellung ist bestätigt.',
+    hi: (o) => `Hallo ${o.name},`,
+    intro: 'Vielen Dank — deine Zahlung ist eingegangen und deine Bestellung ist bestätigt.',
+    order: 'Bestellung', reference: 'Referenz',
+    item: 'Artikel', qty: 'Menge', amount: 'Betrag',
+    total: 'Bezahlt',
+    ship: 'Wir bereiten dein Paket vor — Versand innerhalb von 1 Werktag, den Tracking-Link bekommst du per E-Mail.',
+    help: 'Fragen? Antworte einfach auf diese E-Mail.',
+    team: 'Dein TOP-Pep-Team',
+    legal: 'TOP Pep · Nur zu Forschungszwecken — nicht zur Anwendung an Mensch oder Tier.',
+  },
+  ro: {
+    s: (o) => `Plată primită — comanda ${o.ref}`,
+    preheader: 'Plată primită — comanda ta este confirmată.',
+    hi: (o) => `Bună ${o.name},`,
+    intro: 'Mulțumim — plata a fost primită și comanda ta este confirmată.',
+    order: 'Comanda', reference: 'Referință',
+    item: 'Produs', qty: 'Cant.', amount: 'Sumă',
+    total: 'Total plătit',
+    ship: 'Pregătim coletul — se expediază în 1 zi lucrătoare și vei primi linkul de urmărire pe e-mail.',
+    help: 'Întrebări? Răspunde direct la acest e-mail.',
+    team: 'Echipa TOP Pep',
+    legal: 'TOP Pep · Doar pentru cercetare — nu pentru uz uman sau veterinar.',
+  },
+};
+
+function orderEmailHtml(o, L) {
+  const rows = (o.items || []).map((i) => {
+    const name = escHtml(i.name) + (i.option ? ` <span style="color:${BRAND.muted}">· ${escHtml(i.option)}</span>` : '');
+    const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
+    return `<tr>
+      <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
+        <span style="display:inline-block;min-width:26px;color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${name}
+      </td>
+      <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">${line}</td>
+    </tr>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="${escHtml(o.lang || 'en')}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><title>${escHtml(L.s(o))}</title></head>
+<body style="margin:0;padding:0;background:${BRAND.bg};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escHtml(L.preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.bg};padding:32px 12px;">
+<tr><td align="center">
+  <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:560px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(17,17,20,.06);">
+    <tr><td style="padding:28px 36px 8px;text-align:center;border-bottom:1px solid ${BRAND.line};">
+      <a href="${BRAND.site}" style="text-decoration:none;"><img src="${BRAND.logo}" alt="TOP Pep" width="132" style="width:132px;height:auto;border:0;display:inline-block;"></a>
+    </td></tr>
+    <tr><td style="height:4px;background:${BRAND.accent};line-height:4px;font-size:0;">&nbsp;</td></tr>
+    <tr><td style="padding:32px 36px 8px;">
+      <p style="margin:0 0 6px;font-size:18px;font-weight:600;color:${BRAND.ink};">${escHtml(L.hi(o))}</p>
+      <p style="margin:0 0 22px;font-size:15px;line-height:1.55;color:${BRAND.muted};">${escHtml(L.intro)}</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.bg};border-radius:12px;margin:0 0 24px;">
+        <tr>
+          <td style="padding:14px 18px;font-size:13px;color:${BRAND.muted};">${escHtml(L.order)}<br><span style="font-size:16px;color:${BRAND.ink};font-weight:600;">${escHtml(o.order_no)}</span></td>
+          <td style="padding:14px 18px;font-size:13px;color:${BRAND.muted};text-align:right;">${escHtml(L.reference)}<br><span style="font-size:16px;color:${BRAND.ink};font-weight:600;">${escHtml(o.ref)}</span></td>
+        </tr>
+      </table>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="padding:0 0 8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:${BRAND.muted};">${escHtml(L.item)}</td>
+          <td style="padding:0 0 8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:${BRAND.muted};text-align:right;">${escHtml(L.amount)}</td>
+        </tr>
+        ${rows}
+        <tr>
+          <td style="padding:16px 0 0;font-size:16px;font-weight:700;color:${BRAND.ink};">${escHtml(L.total)}</td>
+          <td style="padding:16px 0 0;font-size:16px;font-weight:700;color:${BRAND.accent};text-align:right;white-space:nowrap;">${escHtml(o.total_text)}</td>
+        </tr>
+      </table>
+    </td></tr>
+    <tr><td style="padding:8px 36px 32px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:22px;">
+        <tr><td style="padding:16px 18px;background:#f6f2ff;border-radius:12px;font-size:14px;line-height:1.55;color:${BRAND.ink};">${escHtml(L.ship)}</td></tr>
+      </table>
+      <p style="margin:22px 0 0;font-size:14px;line-height:1.55;color:${BRAND.muted};">${escHtml(L.help)}</p>
+      <p style="margin:20px 0 0;font-size:15px;color:${BRAND.ink};">— ${escHtml(L.team)}</p>
+    </td></tr>
+    <tr><td style="padding:20px 36px;border-top:1px solid ${BRAND.line};text-align:center;">
+      <p style="margin:0;font-size:12px;line-height:1.5;color:${BRAND.muted};">${escHtml(L.legal)}<br><a href="${BRAND.site}" style="color:${BRAND.muted};">top-pep.com</a></p>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body></html>`;
+}
+
 function thankYouTemplate(o) {
-  const items = (o.items || []).map((i) => `  ${i.qty}× ${i.name}`).join('\n');
-  const T = {
-    en: { s: `Payment received — order ${o.ref}`, b: `Hi ${o.name},\n\nThank you — we've received your payment for order ${o.order_no} (reference ${o.ref}).\n\n${items}\nTotal paid: ${o.total_text}\n\nWe're preparing your parcel now; it ships within 1 business day and you'll get a tracking link by email.\n\n— The TOP Pep team` },
-    de: { s: `Zahlung erhalten — Bestellung ${o.ref}`, b: `Hallo ${o.name},\n\nvielen Dank — wir haben deine Zahlung für Bestellung ${o.order_no} (Referenz ${o.ref}) erhalten.\n\n${items}\nBezahlt: ${o.total_text}\n\nWir bereiten dein Paket vor; Versand innerhalb von 1 Werktag, den Tracking-Link bekommst du per E-Mail.\n\n— Dein TOP-Pep-Team` },
-    ro: { s: `Plată primită — comanda ${o.ref}`, b: `Bună ${o.name},\n\nMulțumim — am primit plata pentru comanda ${o.order_no} (referință ${o.ref}).\n\n${items}\nTotal plătit: ${o.total_text}\n\nPregătim coletul; se expediază în 1 zi lucrătoare și vei primi linkul de urmărire pe e-mail.\n\n— Echipa TOP Pep` },
-  };
-  return T[o.lang] || T.en;
+  const L = ORDER_EMAIL_COPY[o.lang] || ORDER_EMAIL_COPY.en;
+  const itemsText = (o.items || []).map((i) => `  ${i.qty}× ${i.name}${i.option ? ' · ' + i.option : ''}`).join('\n');
+  const b = `${L.hi(o)}\n\n${L.intro}\n\n${L.order}: ${o.order_no}   ${L.reference}: ${o.ref}\n\n${itemsText}\n${L.total}: ${o.total_text}\n\n${L.ship}\n\n— ${L.team}`;
+  return { s: L.s(o), b, html: orderEmailHtml(o, L) };
 }
 
 // generic sender (Resend) — used for the thank-you email and the admin 2FA code
-async function sendEmail(env, { to, subject, text }) {
+async function sendEmail(env, { to, subject, text, html }) {
   if (!env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured');
+  const payload = { from: FROM, to, subject, text };
+  if (html) payload.html = html;
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ from: FROM, to, subject, text }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
@@ -759,7 +892,7 @@ async function sendEmail(env, { to, subject, text }) {
 
 async function sendThankYouEmail(order, env) {
   const tpl = thankYouTemplate(order);
-  await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b });
+  await sendEmail(env, { to: order.email, subject: tpl.s, text: tpl.b, html: tpl.html });
   return tpl;
 }
 
