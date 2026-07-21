@@ -789,7 +789,7 @@ function imageUrl(img) {
 function itemThumb(img) {
   const u = imageUrl(img);
   return u
-    ? `<img src="${u}" alt="" width="42" height="42" style="width:42px;height:42px;border-radius:8px;border:1px solid ${BRAND.line};object-fit:cover;vertical-align:middle;margin-right:11px;background:#fff;">`
+    ? `<img src="${u}" alt="" width="64" height="64" style="width:64px;height:64px;border-radius:10px;border:1px solid ${BRAND.line};object-fit:cover;vertical-align:middle;margin-right:13px;background:#fff;">`
     : '';
 }
 
@@ -1048,15 +1048,15 @@ const TEAM = { en: 'The TOP Pep team', de: 'Dein TOP-Pep-Team', ro: 'Echipa TOP 
 const CART_COPY = {
   en: { s: () => 'Your TOP Pep cart is waiting', preheader: 'You left items in your basket — finish your order.',
     hi: (o) => `Hi${o.name ? ' ' + o.name : ''},`, intro: 'You left these items in your basket. We saved them for you — pick up right where you left off.',
-    showItems: true, totalLabel: 'Total', cta: 'Complete your order', ctaUrl: () => BRAND.site + '/checkout/',
+    showItems: true, totalLabel: 'Total', cta: 'Complete your order', ctaUrl: (o) => BRAND.site + '/checkout/' + (o && o.token ? '?restore=' + encodeURIComponent(o.token) : ''),
     note: 'Stock moves quickly — complete your order to make sure your items are reserved.', help: 'Questions? Just reply to this email.' },
   de: { s: () => 'Dein TOP-Pep-Warenkorb wartet', preheader: 'Du hast Artikel im Warenkorb — schließe deine Bestellung ab.',
     hi: (o) => `Hallo${o.name ? ' ' + o.name : ''},`, intro: 'Du hast diese Artikel in deinem Warenkorb gelassen. Wir haben sie für dich gespeichert — mach einfach dort weiter, wo du aufgehört hast.',
-    showItems: true, totalLabel: 'Gesamt', cta: 'Bestellung abschließen', ctaUrl: () => BRAND.site + '/checkout/',
+    showItems: true, totalLabel: 'Gesamt', cta: 'Bestellung abschließen', ctaUrl: (o) => BRAND.site + '/checkout/' + (o && o.token ? '?restore=' + encodeURIComponent(o.token) : ''),
     note: 'Der Bestand ist begrenzt — schließe deine Bestellung ab, damit deine Artikel reserviert bleiben.', help: 'Fragen? Antworte einfach auf diese E-Mail.' },
   ro: { s: () => 'Coșul tău TOP Pep te așteaptă', preheader: 'Ai produse în coș — finalizează comanda.',
     hi: (o) => `Bună${o.name ? ' ' + o.name : ''},`, intro: 'Ai lăsat aceste produse în coș. Le-am păstrat pentru tine — continuă de unde ai rămas.',
-    showItems: true, totalLabel: 'Total', cta: 'Finalizează comanda', ctaUrl: () => BRAND.site + '/checkout/',
+    showItems: true, totalLabel: 'Total', cta: 'Finalizează comanda', ctaUrl: (o) => BRAND.site + '/checkout/' + (o && o.token ? '?restore=' + encodeURIComponent(o.token) : ''),
     note: 'Stocul se mișcă repede — finalizează comanda ca produsele tale să rămână rezervate.', help: 'Întrebări? Răspunde direct la acest e-mail.' },
 };
 
@@ -1136,14 +1136,21 @@ async function saveCart(db, body) {
   const email = String(body.email || '').trim().toLowerCase();
   if (!email || !/.+@.+\..+/.test(email)) return { error: 'valid email required', status: 400 };
   if (!Array.isArray(body.items) || !body.items.length) return { error: 'no items', status: 400 };
+  const first = body.first || '';
+  const last = body.last || '';
   const row = {
     email,
-    name: body.name || null,
+    name: (first + ' ' + last).trim() || body.name || null,
+    first: first || null, last: last || null,
+    org: body.org || null, phone: body.phone || null,
+    address: body.address || null, house: body.house || null,
+    city: body.city || null, zip: body.zip || null, country: body.country || null,
     lang: body.lang || 'en',
     currency: body.currency || 'eur',
     items: body.items,
     total: body.total != null ? Number(body.total) : null,
     total_text: body.total_text || null,
+    token: randomToken(16),   // fresh restore token → the reminder link uses it
     updated_at: new Date().toISOString(),
     reminded_at: null,     // a fresh basket → eligible for a new reminder
     converted: false,
@@ -1151,6 +1158,22 @@ async function saveCart(db, body) {
   const { error } = await db.from('carts').upsert(row, { onConflict: 'email' });
   if (error) return { error: error.message, status: 500 };
   return { ok: true };
+}
+
+// ---- GET /cart/restore?token= — return a saved basket + entered details ----
+async function restoreCart(db, token) {
+  if (!token) return { error: 'token required', status: 400 };
+  const { data, error } = await db.from('carts').select('*').eq('token', token).maybeSingle();
+  if (error) return { error: error.message, status: 500 };
+  if (!data) return { ok: false, status: 404 };
+  return {
+    ok: true,
+    cart: {
+      email: data.email, first: data.first, last: data.last, org: data.org, phone: data.phone,
+      address: data.address, house: data.house, city: data.city, zip: data.zip, country: data.country,
+      lang: data.lang, items: data.items || [],
+    },
+  };
 }
 async function markCartConverted(db, email) {
   if (!email) return;
@@ -1411,6 +1434,13 @@ export default {
         const res = await saveCart(db, body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, {}, env);
+      }
+
+      if (request.method === 'GET' && url.pathname === '/cart/restore') {
+        if (!db) return jsonResponse({ ok: false }, {}, env);
+        const res = await restoreCart(db, url.searchParams.get('token'));
+        if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
+        return jsonResponse(res, { status: res.ok ? 200 : 404 }, env);
       }
 
       if (request.method === 'POST' && url.pathname === '/promo/check') {

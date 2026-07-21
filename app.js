@@ -1479,6 +1479,8 @@
         showStripePaid(params.get('ref')); return;
       }
       renderCheckout();
+      var restoreToken = params.get('restore');
+      if (restoreToken) applyCartRestore(restoreToken);
       if (stripe === 'cancel') {
         var note = $('#placeOrderNote');
         if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_cancel_note'); }
@@ -1967,6 +1969,59 @@
   }
 
   /* ---- blur validation on the address fields ---- */
+  // Persist the current checkout state (basket + entered fields) to the backend
+  // so the abandoned-cart reminder can restore it. No-op without email/items.
+  function saveCartSnapshot() {
+    if (!T.orderApiUrl || !Cart.items.length) return;
+    var g = function (id) { var el = $('#' + id); return el ? el.value.trim() : ''; };
+    var email = g('coEmail');
+    if (!email || !/.+@.+\..+/.test(email)) return;
+    var items = Cart.items.map(function (i) {
+      return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i),
+        img: i.img || (T.bySlug(i.slug) || {}).img || '', slug: i.slug, option: i.option || '' };
+    });
+    var sub = Cart.subtotal();
+    fetch(T.orderApiUrl + '/cart/save', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email, first: g('coFirst'), last: g('coLast'), org: g('coOrg'), phone: g('coPhone'),
+        address: g('coAddr'), house: g('coHouse'), city: g('coCity'), zip: g('coZip'), country: selectedCountry(),
+        lang: lang, currency: CUR, items: items, total: sub, total_text: money(sub)
+      })
+    }).catch(function () {});
+  }
+
+  // Restore a saved basket + entered details from a reminder link (?restore=token).
+  function applyCartRestore(token) {
+    if (!T.orderApiUrl || !token) return;
+    fetch(T.orderApiUrl + '/cart/restore?token=' + encodeURIComponent(token))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.ok || !d.cart) return;
+        var c = d.cart;
+        if (c.items && c.items.length) {
+          Cart.items = c.items.map(function (it) {
+            var p = T.bySlug(it.slug) || {};
+            var opt = null;
+            if (it.option && p.options) opt = p.options.filter(function (o) { return o.label === it.option; })[0];
+            return { key: it.slug + (it.option ? '|' + it.option : ''), slug: it.slug, name: p.name || it.name,
+              category: p.category, option: it.option || '', price: opt ? opt.price : p.price,
+              ron: opt ? opt.ron : p.ron, img: p.img, qty: it.qty || 1, auto: false };
+          }).filter(function (x) { return x.slug; });
+          Cart.save();
+        }
+        var set = function (id, v) { var el = $('#' + id); if (el && v) el.value = v; };
+        set('coEmail', c.email); set('coFirst', c.first); set('coLast', c.last); set('coOrg', c.org);
+        set('coPhone', c.phone); set('coAddr', c.address); set('coHouse', c.house); set('coCity', c.city); set('coZip', c.zip);
+        if (c.country) {
+          var sel = $('#coCountry');
+          if (sel) { for (var i = 0; i < sel.options.length; i++) { var o = sel.options[i]; if (o.getAttribute('data-country') === c.country || o.value === c.country) { sel.selectedIndex = i; break; } } sel.dispatchEvent(new Event('change')); }
+        }
+        renderCheckout();
+        try { history.replaceState(null, '', location.pathname); } catch (e) {}
+      }).catch(function () {});
+  }
+
   function wireAddressValidation() {
     var form = $('#coZip') && $('#coZip').form;
     if (!form || form.dataset.addrWired) return;
@@ -1980,20 +2035,12 @@
       clearFieldMsg('coHouse');
     });
 
-    // Save the basket as soon as we have the customer's email, so an
-    // abandoned-cart reminder can be sent if they don't finish checkout.
-    var emailEl = $('#coEmail');
-    if (emailEl) emailEl.addEventListener('blur', function () {
-      var email = (emailEl.value || '').trim();
-      if (!email || !/.+@.+\..+/.test(email) || !Cart.items.length || !T.orderApiUrl) return;
-      var nm = (($('#coFirst') ? $('#coFirst').value : '') + ' ' + ($('#coLast') ? $('#coLast').value : '')).trim();
-      var sub = Cart.subtotal();
-      var items = Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i), img: i.img || (T.bySlug(i.slug) || {}).img || '' }; });
-      fetch(T.orderApiUrl + '/cart/save', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, name: nm, lang: lang, currency: CUR, items: items, total: sub, total_text: money(sub) })
-      }).catch(function () {});
+    // Save the basket + whatever the customer has entered so far, so an
+    // abandoned-cart reminder can bring them back with everything pre-filled.
+    ['coEmail', 'coFirst', 'coLast', 'coOrg', 'coPhone', 'coAddr', 'coHouse', 'coCity', 'coZip'].forEach(function (id) {
+      var el = $('#' + id); if (el) el.addEventListener('blur', saveCartSnapshot);
     });
+    var cc = $('#coCountry'); if (cc) cc.addEventListener('change', saveCartSnapshot);
 
     function zipBlur() {
       var zip = ($('#coZip').value || '').trim();
