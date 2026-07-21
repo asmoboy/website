@@ -776,6 +776,23 @@ function money(n, currency) {
     : v.toFixed(2) + ' €';
 }
 
+// build an absolute, URL-encoded product image URL for emails (items carry a
+// site-relative path like "/Produktbilder/BPC-157 10mg.png")
+function imageUrl(img) {
+  if (!img) return '';
+  if (/^https?:\/\//i.test(img)) return img;
+  const p = String(img).startsWith('/') ? img : '/' + img;
+  return BRAND.site + p.split('/').map(encodeURIComponent).join('/');
+}
+
+// a product thumbnail cell for an item row (empty string if no image)
+function itemThumb(img) {
+  const u = imageUrl(img);
+  return u
+    ? `<img src="${u}" alt="" width="42" height="42" style="width:42px;height:42px;border-radius:8px;border:1px solid ${BRAND.line};object-fit:cover;vertical-align:middle;margin-right:11px;background:#fff;">`
+    : '';
+}
+
 // per-language copy for the confirmation email
 const ORDER_EMAIL_COPY = {
   en: {
@@ -827,9 +844,9 @@ function orderEmailHtml(o, L) {
     const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
     return `<tr>
       <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
-        <span style="display:inline-block;min-width:26px;color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${name}
+        ${itemThumb(i.img)}<span style="vertical-align:middle;"><span style="color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${name}</span>
       </td>
-      <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">${line}</td>
+      <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:middle;">${line}</td>
     </tr>`;
   }).join('');
 
@@ -973,9 +990,9 @@ function ctaEmailHtml(o, L) {
         const line = (i.price != null) ? money(Number(i.price) * Number(i.qty || 1), o.currency) : '';
         return `<tr>
           <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};">
-            <span style="display:inline-block;min-width:26px;color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${escHtml(i.name)}
+            ${itemThumb(i.img)}<span style="vertical-align:middle;"><span style="color:${BRAND.muted};font-variant-numeric:tabular-nums;">${escHtml(i.qty)}×</span> ${escHtml(i.name)}</span>
           </td>
-          <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;">${line}</td>
+          <td style="padding:12px 0;border-bottom:1px solid ${BRAND.line};font-size:15px;color:${BRAND.ink};text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:middle;">${line}</td>
         </tr>`;
       }).join('')
     : '';
@@ -1179,7 +1196,10 @@ async function sendTestEmails(env, to, lang) {
     currency: 'EUR', total_text: '94,98 €', payment_method: 'card', status: 'paid',
     org: '', address: 'Musterstr. 5', city: 'Berlin', zip: '10115', country: 'Germany',
     tracking_url: 'https://www.dhl.de/tracking?piececode=TEST123456',
-    items: [{ name: 'BPC-157 · 10 mg', qty: 2, price: 42 }, { name: 'Bacteriostatic Water · 10 ml', qty: 1, price: 4.99 }],
+    items: [
+      { name: 'BPC-157 · 10 mg', qty: 2, price: 42, img: '/Produktbilder/BPC-157 10mg.png' },
+      { name: 'Bacteriostatic Water · 10 ml', qty: 1, price: 4.99, img: '/Produktbilder/Bacteriostatic Water 10mg.png' },
+    ],
   };
   const cart = { email: to, name: 'Test Customer', lang: L, currency: 'EUR', total_text: '94,98 €', items: order.items };
   const results = {};

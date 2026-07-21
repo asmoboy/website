@@ -1988,7 +1988,7 @@
       if (!email || !/.+@.+\..+/.test(email) || !Cart.items.length || !T.orderApiUrl) return;
       var nm = (($('#coFirst') ? $('#coFirst').value : '') + ' ' + ($('#coLast') ? $('#coLast').value : '')).trim();
       var sub = Cart.subtotal();
-      var items = Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i) }; });
+      var items = Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i), img: i.img || (T.bySlug(i.slug) || {}).img || '' }; });
       fetch(T.orderApiUrl + '/cart/save', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, name: nm, lang: lang, currency: CUR, items: items, total: sub, total_text: money(sub) })
@@ -2107,7 +2107,7 @@
       city: val('coCity'),
       zip: val('coZip'),
       country: country,
-      items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i), slug: i.slug, option: i.option || '', inStock: T.inStock(i.slug, i.option) }; }),
+      items: Cart.items.map(function (i) { return { name: lineName(i) + (i.option ? ' · ' + i.option : ''), qty: i.qty, price: lv(i), slug: i.slug, option: i.option || '', img: i.img || (T.bySlug(i.slug) || {}).img || '', inStock: T.inStock(i.slug, i.option) }; }),
       subtotal: sub, shipping: ship, insurance: ins,
       promo: promoCode, discount: discount, total: total,
       totalText: money(total)
