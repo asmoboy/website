@@ -781,7 +781,11 @@ function money(n, currency) {
 function imageUrl(img) {
   if (!img) return '';
   if (/^https?:\/\//i.test(img)) return img;
-  const p = String(img).startsWith('/') ? img : '/' + img;
+  let p = String(img).startsWith('/') ? img : '/' + img;
+  // swap the full-size product image for its small email-optimised JPEG
+  // thumbnail (~12 KB vs ~900 KB) so emails load fast on mobile.
+  const m = p.match(/^\/Produktbilder\/(.+)\.[^./]+$/i);
+  if (m) p = '/Produktbilder/email/' + m[1] + '.jpg';
   return BRAND.site + p.split('/').map(encodeURIComponent).join('/');
 }
 
