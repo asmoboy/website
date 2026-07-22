@@ -1053,12 +1053,12 @@
     var addIcon = variable ? I.menu : I.plus;
     return '' +
       '<article class="product-card">' +
-        '<a class="card-media" href="/product/?p=' + p.slug + '" aria-label="' + p.name + '">' +
+        '<a class="card-media" href="' + productHref(p.slug) + '" aria-label="' + p.name + '">' +
           cornerBadge(p) +
           pimg(p) +
         '</a>' +
         '<div class="card-info">' +
-          '<a class="c-name" href="/product/?p=' + p.slug + '">' + displayName(p) + '</a>' +
+          '<a class="c-name" href="' + productHref(p.slug) + '">' + displayName(p) + '</a>' +
           '<div class="c-size">' + T.sizeLabel(p) + '</div>' +
           '<div class="c-price">' + priceHTML(p) + '</div>' +
           '<button class="card-add" data-add="' + p.slug + '">' + addIcon + '<span>' + addLabel + '</span></button>' +
