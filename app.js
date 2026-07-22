@@ -17,6 +17,43 @@
   function pimgLine(i) { var im = i.img || (T.bySlug(i.slug) || {}).img || ''; return '<img src="' + T.imgUrl(im) + '" alt="" loading="lazy">'; }
   function displayName(p) { return (p.nameI18n && p.nameI18n[lang]) || p.name; }
   function lineName(i) { var p = T.bySlug(i.slug); return p ? displayName(p) : i.name; }
+  var GA_MEASUREMENT_ID = 'G-2R0ZC3GZ07';
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ window.dataLayer.push(arguments); }
+  gtag('consent', 'default', {
+    analytics_storage: 'denied',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    wait_for_update: 500
+  });
+  function enableAnalytics() {
+    if (window.__toppepGaLoaded) return;
+    window.__toppepGaLoaded = true;
+    gtag('consent', 'update', { analytics_storage: 'granted' });
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_MEASUREMENT_ID);
+    document.head.appendChild(script);
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID, { anonymize_ip: true, send_page_view: true });
+  }
+  function gaEvent(name, params) {
+    if (localStorage.getItem('toppep_cookie_consent') !== 'all') return;
+    enableAnalytics();
+    gtag('event', name, params || {});
+  }
+  function gaItem(p, option, qty) {
+    return {
+      item_id: p.slug,
+      item_name: displayName(p),
+      item_category: p.category || '',
+      item_variant: option ? option.label : '',
+      price: Number(option ? option.price : p.price) || 0,
+      quantity: qty || 1
+    };
+  }
+
   function productHref(slug) {
     var section = lang === 'de' ? 'produkte' : lang === 'ro' ? 'produse' : 'products';
     return '/' + lang + '/' + section + '/' + slug + '/';
@@ -794,6 +831,7 @@
       if (line) { line.qty += qty; }
       else { this.items.push({ key: key, slug: p.slug, name: p.name, category: p.category, option: option ? option.label : '', price: price, ron: ron, img: p.img, qty: qty, auto: !!isAuto }); }
       this.save();
+      if (!isAuto) gaEvent('add_to_cart', { currency: CUR === 'ron' ? 'RON' : 'EUR', value: Number(price) * qty, items: [gaItem(p, option, qty)] });
       // every peptide needs a diluent — auto-add Bacteriostatic Water 10ml (not for serum / lab supplies)
       if (!isAuto && p.category === 'Peptides' && p.slug !== 'bacteriostatic-water') {
         var bw = T.bacWater10();
@@ -1157,6 +1195,7 @@
     document.body.insertAdjacentHTML('beforeend', cookieBannerHTML());
     function close(choice) {
       localStorage.setItem('toppep_cookie_consent', choice);
+      if (choice === 'all') enableAnalytics();
       var bar = $('#cookieBar'); if (bar) bar.remove();
     }
     var a = $('#cookieAccept'), d = $('#cookieDecline');
@@ -1652,6 +1691,7 @@
 
   function renderProduct(p) {
     document.title = p.name + ' — TOP Pep';
+    gaEvent('view_item', { currency: CUR === 'ron' ? 'RON' : 'EUR', value: Number(p.price || (p.options && p.options[0] && p.options[0].price) || 0), items: [gaItem(p, p.options && p.options[0], 1)] });
     var root = $('#productRoot');
     var isVar = p.type === 'variable';
     // Preselect an IN-STOCK size by default; only if nothing is in stock fall
@@ -2786,6 +2826,7 @@
      BOOT
   ================================================================= */
   Cart.load();
+  if (localStorage.getItem('toppep_cookie_consent') === 'all') enableAnalytics();
   Affiliate.init();
   buildChrome();
   if (Pages[page]) Pages[page]();
