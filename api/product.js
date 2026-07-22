@@ -12,7 +12,7 @@ module.exports=(req,res)=>{
  const base='https://www.top-pep.com', canonical=base+'/'+lang+'/'+c.section+'/'+p.slug+'/', image=base+'/Produktbilder/'+encodeURIComponent(p.img).replace(/%2F/g,'/');
  const title=p.full+' — '+c.catalog+' | TOP Pep', description=(p.blurb||c.desc)+' '+c.research+'.';
  const urls={en:base+'/en/products/'+p.slug+'/',de:base+'/de/produkte/'+p.slug+'/',ro:base+'/ro/produse/'+p.slug+'/'};
- const schema={'@context':'https://schema.org','@type':'Product','@id':canonical+'#product',name:p.full,image:[image],description:description,sku:p.slug,brand:{'@type':'Brand',name:'TOP Pep'}};
+ const schema={'@context':'https://schema.org','@type':'Product','@id':canonical+'#product',name:p.full,image:[image],description:description,sku:p.slug,brand:{'@type':'Brand',name:'TOP Pep'},offers:{'@type':'Offer',url:canonical,priceCurrency:'EUR',price:Number(p.price).toFixed(2),itemCondition:'https://schema.org/NewCondition',seller:{'@type':'Organization',name:'TOP Pep'}}};
  res.setHeader('Content-Type','text/html; charset=utf-8');
  res.setHeader('Cache-Control','public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
  res.end(`<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
