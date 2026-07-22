@@ -1352,7 +1352,7 @@
       .map(function (x) { return x.p; });
   }
   function resultRow(p) {
-    return '<button class="search-result" data-seo-url="' + productHref(p.slug) + '">' +
+    return '<button class="search-result" onclick="location.href=\'' + productHref(p.slug) + '\'">' +
       '<span class="thumb">' + pimg(p) + '</span>' +
       '<span><span class="r-name">' + displayName(p) + '</span></span>' +
       '<span class="r-cat">' + t('cat_' + T.strip(p.category)) + '</span>' +
