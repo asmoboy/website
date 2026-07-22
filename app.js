@@ -17,6 +17,10 @@
   function pimgLine(i) { var im = i.img || (T.bySlug(i.slug) || {}).img || ''; return '<img src="' + T.imgUrl(im) + '" alt="" loading="lazy">'; }
   function displayName(p) { return (p.nameI18n && p.nameI18n[lang]) || p.name; }
   function lineName(i) { var p = T.bySlug(i.slug); return p ? displayName(p) : i.name; }
+  function productHref(slug) {
+    var section = lang === 'de' ? 'produkte' : lang === 'ro' ? 'produse' : 'products';
+    return '/' + lang + '/' + section + '/' + slug + '/';
+  }
   function blurbText(p) { return (p.blurbI18n && p.blurbI18n[lang]) || p.blurb; }
   function formLabel(p) { return (p.formI18n && p.formI18n[lang]) || p.form; }
   function groupLabel(p) { return (p.groupI18n && p.groupI18n[lang]) || p.group; }
@@ -1348,7 +1352,7 @@
       .map(function (x) { return x.p; });
   }
   function resultRow(p) {
-    return '<button class="search-result" onclick="location.href=\'/product/?p=' + p.slug + '\'">' +
+    return '<button class="search-result" onclick="location.href=\productHref(p.slug) + '\'">' +
       '<span class="thumb">' + pimg(p) + '</span>' +
       '<span><span class="r-name">' + displayName(p) + '</span></span>' +
       '<span class="r-cat">' + t('cat_' + T.strip(p.category)) + '</span>' +
@@ -1456,7 +1460,8 @@
 
     product: function () {
       var params = new URLSearchParams(location.search);
-      var p = T.bySlug(params.get('p')) || T.products[0];
+      var pathSlug = location.pathname.split('/').filter(Boolean).pop();
+      var p = T.bySlug(params.get('p')) || T.bySlug(pathSlug) || T.products[0];
       renderProduct(p);
     },
 
