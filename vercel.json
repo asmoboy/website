@@ -1,5 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/en/products/:slug/",
+      "destination": "/api/product?lang=en&slug=:slug"
+    },
+    {
+      "source": "/de/produkte/:slug/",
+      "destination": "/api/product?lang=de&slug=:slug"
+    },
+    {
+      "source": "/ro/produse/:slug/",
+      "destination": "/api/product?lang=ro&slug=:slug"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
