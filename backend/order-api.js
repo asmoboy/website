@@ -135,24 +135,24 @@ async function resolveDiscountRate(db, code) {
 // without size options.
 const CATALOG = {
   'tirzepatide': { '5 mg': [60, 313.99], '10 mg': [74.99, 392.99], '15 mg': [119.99, 627.99], '20 mg': [140, 732.99], '30 mg': [155, 811.99], '60 mg': [240, 1256.99] },
-  'semaglutide': { '5 mg': [55, 287.99], '10 mg': [75, 392.99], '15 mg': [95, 496.99], '20 mg': [115, 601.99] },
+  'semaglutide': { '5 mg': [49.5, 259.19], '10 mg': [67.5, 353.69], '15 mg': [85.5, 447.29], '20 mg': [103.5, 541.79] }, // on-sale (−10%)
   'retatrutide': { '5 mg': [54.99, 287.99], '10 mg': [79.99, 418.99], '15 mg': [119.99, 627.99], '20 mg': [129.99, 680.99] },
-  'ghk-cu': { '50 mg': [44.99, 235.99], '100 mg': [74.99, 392.99] },
+  'ghk-cu': { '50 mg': [40.49, 212.39], '100 mg': [67.49, 353.69] }, // on-sale (−10%)
   'hgh-somatropin': { '15 IU': [99.99, 523.99], '24 IU': [149.99, 784.99] },
   'bacteriostatic-water': { '3 ml': [4.99, 25.99], '10 ml': [14.99, 77.99] },
   'cagrilintide': { '': [119.99, 627.99] },
   'hcg': { '': [69.99, 365.99] },
   'cjc-1295-no-dac': { '': [64.99, 339.99] },
   'cjc-1295-with-dac': { '': [149.99, 784.99] },
-  'cjc-1295-ipamorelin': { '': [74.99, 392.99] },
-  'ipamorelin': { '': [74.99, 392.99] },
-  'tesamorelin': { '': [85, 444.99] },
+  'cjc-1295-ipamorelin': { '': [67.49, 353.69] }, // on-sale (−10%)
+  'ipamorelin': { '': [67.49, 353.69] }, // on-sale (−10%)
+  'tesamorelin': { '': [76.5, 400.49] }, // on-sale (−10%)
   'sermorelin': { '': [129.99, 680.99] },
   'igf1-lr3': { '': [89.99, 470.99] },
-  'bpc-157': { '': [44.99, 235.99] },
+  'bpc-157': { '': [40.49, 212.39] }, // on-sale (−10%)
   'tb-500': { '': [44.99, 235.99] },
   'bpc-157-tb-500': { '': [79.99, 418.99] },
-  'glow-blend': { '': [99, 517.99] },
+  'glow-blend': { '': [89.1, 466.19] }, // on-sale (−10%)
   'ss-31': { '': [55.99, 292.99] },
   'mots-c': { '': [64.99, 339.99] },
   'thymosin-alpha-1': { '': [159.99, 837.99] },
@@ -163,7 +163,7 @@ const CATALOG = {
   'nad-plus': { '': [74.99, 392.99] },
   'pt-141': { '': [69.99, 365.99] },
   'kpv': { '': [49.99, 261.99] },
-  'mt-2': { '': [34.99, 182.99] },
+  'mt-2': { '': [31.49, 164.69] }, // on-sale (−10%)
   'ghk-cu-serum': { '': [49.99, 261.99] },
 };
 
@@ -1326,13 +1326,29 @@ async function isAdminEmail(db, email) {
 
 // ---- POST /admin/login/request-code ----
 // body: {} ; header: Authorization: Bearer <supabase access token from signInWithPassword>
+// brute-force hardening for the emailed 2FA code (all server-side, no JS globals)
+const MFA_MAX_ATTEMPTS = 5;        // wrong tries before a code is locked
+const MFA_COOLDOWN_MS = 60 * 1000; // min gap between code requests per admin
+
 async function requestAdminCode(env, db, accessToken) {
   const email = await resolveSupabaseUser(db, accessToken);
   if (!email || !(await isAdminEmail(db, email))) return { error: 'forbidden', status: 403 };
+  const lc = email.toLowerCase();
+
+  // cooldown — refuse if a code was already issued within MFA_COOLDOWN_MS
+  // (checked against created_at in the DB, not an in-memory counter)
+  const since = new Date(Date.now() - MFA_COOLDOWN_MS).toISOString();
+  const { data: recent } = await db.from('admin_mfa_codes').select('id')
+    .eq('email', lc).gt('created_at', since).limit(1).maybeSingle();
+  if (recent) return { error: 'a code was just sent — please wait a moment', status: 429 };
+
+  // exactly one active code per admin: invalidate any older unused ones
+  await db.from('admin_mfa_codes').update({ used: true }).eq('email', lc).eq('used', false);
+
   const code = randomCode();
   const codeHash = await sha256Hex(code);
   await db.from('admin_mfa_codes').insert({
-    email: email.toLowerCase(), code_hash: codeHash,
+    email: lc, code_hash: codeHash, attempts: 0, locked: false,
     expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
   });
   await sendEmail(env, {
@@ -1347,12 +1363,25 @@ async function requestAdminCode(env, db, accessToken) {
 async function verifyAdminCode(db, accessToken, code) {
   const email = await resolveSupabaseUser(db, accessToken);
   if (!email || !(await isAdminEmail(db, email))) return { error: 'forbidden', status: 403 };
+  const lc = email.toLowerCase();
+  // there is at most one active (unused, unlocked, unexpired) code per admin
+  const { data: active } = await db.from('admin_mfa_codes')
+    .select('id, code_hash, attempts')
+    .eq('email', lc).eq('used', false).eq('locked', false)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (!active) return { error: 'invalid or expired code', status: 401 };
+
   const codeHash = await sha256Hex(String(code || '').trim());
-  const { data: match } = await db.from('admin_mfa_codes').select('id')
-    .eq('email', email.toLowerCase()).eq('code_hash', codeHash).eq('used', false)
-    .gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(1).maybeSingle();
-  if (!match) return { error: 'invalid or expired code', status: 401 };
-  await db.from('admin_mfa_codes').update({ used: true }).eq('id', match.id);
+  if (codeHash !== active.code_hash) {
+    // wrong try → count it, and burn the code after MFA_MAX_ATTEMPTS
+    const attempts = Number(active.attempts || 0) + 1;
+    const patch = { attempts };
+    if (attempts >= MFA_MAX_ATTEMPTS) patch.locked = true;
+    await db.from('admin_mfa_codes').update(patch).eq('id', active.id);
+    return { error: 'invalid or expired code', status: 401 };
+  }
+  await db.from('admin_mfa_codes').update({ used: true }).eq('id', active.id);
 
   const token = randomToken(32);
   const tokenHash = await sha256Hex(token);
