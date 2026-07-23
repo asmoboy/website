@@ -1537,6 +1537,7 @@
         showStripePaid(params.get('ref')); return;
       }
       renderCheckout();
+      prefillAddressFromAccount();
       var restoreToken = params.get('restore');
       if (restoreToken) applyCartRestore(restoreToken);
       if (stripe === 'cancel') {
@@ -2081,6 +2082,49 @@
       }).catch(function () {});
   }
 
+  /* ---- saved address for logged-in customers ----
+     A signed-in customer's delivery details are stored on their Supabase
+     account (user_metadata.address) so repeat orders don't need re-typing.
+     Uses the same anon-key client + session the account page uses; a user can
+     only ever read/write their OWN metadata, so no extra table/RLS is needed. */
+  var _sbClient = null;
+  function sbClient() {
+    if (_sbClient) return _sbClient;
+    if (window.supabase && T.supabaseUrl && T.supabaseAnonKey) {
+      _sbClient = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
+    }
+    return _sbClient;
+  }
+  // prefill the checkout address from the account — only EMPTY fields, so a
+  // restore link or anything the customer already typed is never overwritten.
+  function prefillAddressFromAccount() {
+    var sb = sbClient(); if (!sb) return;
+    sb.auth.getUser().then(function (r) {
+      var u = r && r.data && r.data.user; if (!u) return;
+      var a = (u.user_metadata && u.user_metadata.address) || {};
+      var set = function (id, v) { var el = $('#' + id); if (el && v && !el.value.trim()) el.value = v; };
+      set('coEmail', u.email);
+      set('coFirst', a.first); set('coLast', a.last); set('coOrg', a.org); set('coPhone', a.phone);
+      set('coAddr', a.address); set('coHouse', a.house); set('coCity', a.city); set('coZip', a.zip);
+      if (a.country) {
+        var sel = $('#coCountry');
+        if (sel && !sel.value) { for (var i = 0; i < sel.options.length; i++) { var o = sel.options[i]; if (o.getAttribute('data-country') === a.country || o.value === a.country) { sel.selectedIndex = i; sel.dispatchEvent(new Event('change')); break; } } }
+      }
+    }).catch(function () {});
+  }
+  // save the entered delivery details back to the account (logged-in only).
+  function saveAddressToAccount() {
+    var sb = sbClient(); if (!sb) return;
+    var g = function (id) { var el = $('#' + id); return el ? el.value.trim() : ''; };
+    sb.auth.getSession().then(function (s) {
+      if (!s || !s.data || !s.data.session) return; // guests: nothing to save
+      sb.auth.updateUser({ data: { address: {
+        first: g('coFirst'), last: g('coLast'), org: g('coOrg'), phone: g('coPhone'),
+        address: g('coAddr'), house: g('coHouse'), city: g('coCity'), zip: g('coZip'), country: selectedCountry()
+      } } }).catch(function () {});
+    }).catch(function () {});
+  }
+
   function wireAddressValidation() {
     var form = $('#coZip') && $('#coZip').form;
     if (!form || form.dataset.addrWired) return;
@@ -2192,10 +2236,15 @@
     var note = $('#placeOrderNote');
     if (firstBad) {
       if (note) { note.style.color = '#e0533d'; note.textContent = msg; }
-      firstBad.focus();
+      // scroll the first wrong field into view so the customer sees WHICH one is
+      // wrong, then focus it without triggering a second jarring jump
+      try { firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+      try { firstBad.focus({ preventScroll: true }); } catch (e) { firstBad.focus(); }
       return null;
     }
     if (note) note.textContent = '';
+    // remember the delivery details on the account (logged-in customers only)
+    saveAddressToAccount();
     var discount = promoDiscount(sub);
     var total = sub - discount + ship + ins;
     return {
@@ -2510,6 +2559,28 @@
     order.paymentMethod = 'cod';
     order.status = 'cod';
 
+    // address zip↔city gate — same as the card path: a mismatch warns once and
+    // the customer must click "use anyway" before the COD order goes through.
+    if (!addressWarnAccepted) {
+      var gBtn = $('#placeOrder'), gNote = $('#placeOrderNote');
+      if (gBtn) gBtn.disabled = true;
+      if (gNote) { gNote.style.color = ''; gNote.textContent = t('zip_checking'); }
+      checkZipCity().then(function (warn) {
+        if (gBtn) gBtn.disabled = false;
+        if (gNote) gNote.textContent = '';
+        if (warn) {
+          showZipWarning(warn);
+          var z = $('#coZip'); if (z) z.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        submitCodOrder(order, sub, ship, ins);
+      });
+      return;
+    }
+    submitCodOrder(order, sub, ship, ins);
+  }
+
+  function submitCodOrder(order, sub, ship, ins) {
     var note = $('#placeOrderNote');
     var btn = $('#placeOrder');
     function finish(workerOk) {
