@@ -1421,6 +1421,30 @@ async function overLimit(limiter, key) {
   catch (e) { return false; }
 }
 
+// ---- Turnstile (Cloudflare bot protection) ----
+// Fails OPEN: if TURNSTILE_SECRET is not configured the check is skipped, so the
+// checkout keeps working until the user pastes their sitekey into data.js and
+// sets the secret. Once the secret is set, a missing/invalid token is rejected.
+async function verifyTurnstile(env, token, ip) {
+  if (!env.TURNSTILE_SECRET) return true; // not configured → don't block
+  if (!token) return false;
+  try {
+    const body = new URLSearchParams();
+    body.append('secret', env.TURNSTILE_SECRET);
+    body.append('response', String(token));
+    if (ip) body.append('remoteip', ip);
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+    const data = await r.json();
+    return !!(data && data.success);
+  } catch (e) {
+    return true; // verification unreachable → fail open, don't lock out real buyers
+  }
+}
+
 // ---- CORS ----
 function corsHeaders(env) {
   const origin = env.ALLOWED_ORIGIN || 'https://top-pep.com';
@@ -1474,6 +1498,8 @@ export default {
       if (request.method === 'POST' && url.pathname === '/stripe/payment-intent') {
         if (await overLimit(env.RL_ORDERS, clientIp)) return rateLimited();
         const body = await request.json();
+        if (!(await verifyTurnstile(env, body && body.turnstile_token, clientIp)))
+          return jsonResponse({ error: 'bot check failed — please reload and try again' }, { status: 403 }, env);
         const res = await createPaymentIntent(env, db, body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
         return jsonResponse(res, { status: 201 }, env);
@@ -1629,6 +1655,8 @@ export default {
       if (request.method === 'POST' && url.pathname === '/orders') {
         if (await overLimit(env.RL_ORDERS, clientIp)) return rateLimited();
         const body = await request.json();
+        if (!(await verifyTurnstile(env, body && body.turnstile_token, clientIp)))
+          return jsonResponse({ error: 'bot check failed — please reload and try again' }, { status: 403 }, env);
         // Validate the cash-on-delivery rule (and address) BEFORE touching the
         // DB, so a hand-crafted COD request is rejected with 400 even if the
         // DB is unavailable — the server veto never depends on Supabase.

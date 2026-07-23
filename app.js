@@ -872,6 +872,7 @@
       email: o.email, name: o.name, org: o.org, address: o.address, city: o.city,
       zip: o.zip, country: o.country, lang: o.lang, items: o.items,
       promo: o.promo || '', ref_code: Affiliate.code(),
+      turnstile_token: getTurnstileToken(),
       payment_method: o.paymentMethod || (o.status === 'cod' ? 'cod' : undefined)
     };
   }
@@ -2330,6 +2331,7 @@
         lang: order.lang, items: order.items,
         shipping: order.shipping, insurance: order.insurance, promo: order.promo || '',
         ref_code: Affiliate.code(),
+        turnstile_token: getTurnstileToken(),
         shipping_label: t('shipping_word'), insurance_label: t('ship_protect')
       };
       return fetch(T.orderApiUrl + '/stripe/payment-intent', {
@@ -2353,6 +2355,7 @@
       if (result.error) throw result.error;
       showStripePaid(serverRef); // succeeded in place, no redirect
     }).catch(function (err) {
+      resetTurnstile(); // token is single-use — refresh it for the retry
       fail(err && err.message);
     });
   }
@@ -2412,6 +2415,31 @@
   }
 
   /* ---- payment-method chooser (card / cash-on-delivery) ---- */
+  // ---- Cloudflare Turnstile (bot protection) — only active when a site key is
+  // set in data.js AND the Worker secret is set; otherwise checkout runs as before.
+  var turnstileWidgetId = null;
+  function renderTurnstile() {
+    var box = $('#cfTurnstile');
+    if (!box || !T.turnstileSiteKey) return; // off
+    (function doRender() {
+      if (!window.turnstile || !window.turnstile.render) { setTimeout(doRender, 300); return; }
+      if (turnstileWidgetId !== null) { try { window.turnstile.remove(turnstileWidgetId); } catch (e) {} turnstileWidgetId = null; }
+      box.innerHTML = '';
+      try {
+        turnstileWidgetId = window.turnstile.render(box, {
+          sitekey: T.turnstileSiteKey, theme: 'auto', action: 'checkout'
+        });
+      } catch (e) {}
+    })();
+  }
+  function getTurnstileToken() {
+    if (!T.turnstileSiteKey || !window.turnstile || turnstileWidgetId === null) return '';
+    try { return window.turnstile.getResponse(turnstileWidgetId) || ''; } catch (e) { return ''; }
+  }
+  function resetTurnstile() {
+    if (window.turnstile && turnstileWidgetId !== null) { try { window.turnstile.reset(turnstileWidgetId); } catch (e) {} }
+  }
+
   function renderPaymentMethods(sub, ship, ins) {
     var host = $('#payMethods');
     if (!host) return;
@@ -2503,6 +2531,7 @@
         finish(true); // Worker accepted the order → it sends the seller mail
       }).catch(function (e) {
         if (btn) btn.disabled = false;
+        resetTurnstile(); // token is single-use — refresh it for the retry
         if (e && e.veto) {
           if (note) { note.style.color = '#e0533d'; note.textContent = t('pay_cod_hint'); }
           coMethod = 'card'; renderPaymentMethods(sub, ship, ins);
@@ -2586,11 +2615,13 @@
         (ins ? '<div class="sum-row"><span class="muted">' + t('ship_protect') + '</span><span>' + money(ins) + '</span></div>' : '') +
         '<div class="sum-row total"><span>' + t('total') + '</span><span>' + money(sub - discount + ship + ins) + '</span></div>' +
         (hasBackorder ? '<div class="co-backorder-warn" role="alert">' + t('co_backorder_warn') + '</div>' : '') +
+        '<div id="cfTurnstile" style="margin-top:14px;display:flex;justify-content:center;"></div>' +
         '<button class="btn btn-block" style="margin-top:16px;" id="placeOrder">' + t('place_order_card') + '</button>' +
         // stays empty until there's something worth saying (status / error)
         '<p class="drawer-note" id="placeOrderNote" style="margin-top:12px;"></p>';
     }
     wireAddressValidation();
+    renderTurnstile(); // bot-protect the order submit (no-op if no site key)
     // render the payment-method chooser; it owns the button handler and mounts
     // the Stripe fields when card is selected
     renderPaymentMethods(sub, ship, ins);

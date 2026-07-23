@@ -36,6 +36,12 @@
   var SUPABASE_URL = 'https://dwozxkyoqwioqggspztr.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3b3p4a3lvcXdpb3FnZ3NwenRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNjQ2NTgsImV4cCI6MjA5OTY0MDY1OH0.ZbYPTMB-mOZyIcTQZAUraiDVfsANiQt5_33yQ5zdAI0';   // the "anon public" key from Supabase → Project settings → API
 
+  /* Cloudflare Turnstile SITE key (public — safe here). Bot-protects checkout.
+     Leave '' to keep Turnstile OFF (checkout runs normally). Paste your widget's
+     Site Key from Cloudflare → Turnstile to switch it on, and set the matching
+     Secret Key as the Worker secret TURNSTILE_SECRET (wrangler secret put). */
+  var TURNSTILE_SITE_KEY = '';
+
   /* =================================================================
      STOCK — everything is pre-order EXCEPT the SKUs listed here.
      Value `true` = the whole product ships now; an array = only those
@@ -363,6 +369,7 @@
     orderInbox: ORDER_INBOX,
     orderApiUrl: ORDER_API_URL,
     stripePublishableKey: STRIPE_PUBLISHABLE_KEY,
+    turnstileSiteKey: TURNSTILE_SITE_KEY,
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
     isPreorder: isPreorder,
