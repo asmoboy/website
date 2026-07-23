@@ -1427,7 +1427,11 @@ async function overLimit(limiter, key) {
 // sets the secret. Once the secret is set, a missing/invalid token is rejected.
 async function verifyTurnstile(env, token, ip) {
   if (!env.TURNSTILE_SECRET) return true; // not configured → don't block
-  if (!token) return false;
+  // Fail OPEN on a missing token: never block a real customer whose widget
+  // didn't hand back a token. Only a token that is PRESENT and fails
+  // verification is treated as a bot. (Turnstile is effectively paused while
+  // the frontend widget is disabled — re-enable by rendering it again.)
+  if (!token) return true;
   try {
     const body = new URLSearchParams();
     body.append('secret', env.TURNSTILE_SECRET);
