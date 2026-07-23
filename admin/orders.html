@@ -151,9 +151,9 @@
   }
   var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
 
-  function getSession() { try { return JSON.parse(localStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; } }
-  function setSession(s) { localStorage.setItem(SESS_KEY, JSON.stringify(s)); }
-  function clearSession() { localStorage.removeItem(SESS_KEY); }
+  function getSession() { try { return JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; } }
+  function setSession(s) { sessionStorage.setItem(SESS_KEY, JSON.stringify(s)); }
+  function clearSession() { sessionStorage.removeItem(SESS_KEY); }
   function headers() { var s = getSession(); return { 'Authorization': 'Bearer ' + (s ? s.token : ''), 'Content-Type': 'application/json' }; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 

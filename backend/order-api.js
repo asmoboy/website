@@ -221,31 +221,27 @@ async function createPaymentIntent(env, db, payload) {
   const amount = await computeAmountCents(db, payload);
   if (amount < 1) return { error: 'no items', status: 400 };
 
-  let ref;
+  let ref, orderNo;
   if (db) {
     const created = await createOrder(db, payload, env);
     if (created.error) return created;
     ref = created.order.ref;
+    orderNo = created.order.order_no; // server-generated, never the client's
   } else {
     ref = payload.ref || genRef();
+    orderNo = genOrderNo();
   }
+  const lang = ['en', 'de', 'ro'].includes(base.lang) ? base.lang : 'en';
 
   const intent = await stripeApi(env, '/payment_intents', {
     amount,
     currency,
     // dashboard shows the bare order reference only (e.g. TOP-R28VXUQB)
     description: ref,
-    receipt_email: base.email,
-    // Automatic payment methods (MUST match the front-end Payment Element,
-    // which no longer passes paymentMethodTypes — mixing the two is what
-    // caused the "collected through automatic payment methods … cannot be
-    // confirmed" error). allow_redirects:'always' so redirect-based methods
-    // (Klarna, Revolut Pay) work — the front-end confirmPayment passes a
-    // return_url and the checkout page verifies redirect_status on return.
-    // Which methods actually appear (card, Apple Pay, Google Pay, Klarna,
-    // Revolut Pay …) is controlled in the Stripe Dashboard → Payment methods.
+    receipt_email: clampText(base.email, 200),
+    // Automatic payment methods (MUST match the front-end Payment Element).
     automatic_payment_methods: { enabled: true, allow_redirects: 'always' },
-    metadata: { ref, order_no: base.order_no || '', lang: base.lang || 'en' },
+    metadata: { ref, order_no: orderNo || '', lang },
   });
 
   return { ok: true, clientSecret: intent.client_secret, ref, amount };
@@ -298,6 +294,16 @@ function genRef() {
   for (let i = 0; i < 8; i++) s += a[r[i] % a.length];
   return 'TOP-' + s;
 }
+
+// server-generated order number — NEVER trust a client-supplied order_no (it is
+// shown in the admin dashboard / emails and must not carry attacker content).
+function genOrderNo() {
+  const r = crypto.getRandomValues(new Uint32Array(2));
+  return 'TP' + (String(r[0]) + String(r[1])).replace(/\D/g, '').padStart(8, '0').slice(-8);
+}
+
+// trim + hard length cap for stored/emailed free-text fields
+function clampText(s, max = 200) { return String(s == null ? '' : s).slice(0, max); }
 
 function isUniqueViolation(e) {
   return e && (e.code === '23505' || /unique/i.test(String(e.message || '')));
@@ -386,9 +392,21 @@ async function createOrder(db, payload, env) {
   const base = pickOrderFields(payload);
   // items carry slug/option for the COD stock check — keep them on the record
   if (payload.items !== undefined) base.items = payload.items;
-  if (!base.email || !base.name || !base.order_no || base.total === undefined) {
+  if (!base.email || !base.name || base.total === undefined) {
     return { error: 'missing required fields', status: 400 };
   }
+  // SECURITY: never store a client-supplied order_no, and hard-cap free-text
+  // fields so a hand-crafted request can't inject content or bloat the DB.
+  base.order_no = genOrderNo();
+  base.email = clampText(base.email, 200);
+  base.name = clampText(base.name, 200);
+  if (base.org !== undefined) base.org = clampText(base.org, 200);
+  if (base.address !== undefined) base.address = clampText(base.address, 200);
+  if (base.city !== undefined) base.city = clampText(base.city, 120);
+  if (base.zip !== undefined) base.zip = clampText(base.zip, 32);
+  if (base.country !== undefined) base.country = clampText(base.country, 80);
+  if (base.total_text !== undefined) base.total_text = clampText(base.total_text, 40);
+  if (!['en', 'de', 'ro'].includes(base.lang)) base.lang = 'en';
   const addrError = validateAddress(base);
   if (addrError) return { error: addrError, status: 400 };
   // cash-on-delivery guard — server is authoritative (frontend checks aren't enough)
@@ -639,7 +657,8 @@ async function sendAffiliatePasswordSetup(env, db, email) {
     }).catch(() => ({ error: true }));
     if (cr && cr.data && cr.data.user) {
       userId = cr.data.user.id;
-      await db.from('affiliates').update({ user_id: userId }).eq('id', aff.id).catch(() => {});
+      // Supabase query builder has no `.catch()` — wrap in try/catch instead.
+      try { await db.from('affiliates').update({ user_id: userId }).eq('id', aff.id); } catch (e) { /* best-effort */ }
     }
     // if createUser failed because the user already exists, generateLink below
     // still works — it resolves the Auth user by email, not by our user_id.
@@ -1125,9 +1144,13 @@ async function sendShipped(order, env) {
 // record one customer email so the orders dashboard can show what was sent
 async function logEmail(db, { email, order_ref, kind, subject }) {
   if (!db || !email) return;
-  await db.from('email_log').insert({
-    email: String(email).toLowerCase(), order_ref: order_ref || null, kind, subject: subject || null,
-  }).catch(() => {});
+  // Supabase query builder has no `.catch()` — wrap in try/catch so a logging
+  // failure never breaks the order flow (this runs between the two emails).
+  try {
+    await db.from('email_log').insert({
+      email: String(email).toLowerCase(), order_ref: order_ref || null, kind, subject: subject || null,
+    });
+  } catch (e) { /* best-effort logging */ }
 }
 
 // ---- carts: upsert on checkout email, mark converted on order ----
@@ -1176,7 +1199,12 @@ async function restoreCart(db, token) {
 }
 async function markCartConverted(db, email) {
   if (!email) return;
-  await db.from('carts').update({ converted: true }).eq('email', String(email).toLowerCase()).catch(() => {});
+  // NB: a Supabase query builder is a thenable but has no `.catch()` — calling
+  // it throws "catch is not a function". Use a real try/catch so this stays
+  // best-effort and never breaks the order (this runs before the emails).
+  try {
+    await db.from('carts').update({ converted: true }).eq('email', String(email).toLowerCase());
+  } catch (e) { /* ignore — cart conversion is best-effort */ }
 }
 
 // ---- PATCH /orders/:ref/shipped — set tracking + email the customer ----

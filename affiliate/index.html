@@ -164,6 +164,7 @@
 (function () {
   var T = window.TOPPEP;
   var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   var money = function (n) { return (Number(n) || 0).toFixed(2) + '€'; };
 
   /* ---- i18n (EN / DE / RO) ---- */
@@ -292,7 +293,7 @@
     $('refLink').textContent = location.origin + '/?ref=' + aff.referral_code;
     if (Number(aff.discount_pct) > 0) {
       $('codeChip').style.display = 'inline-flex';
-      $('codeChip').innerHTML = t('discount_chip').replace('{pct}', aff.discount_pct) + ' <b>' + aff.referral_code + '</b>';
+      $('codeChip').innerHTML = esc(t('discount_chip').replace('{pct}', Number(aff.discount_pct) || 0)) + ' <b>' + esc(aff.referral_code) + '</b>';
     } else { $('codeChip').style.display = 'none'; }
     $('stClicks').textContent = clicks != null ? clicks : 0;
     var confirmed = sales.filter(function (s) { return s.status === 'confirmed'; });
@@ -303,8 +304,9 @@
     $('stPending').textContent = money(sum(pending));
     $('salesBody').innerHTML = sales.length ? sales.map(function (s) {
       var label = t('st_' + s.status) || s.status;
-      return '<tr><td>' + (s.order_no || '—') + '</td><td>' + money(s.order_total) + '</td><td><b>' + money(s.commission) + '</b></td>' +
-        '<td><span class="pill ' + s.status + '">' + label + '</span></td>' +
+      var statusClass = /^[a-z]+$/.test(String(s.status || '')) ? s.status : '';
+      return '<tr><td>' + esc(s.order_no || '—') + '</td><td>' + money(s.order_total) + '</td><td><b>' + money(s.commission) + '</b></td>' +
+        '<td><span class="pill ' + statusClass + '">' + esc(label) + '</span></td>' +
         '<td class="text-muted">' + new Date(s.created_at).toLocaleDateString() + '</td></tr>';
     }).join('') : '<tr><td colspan="5" class="text-muted" style="padding:16px 10px;">' + t('no_sales') + '</td></tr>';
   }

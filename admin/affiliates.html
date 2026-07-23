@@ -109,9 +109,9 @@
   }
   var sb = window.supabase.createClient(T.supabaseUrl, T.supabaseAnonKey);
 
-  function getSession() { try { return JSON.parse(localStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; } }
-  function setSession(s) { localStorage.setItem(SESS_KEY, JSON.stringify(s)); }
-  function clearSession() { localStorage.removeItem(SESS_KEY); }
+  function getSession() { try { return JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null'); } catch (e) { return null; } }
+  function setSession(s) { sessionStorage.setItem(SESS_KEY, JSON.stringify(s)); }
+  function clearSession() { sessionStorage.removeItem(SESS_KEY); }
   function headers() {
     var s = getSession();
     return { 'Authorization': 'Bearer ' + (s ? s.token : ''), 'Content-Type': 'application/json' };
@@ -288,12 +288,12 @@
     var keys = Object.keys(groups);
     $('payouts').innerHTML = keys.length ? keys.map(function (k) {
       var g = groups[k];
-      return '<div class="aff-group"><div class="top"><div><div class="who">' + (g.aff.name || '—') + ' · <span class="text-muted">' + (g.aff.email || '') + '</span></div>' +
-        '<div class="pay">' + (g.aff.payout_method || 'no payout method') + (g.aff.payout_details ? ' · ' + g.aff.payout_details : '') + '</div></div>' +
+      return '<div class="aff-group"><div class="top"><div><div class="who">' + esc(g.aff.name || '—') + ' · <span class="text-muted">' + esc(g.aff.email || '') + '</span></div>' +
+        '<div class="pay">' + esc(g.aff.payout_method || 'no payout method') + (g.aff.payout_details ? ' · ' + esc(g.aff.payout_details) : '') + '</div></div>' +
         '<div class="tot">' + money(g.total) + '</div></div>' +
         '<table class="t"><thead><tr><th>Order</th><th>Commission</th><th>Date</th><th></th></tr></thead><tbody>' +
         g.rows.map(function (s) {
-          return '<tr><td>' + (s.order_no || s.order_ref) + '</td><td><b>' + money(s.commission) + '</b></td>' +
+          return '<tr><td>' + esc(s.order_no || s.order_ref) + '</td><td><b>' + money(s.commission) + '</b></td>' +
             '<td class="text-muted">' + new Date(s.created_at).toLocaleDateString() + '</td>' +
             '<td><button class="btn btn-sm btn-outline" data-payout="' + s.id + '">Mark paid</button></td></tr>';
         }).join('') + '</tbody></table></div>';
