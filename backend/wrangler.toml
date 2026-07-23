@@ -21,3 +21,23 @@ SITE_URL = "https://www.top-pep.com"          # used for Stripe success/cancel r
 # Abandoned-cart reminder: run the scheduled() handler every 30 minutes.
 [triggers]
 crons = ["*/30 * * * *"]
+
+# Native per-IP rate limiting (no dashboard / custom domain needed). Protects the
+# open, side-effecting endpoints against flood/spam abuse.
+#   RL_ORDERS — order creation / payment-intent      (12 / min per IP)
+#   RL_MAIL   — password-reset endpoints (send email) ( 4 / min per IP)
+#   RL_CART   — abandoned-cart save (fires on blur)   (40 / min per IP)
+[[ratelimits]]
+name = "RL_ORDERS"
+namespace_id = "1001"
+simple = { limit = 12, period = 60 }
+
+[[ratelimits]]
+name = "RL_MAIL"
+namespace_id = "1002"
+simple = { limit = 4, period = 60 }
+
+[[ratelimits]]
+name = "RL_CART"
+namespace_id = "1003"
+simple = { limit = 40, period = 60 }

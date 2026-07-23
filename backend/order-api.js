@@ -1411,6 +1411,16 @@ async function requireAdminSession(db, request) {
   return data.email;
 }
 
+// ---- per-IP rate limiting (Cloudflare native binding) ----
+// Returns true when the caller is OVER the limit. Fails OPEN (never blocks a
+// real request) if the binding is missing or errors — the binding is defined
+// in wrangler.toml ([[ratelimits]]).
+async function overLimit(limiter, key) {
+  if (!limiter || !key) return false;
+  try { const { success } = await limiter.limit({ key }); return !success; }
+  catch (e) { return false; }
+}
+
 // ---- CORS ----
 function corsHeaders(env) {
   const origin = env.ALLOWED_ORIGIN || 'https://top-pep.com';
@@ -1441,6 +1451,8 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
+    const clientIp = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const rateLimited = () => jsonResponse({ error: 'too many requests — please slow down' }, { status: 429 }, env);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(env) });
@@ -1460,6 +1472,7 @@ export default {
     try {
       // ---- Stripe: card checkout + webhook (no Supabase required) ----
       if (request.method === 'POST' && url.pathname === '/stripe/payment-intent') {
+        if (await overLimit(env.RL_ORDERS, clientIp)) return rateLimited();
         const body = await request.json();
         const res = await createPaymentIntent(env, db, body);
         if (res.error) return jsonResponse({ error: res.error }, { status: res.status || 500 }, env);
@@ -1485,6 +1498,7 @@ export default {
       // ---- checkout: validate a typed code (public) — static promo code OR
       // an affiliate's own referral_code used as a discount code ----
       if (request.method === 'POST' && url.pathname === '/cart/save') {
+        if (await overLimit(env.RL_CART, clientIp)) return rateLimited();
         if (!db) return jsonResponse({ ok: true }, {}, env); // no DB → nothing to save, don't error the checkout
         const body = await request.json().catch(() => ({}));
         const res = await saveCart(db, body);
@@ -1507,6 +1521,7 @@ export default {
 
       // ---- affiliate: send a set/reset-password email (public, gated) ----
       if (request.method === 'POST' && url.pathname === '/affiliate/auth/reset') {
+        if (await overLimit(env.RL_MAIL, clientIp)) return rateLimited();
         if (db) {
           const body = await request.json().catch(() => ({}));
           await sendAffiliatePasswordSetup(env, db, body.email).catch(() => {});
@@ -1516,6 +1531,7 @@ export default {
 
       // ---- customer: send a password-reset email (public, from TOP Pep via Resend) ----
       if (request.method === 'POST' && url.pathname === '/account/auth/reset') {
+        if (await overLimit(env.RL_MAIL, clientIp)) return rateLimited();
         if (db) {
           const body = await request.json().catch(() => ({}));
           await sendCustomerPasswordReset(env, db, body.email, body.lang).catch(() => {});
@@ -1611,6 +1627,7 @@ export default {
       }
 
       if (request.method === 'POST' && url.pathname === '/orders') {
+        if (await overLimit(env.RL_ORDERS, clientIp)) return rateLimited();
         const body = await request.json();
         // Validate the cash-on-delivery rule (and address) BEFORE touching the
         // DB, so a hand-crafted COD request is rejected with 400 even if the
