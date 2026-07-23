@@ -40,7 +40,7 @@
      Leave '' to keep Turnstile OFF (checkout runs normally). Paste your widget's
      Site Key from Cloudflare → Turnstile to switch it on, and set the matching
      Secret Key as the Worker secret TURNSTILE_SECRET (wrangler secret put). */
-  var TURNSTILE_SITE_KEY = '';
+  var TURNSTILE_SITE_KEY = '0x4AAAAAAD8G6sOtMMBB5u-3';
 
   /* =================================================================
      STOCK — everything is pre-order EXCEPT the SKUs listed here.
