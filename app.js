@@ -802,7 +802,17 @@
   var lang = localStorage.getItem('toppep_lang') || 'en';
   if (!DICT[lang]) lang = 'en';
   function t(key) { return (DICT[lang] && DICT[lang][key]) || DICT.en[key] || key; }
-  function setLang(l) { if (!DICT[l]) return; lang = l; localStorage.setItem('toppep_lang', l); location.reload(); }
+  function setLang(l) {
+    if (!DICT[l]) return;
+    lang = l;
+    localStorage.setItem('toppep_lang', l);
+    // Language-prefixed product pages (/en/products/<slug>/, /de/produkte/…, /ro/produse/…)
+    // re-force their own language on reload, so a plain reload can't switch them.
+    // Navigate to the same product under the new prefix instead.
+    var m = location.pathname.match(/^\/(?:en|de|ro)\/(?:products|produkte|produse)\/([^/]+)\/?$/);
+    if (m) { location.href = productHref(m[1]); return; }
+    location.reload();
+  }
 
   var NAV = [
     { label: 'Shop', href: '/shop/', page: 'shop' },
