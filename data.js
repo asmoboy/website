@@ -7,14 +7,17 @@
 (function () {
   'use strict';
 
-  /* first visit: pick the language from the visitor's browser locale */
-  if (!localStorage.getItem('toppep_lang')) {
+  /* first visit: pick the language from the visitor's browser locale.
+     (Browser only — this file is also require()'d from Node by api/product.js
+     so its pricing/stock logic stays the single source of truth; localStorage
+     and navigator don't exist there.) */
+  if (typeof localStorage !== 'undefined' && !localStorage.getItem('toppep_lang')) {
     var navLang = (navigator.language || (navigator.languages && navigator.languages[0]) || '').toLowerCase();
     localStorage.setItem('toppep_lang', navLang.indexOf('de') === 0 ? 'de' : navLang.indexOf('ro') === 0 ? 'ro' : 'en');
   }
 
-  /* currency follows language: Romanian → lei, else → euro */
-  var CUR = (localStorage.getItem('toppep_lang') === 'ro') ? 'ron' : 'eur';
+  /* currency follows language: Romanian → lei, else → euro (defaults to EUR server-side) */
+  var CUR = (typeof localStorage !== 'undefined' && localStorage.getItem('toppep_lang') === 'ro') ? 'ron' : 'eur';
 
   /* Bank-transfer as a payment method has been removed (checkout offers card +
      cash-on-delivery only), so the IBAN/BIC no longer ship in the client. */
@@ -358,7 +361,8 @@
   function val(x) { return CUR === 'ron' ? x.ron : x.price; }
   function fmt(n) { return CUR === 'ron' ? n.toFixed(2) + ' Lei' : n.toFixed(2) + '€'; }
 
-  window.TOPPEP = {
+  var globalScope = typeof window !== 'undefined' ? window : global;
+  globalScope.TOPPEP = {
     products: products,
     coas: products.filter(function (p) { return p.category !== 'Lab Supplies'; }).concat(extraCoas),
     categories: ['Peptides', 'Lab Supplies', 'Topicals'],
@@ -418,4 +422,9 @@
     },
     money: fmt
   };
+
+  /* expose to Node (api/product.js) so the server-rendered SEO pages read
+     prices/sale status/stock from this same catalog instead of a separate
+     hand-maintained copy that can silently drift out of sync */
+  if (typeof module !== 'undefined' && module.exports) module.exports = globalScope.TOPPEP;
 })();
