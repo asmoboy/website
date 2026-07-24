@@ -37,5 +37,5 @@ module.exports=(req,res)=>{
 <script type="application/ld+json">${JSON.stringify(schema).replace(/</g,'\\u003c')}</script></head>
 <body data-page="product"><a class="skip-link" href="#main">Skip to content</a><main id="main"><div class="wrap" style="padding-top:20px"><a class="link-arrow" href="/shop/">← ${esc(c.back)}</a></div>
 <div class="wrap" id="productRoot"><article class="pd"><div class="pd-media"><div class="main-img"><img src="${image}" alt="${esc(p.full)}" width="800" height="800"></div></div><div class="pd-info"><span class="eyebrow">${esc(c.research)}</span><h1>${esc(p.full)}</h1><div class="pd-price">${esc(c.from)} €${Number(price).toFixed(2)}</div><p class="pd-desc">${esc(description)}</p><a class="btn btn-block" href="/product/?p=${encodeURIComponent(p.slug)}">${esc(c.cta)}</a></div></article></div><div style="height:80px"></div></main><div class="sticky-buy" id="stickyBuy"></div>
-<script>try{localStorage.setItem('toppep_lang','${lang}')}catch(e){}</script><script src="/data.js?v=51"></script><script src="/app.js?v=56"></script></body></html>`);
+<script>try{localStorage.setItem('toppep_lang','${lang}')}catch(e){}</script><script src="/data.js?v=55"></script><script src="/app.js?v=56"></script></body></html>`);
 };

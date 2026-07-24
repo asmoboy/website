@@ -43,7 +43,7 @@
      Leave '' to keep Turnstile OFF (checkout runs normally). Paste your widget's
      Site Key from Cloudflare → Turnstile to switch it on, and set the matching
      Secret Key as the Worker secret TURNSTILE_SECRET (wrangler secret put). */
-  var TURNSTILE_SITE_KEY = ''; // paused — widget was blocking real orders; re-enable after verifying it renders + hands back a token
+  var TURNSTILE_SITE_KEY = '0x4AAAAAAD8G6sOtMMBB5u-3'; // public site key for the top-pep-checkout widget (server checks token via TURNSTILE_SECRET)
 
   /* =================================================================
      STOCK — everything is pre-order EXCEPT the SKUs listed here.
