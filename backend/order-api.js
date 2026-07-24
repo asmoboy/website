@@ -115,12 +115,17 @@ function promoRate(code) {
 // This is the single source of truth for "how much does this code discount";
 // createSale() below uses it too, so the commission base and the customer's
 // discount always agree.
+// Escape LIKE/ILIKE metacharacters so a customer-typed code/email is matched
+// literally — otherwise "%" or "_" would act as SQL wildcards and could match a
+// referral code (or affiliate email) the sender doesn't actually know.
+function likeEscape(s) { return String(s || '').replace(/[\\%_]/g, '\\$&'); }
+
 async function resolveDiscountRate(db, code) {
   const trimmed = String(code || '').trim();
   if (!trimmed) return 0;
   if (db) {
     const { data } = await db.from('affiliates').select('discount_pct, active')
-      .ilike('referral_code', trimmed).maybeSingle();
+      .ilike('referral_code', likeEscape(trimmed)).maybeSingle();
     if (data) return data.active === false ? 0 : Number(data.discount_pct || 0) / 100;
   }
   return promoRate(trimmed); // no affiliate row → static promo code fallback
@@ -527,7 +532,7 @@ async function serverTotal(db, payload) {
 async function recordClick(db, payload, ip) {
   const code = String(payload.ref || '').trim();
   if (!code) return;
-  const { data: aff } = await db.from('affiliates').select('id, active').ilike('referral_code', code).maybeSingle();
+  const { data: aff } = await db.from('affiliates').select('id, active').ilike('referral_code', likeEscape(code)).maybeSingle();
   if (!aff || aff.active === false) return;
   await db.from('clicks').insert({
     referral_code: code,
@@ -547,7 +552,7 @@ async function createSale(db, order, payload) {
   const code = String(payload.ref_code || payload.promo || '').trim();
   if (!code) return;
   const { data: aff } = await db.from('affiliates')
-    .select('id, email, commission_pct, active').ilike('referral_code', code).maybeSingle();
+    .select('id, email, commission_pct, active').ilike('referral_code', likeEscape(code)).maybeSingle();
   if (!aff || aff.active === false) return;           // unknown/inactive code → no attribution
   const base = round2(itemsSubtotal(payload) * (1 - await resolveDiscountRate(db, payload.promo)));
   const pct = Number(aff.commission_pct);
@@ -646,7 +651,7 @@ async function sendAffiliatePasswordSetup(env, db, email) {
   const clean = String(email || '').trim().toLowerCase();
   if (!clean) return { ok: true };
   const { data: aff } = await db.from('affiliates')
-    .select('id, user_id, active, name').ilike('email', clean).maybeSingle();
+    .select('id, user_id, active, name').ilike('email', likeEscape(clean)).maybeSingle();
   if (!aff || aff.active === false) return { ok: true }; // never leak non-affiliates
 
   // ensure a Supabase Auth user exists for this email (recovery links need one)
@@ -1744,7 +1749,10 @@ export default {
 
       return jsonResponse({ error: 'not found' }, { status: 404 }, env);
     } catch (e) {
-      return jsonResponse({ error: e.message }, { status: 500 }, env);
+      // Log the real error to Worker observability, but never return internal
+      // details (stack, DB messages) to the client.
+      console.error('order-api unhandled error:', (e && e.stack) || e);
+      return jsonResponse({ error: 'internal error' }, { status: 500 }, env);
     }
   },
 };
